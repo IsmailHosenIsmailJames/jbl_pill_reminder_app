@@ -43,6 +43,7 @@ dependencies:
   http: ^1.2.2
   dio: ^5.7.0
   icons_launcher: ^3.0.0
+  flutter_native_splash: ^2.4.3
 
 dev_dependencies:
   flutter_test:
@@ -111,3 +112,12 @@ icons_launcher:
       enable: true
     linux:
       enable: true
+
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/app_logo.jpg
+  android_12:
+    image: assets/app_logo.jpg
+    icon_background_color: "#ffffff"
+  web: true

@@ -7,10 +7,12 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await initializeService();
   await Alarm.init();
   runApp(const MyApp());
@@ -262,6 +264,7 @@ class _LogViewState extends State<LogView> {
 
   @override
   void initState() {
+    FlutterNativeSplash.remove();
     super.initState();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       final SharedPreferences sp = await SharedPreferences.getInstance();
