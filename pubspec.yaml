@@ -44,6 +44,13 @@ dependencies:
   dio: ^5.7.0
   icons_launcher: ^3.0.0
   flutter_native_splash: ^2.4.3
+  get: ^5.0.0-release-candidate-9.2.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.5
+  toastification: ^2.3.0
+  gap: ^3.0.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -103,14 +110,6 @@ icons_launcher:
     android:
       enable: true
     ios:
-      enable: true
-    web:
-      enable: true
-    macos:
-      enable: true
-    windows:
-      enable: true
-    linux:
       enable: true
 
 
