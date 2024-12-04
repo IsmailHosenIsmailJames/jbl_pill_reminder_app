@@ -11,6 +11,7 @@ InputDecoration textFieldInputDecoration({
     border: InputBorder.none,
     hintText: hint,
     labelText: label,
+    hintStyle: TextStyle(color: Colors.grey.shade600),
     alignLabelWithHint: true,
     floatingLabelAlignment: FloatingLabelAlignment.center,
     suffix: suffixIcon,

@@ -17,6 +17,10 @@ class JblPillReminderApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         themeMode: ThemeMode.light,
         theme: ThemeData.light().copyWith(
+          colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.light,
+            seedColor: MyAppColors.primaryColor,
+          ),
           textTheme: GoogleFonts.poppinsTextTheme(),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
