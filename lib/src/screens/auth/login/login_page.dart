@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/screens/auth/login/controller/login_page_controller.dart';
+import 'package:jbl_pill_reminder_app/src/screens/auth/signup/signup_page.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
-import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/intro_pages.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -146,7 +146,11 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 40,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(
+                          () => const SignupPage(),
+                        );
+                      },
                       child: const Text("Sign Up"),
                     ),
                   ),

@@ -35,6 +35,7 @@ class JblPillReminderApp extends StatelessWidget {
             ),
           ),
         ),
+        defaultTransition: Transition.leftToRight,
         onInit: () {
           FlutterNativeSplash.remove();
         },

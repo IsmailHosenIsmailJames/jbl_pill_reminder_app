@@ -1,3 +1,5 @@
 import 'package:get/get.dart';
 
-class SignupPageController extends GetxController {}
+class SignupPageController extends GetxController {
+  RxBool showPassword = false.obs;
+}
