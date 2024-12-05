@@ -219,12 +219,12 @@ class _SignupPageState extends State<SignupPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (formKey.currentState?.validate() == true) {
-                        bool isSuccessful = await signupControllerGetx.signUp(
+                        String? uuid = await signupControllerGetx.signUp(
                           name: textEditingControllerName.text,
                           phone: textEditingControllerPhone.text,
                           password: textEditingControllerPassword.text,
                         );
-                        if (isSuccessful) {
+                        if (uuid != null) {
                           Get.off(() => const HomePage());
                         }
                       }
