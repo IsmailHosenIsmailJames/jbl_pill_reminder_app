@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/screens/auth/signup/controller/signup_page_controller.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/home_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../theme/colors.dart';
@@ -58,19 +59,29 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
                 const Gap(20),
-                const Text(
-                  "Name",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                const Row(
+                  children: [
+                    Text(
+                      "Name",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      " *",
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(5),
                 // phone text field
                 customTextFieldDecoration(
                   textFormField: TextFormField(
                     controller: textEditingControllerName,
-                    keyboardType: TextInputType.phone,
+                    keyboardType: TextInputType.name,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: textFieldInputDecoration(
                       hint: "type your name here...",
@@ -189,7 +200,7 @@ class _SignupPageState extends State<SignupPage> {
                         }
                         if (textEditingControllerConfirmPassword.text !=
                             textEditingControllerPassword.text) {
-                          return "Password does not match";
+                          return "Confirm password does not match";
                         }
                         return null;
                       },
@@ -206,13 +217,16 @@ class _SignupPageState extends State<SignupPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (formKey.currentState?.validate() == true) {
-                        signupControllerGetx.signUp(
+                        bool isSuccessful = await signupControllerGetx.signUp(
                           name: textEditingControllerName.text,
                           phone: textEditingControllerPhone.text,
                           password: textEditingControllerPassword.text,
                         );
+                        if (isSuccessful) {
+                          Get.off(() => const HomePage());
+                        }
                       }
                     },
                     child: const Text(

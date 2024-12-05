@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 class LoginPageController extends GetxController {
   RxBool showPassword = true.obs;
 
-  void login({
+  Future<void> login({
     required String phone,
     required String password,
-  }) {
+  }) async {
     // TODO: implement login
   }
 }

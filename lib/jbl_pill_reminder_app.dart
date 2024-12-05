@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jbl_pill_reminder_app/src/data/check/auth_check.dart';
 import 'package:jbl_pill_reminder_app/src/screens/auth/login/login_page.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/home_page.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:toastification/toastification.dart';
@@ -39,7 +41,7 @@ class JblPillReminderApp extends StatelessWidget {
         onInit: () {
           FlutterNativeSplash.remove();
         },
-        home: const LoginPage(),
+        home: AuthCheck.isLoggedIn() ? const HomePage() : const LoginPage(),
       ),
     );
   }
