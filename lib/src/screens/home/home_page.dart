@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,14 +14,64 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pill Reminder"),
       ),
       drawer: const MyDrawer(),
-      body: const Center(
-        child: Text("data"),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () async {
+            // LocalNotifications.flutterLocalNotificationsPlugin.show(
+            //   1,
+            //   "Hello BOOOOOOS",
+            //   "Do you want to join with us...",
+            //   const NotificationDetails(
+            //     android: AndroidNotificationDetails(
+            //       'channel id',
+            //       'channel name',
+            //       actions: [
+            //         AndroidNotificationAction(
+            //           'id 1',
+            //           'Yes',
+            //           titleColor: Colors.green,
+            //         ),
+            //         AndroidNotificationAction(
+            //           'id 2',
+            //           'No',
+            //           titleColor: Colors.red,
+            //         ),
+            //       ],
+            //       importance: Importance.max,
+            //     ),
+            //   ),
+            //   payload: jsonEncode({"key": "value"}),
+            // );
+
+            await SharedPrefs.prefs.setString(
+              "timestamp",
+              jsonEncode(
+                {
+                  "time": DateTime.now()
+                      .add(const Duration(seconds: 20))
+                      .millisecondsSinceEpoch,
+                  "isShown": false,
+                },
+              ),
+            );
+            log(DateTime.now()
+                .add(const Duration(seconds: 20))
+                .millisecondsSinceEpoch
+                .toString());
+          },
+          child: const Text("Local Notifications"),
+        ),
       ),
     );
   }
