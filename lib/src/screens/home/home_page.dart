@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +15,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Pill Reminder"),
       ),
-      drawer: const Drawer(),
+      drawer: const MyDrawer(),
       body: const Center(
         child: Text("data"),
       ),
