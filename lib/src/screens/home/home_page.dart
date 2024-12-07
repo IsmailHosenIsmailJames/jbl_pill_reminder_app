@@ -26,51 +26,49 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: const MyDrawer(),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            // LocalNotifications.flutterLocalNotificationsPlugin.show(
-            //   1,
-            //   "Hello BOOOOOOS",
-            //   "Do you want to join with us...",
-            //   const NotificationDetails(
-            //     android: AndroidNotificationDetails(
-            //       'channel id',
-            //       'channel name',
-            //       actions: [
-            //         AndroidNotificationAction(
-            //           'id 1',
-            //           'Yes',
-            //           titleColor: Colors.green,
-            //         ),
-            //         AndroidNotificationAction(
-            //           'id 2',
-            //           'No',
-            //           titleColor: Colors.red,
-            //         ),
-            //       ],
-            //       importance: Importance.max,
-            //     ),
-            //   ),
-            //   payload: jsonEncode({"key": "value"}),
-            // );
-
-            await SharedPrefs.prefs.setString(
-              "timestamp",
-              jsonEncode(
-                {
-                  "time": DateTime.now()
-                      .add(const Duration(seconds: 20))
-                      .millisecondsSinceEpoch,
-                  "isShown": false,
-                },
-              ),
-            );
-            log(DateTime.now()
-                .add(const Duration(seconds: 20))
-                .millisecondsSinceEpoch
-                .toString());
-          },
-          child: const Text("Local Notifications"),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                await SharedPrefs.prefs.setString(
+                  "timestamp",
+                  jsonEncode(
+                    {
+                      "time": DateTime.now()
+                          .add(const Duration(seconds: 20))
+                          .millisecondsSinceEpoch,
+                      "isShown": false,
+                    },
+                  ),
+                );
+                log(DateTime.now()
+                    .add(const Duration(seconds: 20))
+                    .millisecondsSinceEpoch
+                    .toString());
+              },
+              child: const Text("Local Notifications"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await SharedPrefs.prefs.setString(
+                  "timestamp",
+                  jsonEncode(
+                    {
+                      "time": DateTime.now()
+                          .add(const Duration(seconds: 20))
+                          .millisecondsSinceEpoch,
+                      "isShown": false,
+                    },
+                  ),
+                );
+                log(DateTime.now()
+                    .add(const Duration(seconds: 20))
+                    .millisecondsSinceEpoch
+                    .toString());
+              },
+              child: const Text("Local Notifications"),
+            ),
+          ],
         ),
       ),
     );

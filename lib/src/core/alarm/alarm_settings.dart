@@ -5,7 +5,7 @@ import 'package:alarm/alarm.dart';
 final alarmSettings = AlarmSettings(
   id: 42,
   dateTime: DateTime.now().add(const Duration(seconds: 30)),
-  assetAudioPath: 'assets/a1.mp3',
+  assetAudioPath: 'assets/shaking-pill-bottle.mp3',
   loopAudio: true,
   vibrate: true,
   volume: 0.8,
