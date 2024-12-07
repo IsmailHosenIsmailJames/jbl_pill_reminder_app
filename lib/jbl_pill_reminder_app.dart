@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,8 @@ import 'package:jbl_pill_reminder_app/src/screens/home/home_page.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:toastification/toastification.dart';
+
+import 'src/core/foreground_service/foreground_task_manager.dart';
 
 class JblPillReminderApp extends StatelessWidget {
   const JblPillReminderApp({super.key});
@@ -36,8 +40,16 @@ class JblPillReminderApp extends StatelessWidget {
           ),
         ),
         defaultTransition: Transition.leftToRight,
-        onInit: () {
+        onInit: () async {
           FlutterNativeSplash.remove();
+
+          if (await ForegroundTaskManager.isServiceRunning() == false) {
+            log("Form OnInit");
+            if (await ForegroundTaskManager.requestPermissions()) {
+              ForegroundTaskManager.initService();
+              await ForegroundTaskManager.startService();
+            }
+          }
         },
         home: const HomePage(),
       ),
