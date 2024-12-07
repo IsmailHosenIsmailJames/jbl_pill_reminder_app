@@ -43,11 +43,11 @@ class JblPillReminderApp extends StatelessWidget {
         onInit: () async {
           FlutterNativeSplash.remove();
 
-          if (await ForegroundTaskManager.isServiceRunning() == false) {
+          if (await isServiceRunning() == false) {
             log("Form OnInit");
-            if (await ForegroundTaskManager.requestPermissions()) {
-              ForegroundTaskManager.initService();
-              await ForegroundTaskManager.startService();
+            if (await requestPermissions()) {
+              initService();
+              await startService();
             }
           }
         },

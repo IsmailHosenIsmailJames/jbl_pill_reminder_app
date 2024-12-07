@@ -13,13 +13,13 @@ import 'src/core/foreground_service/foreground_task_manager.dart';
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterForegroundTask.initCommunicationPort();
-  if (await ForegroundTaskManager.checkPermissions()) {
-    log("Form main");
-    ForegroundTaskManager.initService();
-    await ForegroundTaskManager.startService();
-  }
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  FlutterForegroundTask.initCommunicationPort();
+  if (await checkPermissions()) {
+    log("Form main");
+    initService();
+    await startService();
+  }
 
   await SharedPrefs.init();
   await LocalNotifications.initializeService();

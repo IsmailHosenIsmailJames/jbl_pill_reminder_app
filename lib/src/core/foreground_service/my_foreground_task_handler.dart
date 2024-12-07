@@ -10,9 +10,11 @@ class MyForegroundTaskHandler extends TaskHandler {
 
     // Update notification content.
     FlutterForegroundTask.updateService(
-      notificationTitle: 'Hello MyTaskHandler :)',
-      notificationText: 'count: $_count',
-    );
+        notificationTitle: 'Hello MyTaskHandler :)',
+        notificationText: 'count: $_count',
+        notificationButtons: [
+          const NotificationButton(id: 'btn_hello', text: 'hello'),
+        ]);
 
     // Send data to main isolate.
     FlutterForegroundTask.sendDataToMain(_count);
