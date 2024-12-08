@@ -1,0 +1,44 @@
+{
+    "user": {
+        "id": "user_id",
+        "name": "user_name"
+    },
+    "medications": [
+        {
+            "id": "medication_id", // Unique ID for the medication
+            "title": "title_of_medication",
+            "medicines": [
+                {
+                    "id": "medicine_id", // Unique ID for the medicine
+                    "name": "name_of_medicine",
+                    "type": "pill, injection, capsule, etc.",
+                    "image_url": "url_of_medicine_image",
+                    "color": "#ffffff",
+                    "notes": "Notes specific to this medicine"
+                }
+            ],
+            "schedule": {
+                "start_date": "10-12-2024",
+                "end_date": "10-12-2025",
+                "frequency": {
+                    "type": "daily, weekly, monthly, yearly",
+                    "weekly": {
+                        "days": ["monday", "tuesday"]
+                    },
+                    "monthly": {
+                        "dates": [1, 15] // Days of the month
+                    },
+                    "yearly": {
+                        "dates": ["01-01-2025"] // Specific dates
+                    }
+                },
+                "times": ["10:00 AM", "8:00 PM"]
+            },
+            "prescription": {
+                "image_url": "url_of_prescription_image",
+                "notes": "Any notes related to the prescription"
+            }
+        }
+    ]
+}
+
