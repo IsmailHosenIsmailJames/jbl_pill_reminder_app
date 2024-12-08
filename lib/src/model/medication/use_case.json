@@ -1,7 +1,11 @@
 {
     "user": {
-        "id": "12345",
-        "name": "John Doe"
+        "id": "user_id",
+        "name": "user_name",
+        "email": "user_email",
+        "mobile": "user_mobile",
+        "age": "user_age",
+        "gender": "user_gender"
     },
     "medications": [
         {

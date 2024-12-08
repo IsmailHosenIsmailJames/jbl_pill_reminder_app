@@ -1,15 +1,19 @@
 {
     "user": {
         "id": "user_id",
-        "name": "user_name"
+        "name": "user_name",
+        "email": "user_email",
+        "mobile": "user_mobile",
+        "age": "user_age",
+        "gender": "user_gender"
     },
     "medications": [
         {
-            "id": "medication_id", // Unique ID for the medication
+            "id": "medication_id", 
             "title": "title_of_medication",
             "medicines": [
                 {
-                    "id": "medicine_id", // Unique ID for the medicine
+                    "id": "medicine_id", 
                     "name": "name_of_medicine",
                     "type": "pill, injection, capsule, etc.",
                     "image_url": "url_of_medicine_image",
@@ -26,10 +30,10 @@
                         "days": ["monday", "tuesday"]
                     },
                     "monthly": {
-                        "dates": [1, 15] // Days of the month
+                        "dates": [1, 15]
                     },
                     "yearly": {
-                        "dates": ["01-01-2025"] // Specific dates
+                        "dates": ["01-01-2025"] 
                     }
                 },
                 "times": ["10:00 AM", "8:00 PM"]

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
@@ -22,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final homeController = Get.put(HomeController());
+  final medicationController = Get.put(AddNewMedicationController());
 
   @override
   Widget build(BuildContext context) {
@@ -98,14 +101,21 @@ class _HomePageState extends State<HomePage> {
           Gap(5),
           Obx(
             () {
-              if (homeController.listOfMedications.isNotEmpty) {
+              if (homeController.listOfTodaysMedications.isNotEmpty) {
                 return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        Text("data"),
-                      ],
-                    ));
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(
+                      homeController.listOfTodaysMedications.length,
+                      (index) {
+                        return Text(
+                          homeController.listOfTodaysMedications[index]
+                              .toJson(),
+                        );
+                      },
+                    ),
+                  ),
+                );
               } else {
                 return Container(
                   height: 150,
@@ -146,13 +156,13 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: List<Widget>.generate(
-                      homeController.listOfMedicines.length,
+                      homeController.listOfAllMedications.length,
                       (index) {
                         return Text("data");
                       },
                     ) +
                     <Widget>[
-                      if (homeController.listOfMedicines.isEmpty)
+                      if (homeController.listOfAllMedications.isEmpty)
                         Container(
                           height: 150,
                           width: 100,
@@ -180,7 +190,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                             backgroundColor: MyAppColors.shadedMutedColor,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.to(() => AddNewMedication());
+                          },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
