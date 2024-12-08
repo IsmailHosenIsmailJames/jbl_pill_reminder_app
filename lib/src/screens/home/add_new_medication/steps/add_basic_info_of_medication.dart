@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
+import 'package:jbl_pill_reminder_app/src/widgets/textfieldinput_decoration.dart';
 
 class AddBasicInfoOfMedication extends StatefulWidget {
   const AddBasicInfoOfMedication({super.key});
@@ -41,8 +43,10 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ],
         ),
         Gap(5),
-        TextFormField(
-          decoration: InputDecoration(hintText: "type title here..."),
+        customTextFieldDecoration(
+          textFormField: TextFormField(
+            decoration: InputDecoration(hintText: "type title here..."),
+          ),
         ),
         Gap(15),
         Text(
@@ -53,9 +57,11 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ),
         ),
         Gap(5),
-        TextFormField(
-          decoration:
-              InputDecoration(hintText: "type reason here. e.g. headache"),
+        customTextFieldDecoration(
+          textFormField: TextFormField(
+            decoration:
+                InputDecoration(hintText: "type reason here. e.g. headache"),
+          ),
         ),
         Gap(15),
         Row(
@@ -82,7 +88,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           margin: const EdgeInsets.only(left: 10, top: 5, bottom: 5),
           padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: MyAppColors.shadedMutedColor,
+            color: MyAppColors.shadedGrey,
             borderRadius: BorderRadius.circular(borderRadius - 2),
           ),
           child: Column(
@@ -115,7 +121,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         ),
         Gap(5),
         OutlinedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            Get.to(() => AddNewMedicine());
+          },
           icon: Icon(
             FluentIcons.add_24_regular,
           ),
@@ -125,7 +133,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         Row(
           children: [
             Text(
-              "Add Photo",
+              "Add Prescription Photo",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
