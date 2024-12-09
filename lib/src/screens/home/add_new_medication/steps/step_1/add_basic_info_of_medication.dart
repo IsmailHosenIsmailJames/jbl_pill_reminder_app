@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
-import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/add_medicine.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/textfieldinput_decoration.dart';
