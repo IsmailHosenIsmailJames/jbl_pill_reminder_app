@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
+import 'package:jbl_pill_reminder_app/src/screens/camera/take_a_picture.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
@@ -28,6 +30,17 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
       text: medicationController.medications.value.reason);
   late TextEditingController medicationNotesController = TextEditingController(
       text: medicationController.medications.value.prescription?.notes);
+
+  late String? medicationPrescriptionImage =
+      medicationController.medications.value.prescription?.imageUrl;
+
+  @override
+  void dispose() {
+    medicationNotesController.dispose();
+    medicationReasonController.dispose();
+    medicationTitleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +125,10 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
               ),
             ),
             Gap(10),
-            Icon(FluentIcons.pill_24_regular),
+            Icon(
+              FluentIcons.pill_24_regular,
+              size: 18,
+            ),
           ],
         ),
         Container(
@@ -166,12 +182,21 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           label: Text("Add Medicine"),
         ),
         Gap(10),
-        Text(
-          "Notes",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          children: [
+            Text(
+              "Notes",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Gap(10),
+            Icon(
+              FluentIcons.note_24_regular,
+              size: 18,
+            )
+          ],
         ),
         Gap(5),
         customTextFieldDecoration(
@@ -207,27 +232,69 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             Gap(10),
             Icon(
               FluentIcons.image_add_24_regular,
+              size: 18,
             ),
           ],
         ),
         Gap(5),
         SizedBox(
-          height: 150,
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: MyAppColors.shadedMutedColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(borderRadius),
-              ),
-            ),
-            onPressed: () {},
-            child: Icon(
-              FluentIcons.image_add_24_regular,
-              size: 36,
-            ),
-          ),
+          height: medicationPrescriptionImage == null ? 150 : null,
+          child: medicationPrescriptionImage != null
+              ? Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        borderRadius,
+                      ),
+                      child: Image.file(
+                        File(medicationPrescriptionImage!),
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: TextButton.icon(
+                        onPressed: takeAPhotoOfPrescription,
+                        icon: Icon(
+                          FluentIcons.image_add_24_regular,
+                          size: 18,
+                        ),
+                        label: Text("Change"),
+                      ),
+                    ),
+                  ],
+                )
+              : TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: MyAppColors.shadedMutedColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                    ),
+                  ),
+                  onPressed: takeAPhotoOfPrescription,
+                  child: Icon(
+                    FluentIcons.image_add_24_regular,
+                    size: 36,
+                  ),
+                ),
         ),
+        Gap(20),
       ],
     );
+  }
+
+  takeAPhotoOfPrescription() async {
+    String? imagePath = await Get.to(
+      () => TakeAPicture(),
+    );
+    if (imagePath != null) {
+      setState(() {
+        medicationPrescriptionImage = imagePath;
+        medicationController.medications.value.prescription = Prescription(
+          imageUrl: medicationPrescriptionImage,
+          notes: medicationController.medications.value.prescription?.notes,
+        );
+      });
+    }
   }
 }
