@@ -1,22 +1,37 @@
-import 'package:jbl_pill_reminder_app/src/model/user/user_model.dart';
 import 'dart:convert';
 
 class MedicationModel {
-  User user;
-  List<Medication> medications;
+  String? id;
+  String? title;
+  String? reason;
+  List<Medicine>? medicines;
+  Schedule? schedule;
+  Prescription? prescription;
 
   MedicationModel({
-    required this.user,
-    required this.medications,
+    this.id,
+    this.title,
+    this.reason,
+    this.medicines,
+    this.schedule,
+    this.prescription,
   });
 
   MedicationModel copyWith({
-    User? user,
-    List<Medication>? medications,
+    String? id,
+    String? title,
+    String? reason,
+    List<Medicine>? medicines,
+    Schedule? schedule,
+    Prescription? prescription,
   }) =>
       MedicationModel(
-        user: user ?? this.user,
-        medications: medications ?? this.medications,
+        id: id ?? this.id,
+        title: title ?? this.title,
+        reason: reason ?? this.reason,
+        medicines: medicines ?? this.medicines,
+        schedule: schedule ?? this.schedule,
+        prescription: prescription ?? this.prescription,
       );
 
   factory MedicationModel.fromJson(String str) =>
@@ -25,85 +40,48 @@ class MedicationModel {
   String toJson() => json.encode(toMap());
 
   factory MedicationModel.fromMap(Map<String, dynamic> json) => MedicationModel(
-        user: User.fromMap(json["user"]),
-        medications: List<Medication>.from(
-            json["medications"].map((x) => Medication.fromMap(x))),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "user": user.toMap(),
-        "medications": List<dynamic>.from(medications.map((x) => x.toMap())),
-      };
-}
-
-class Medication {
-  String id;
-  String title;
-  List<Medicine> medicines;
-  Schedule schedule;
-  Prescription prescription;
-
-  Medication({
-    required this.id,
-    required this.title,
-    required this.medicines,
-    required this.schedule,
-    required this.prescription,
-  });
-
-  Medication copyWith({
-    String? id,
-    String? title,
-    List<Medicine>? medicines,
-    Schedule? schedule,
-    Prescription? prescription,
-  }) =>
-      Medication(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        medicines: medicines ?? this.medicines,
-        schedule: schedule ?? this.schedule,
-        prescription: prescription ?? this.prescription,
-      );
-
-  factory Medication.fromJson(String str) =>
-      Medication.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Medication.fromMap(Map<String, dynamic> json) => Medication(
         id: json["id"],
         title: json["title"],
-        medicines: List<Medicine>.from(
-            json["medicines"].map((x) => Medicine.fromMap(x))),
-        schedule: Schedule.fromMap(json["schedule"]),
-        prescription: Prescription.fromMap(json["prescription"]),
+        reason: json["reason"],
+        medicines: json["medicines"] == null
+            ? []
+            : List<Medicine>.from(
+                json["medicines"]!.map((x) => Medicine.fromMap(x))),
+        schedule: json["schedule"] == null
+            ? null
+            : Schedule.fromMap(json["schedule"]),
+        prescription: json["prescription"] == null
+            ? null
+            : Prescription.fromMap(json["prescription"]),
       );
 
   Map<String, dynamic> toMap() => {
         "id": id,
         "title": title,
-        "medicines": List<dynamic>.from(medicines.map((x) => x.toMap())),
-        "schedule": schedule.toMap(),
-        "prescription": prescription.toMap(),
+        "reason": reason,
+        "medicines": medicines == null
+            ? []
+            : List<dynamic>.from(medicines!.map((x) => x.toMap())),
+        "schedule": schedule?.toMap(),
+        "prescription": prescription?.toMap(),
       };
 }
 
 class Medicine {
-  String id;
-  String name;
-  String type;
-  String imageUrl;
-  String color;
-  String notes;
+  String? id;
+  String? name;
+  String? type;
+  String? imageUrl;
+  String? color;
+  String? notes;
 
   Medicine({
-    required this.id,
-    required this.name,
-    required this.type,
-    required this.imageUrl,
-    required this.color,
-    required this.notes,
+    this.id,
+    this.name,
+    this.type,
+    this.imageUrl,
+    this.color,
+    this.notes,
   });
 
   Medicine copyWith({
@@ -147,12 +125,12 @@ class Medicine {
 }
 
 class Prescription {
-  String imageUrl;
-  String notes;
+  String? imageUrl;
+  String? notes;
 
   Prescription({
-    required this.imageUrl,
-    required this.notes,
+    this.imageUrl,
+    this.notes,
   });
 
   Prescription copyWith({
@@ -181,16 +159,16 @@ class Prescription {
 }
 
 class Schedule {
-  String startDate;
-  String endDate;
-  Frequency frequency;
-  List<String> times;
+  String? startDate;
+  String? endDate;
+  Frequency? frequency;
+  List<String>? times;
 
   Schedule({
-    required this.startDate,
-    required this.endDate,
-    required this.frequency,
-    required this.times,
+    this.startDate,
+    this.endDate,
+    this.frequency,
+    this.times,
   });
 
   Schedule copyWith({
@@ -213,29 +191,33 @@ class Schedule {
   factory Schedule.fromMap(Map<String, dynamic> json) => Schedule(
         startDate: json["start_date"],
         endDate: json["end_date"],
-        frequency: Frequency.fromMap(json["frequency"]),
-        times: List<String>.from(json["times"].map((x) => x)),
+        frequency: json["frequency"] == null
+            ? null
+            : Frequency.fromMap(json["frequency"]),
+        times: json["times"] == null
+            ? []
+            : List<String>.from(json["times"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
         "start_date": startDate,
         "end_date": endDate,
-        "frequency": frequency.toMap(),
-        "times": List<dynamic>.from(times.map((x) => x)),
+        "frequency": frequency?.toMap(),
+        "times": times == null ? [] : List<dynamic>.from(times!.map((x) => x)),
       };
 }
 
 class Frequency {
-  String type;
-  Weekly weekly;
-  Monthly monthly;
-  Yearly yearly;
+  String? type;
+  Weekly? weekly;
+  Monthly? monthly;
+  Yearly? yearly;
 
   Frequency({
-    required this.type,
-    required this.weekly,
-    required this.monthly,
-    required this.yearly,
+    this.type,
+    this.weekly,
+    this.monthly,
+    this.yearly,
   });
 
   Frequency copyWith({
@@ -257,24 +239,25 @@ class Frequency {
 
   factory Frequency.fromMap(Map<String, dynamic> json) => Frequency(
         type: json["type"],
-        weekly: Weekly.fromMap(json["weekly"]),
-        monthly: Monthly.fromMap(json["monthly"]),
-        yearly: Yearly.fromMap(json["yearly"]),
+        weekly: json["weekly"] == null ? null : Weekly.fromMap(json["weekly"]),
+        monthly:
+            json["monthly"] == null ? null : Monthly.fromMap(json["monthly"]),
+        yearly: json["yearly"] == null ? null : Yearly.fromMap(json["yearly"]),
       );
 
   Map<String, dynamic> toMap() => {
         "type": type,
-        "weekly": weekly.toMap(),
-        "monthly": monthly.toMap(),
-        "yearly": yearly.toMap(),
+        "weekly": weekly?.toMap(),
+        "monthly": monthly?.toMap(),
+        "yearly": yearly?.toMap(),
       };
 }
 
 class Monthly {
-  List<int> dates;
+  List<int>? dates;
 
   Monthly({
-    required this.dates,
+    this.dates,
   });
 
   Monthly copyWith({
@@ -289,19 +272,21 @@ class Monthly {
   String toJson() => json.encode(toMap());
 
   factory Monthly.fromMap(Map<String, dynamic> json) => Monthly(
-        dates: List<int>.from(json["dates"].map((x) => x)),
+        dates: json["dates"] == null
+            ? []
+            : List<int>.from(json["dates"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        "dates": List<dynamic>.from(dates.map((x) => x)),
+        "dates": dates == null ? [] : List<dynamic>.from(dates!.map((x) => x)),
       };
 }
 
 class Weekly {
-  List<String> days;
+  List<String>? days;
 
   Weekly({
-    required this.days,
+    this.days,
   });
 
   Weekly copyWith({
@@ -316,19 +301,21 @@ class Weekly {
   String toJson() => json.encode(toMap());
 
   factory Weekly.fromMap(Map<String, dynamic> json) => Weekly(
-        days: List<String>.from(json["days"].map((x) => x)),
+        days: json["days"] == null
+            ? []
+            : List<String>.from(json["days"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        "days": List<dynamic>.from(days.map((x) => x)),
+        "days": days == null ? [] : List<dynamic>.from(days!.map((x) => x)),
       };
 }
 
 class Yearly {
-  List<String> dates;
+  List<String>? dates;
 
   Yearly({
-    required this.dates,
+    this.dates,
   });
 
   Yearly copyWith({
@@ -343,10 +330,12 @@ class Yearly {
   String toJson() => json.encode(toMap());
 
   factory Yearly.fromMap(Map<String, dynamic> json) => Yearly(
-        dates: List<String>.from(json["dates"].map((x) => x)),
+        dates: json["dates"] == null
+            ? []
+            : List<String>.from(json["dates"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        "dates": List<dynamic>.from(dates.map((x) => x)),
+        "dates": dates == null ? [] : List<dynamic>.from(dates!.map((x) => x)),
       };
 }

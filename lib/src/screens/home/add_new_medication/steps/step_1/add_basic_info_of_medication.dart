@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
@@ -19,8 +22,16 @@ class AddBasicInfoOfMedication extends StatefulWidget {
 class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
   final medicationController = Get.put(AddNewMedicationController());
 
+  late TextEditingController medicationTitleController =
+      TextEditingController(text: medicationController.medications.value.title);
+  late TextEditingController medicationReasonController = TextEditingController(
+      text: medicationController.medications.value.reason);
+  late TextEditingController medicationNotesController = TextEditingController(
+      text: medicationController.medications.value.prescription?.notes);
+
   @override
   Widget build(BuildContext context) {
+    log(medicationController.medications.value.toJson().toString());
     return ListView(
       padding: EdgeInsets.all(10),
       children: [
@@ -45,6 +56,16 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         Gap(5),
         customTextFieldDecoration(
           textFormField: TextFormField(
+            controller: medicationTitleController,
+            validator: (medicationTitle) {
+              if (medicationTitle == null || medicationTitle.isEmpty) {
+                return "Medication title can't ne empty";
+              }
+              return null;
+            },
+            onChanged: (medicationTitle) {
+              medicationController.medications.value.title = medicationTitle;
+            },
             decoration: InputDecoration(hintText: "type title here..."),
           ),
         ),
@@ -59,6 +80,16 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         Gap(5),
         customTextFieldDecoration(
           textFormField: TextFormField(
+            controller: medicationReasonController,
+            validator: (medicationReason) {
+              if (medicationReason == null || medicationReason.isEmpty) {
+                return "Medication reason can't ne empty";
+              }
+              return null;
+            },
+            onChanged: (medicationReason) {
+              medicationController.medications.value.reason = medicationReason;
+            },
             decoration:
                 InputDecoration(hintText: "type reason here. e.g. headache"),
           ),
@@ -93,7 +124,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ),
           child: Column(
             children: <Widget>[
-                  if (medicationController.medications.isEmpty)
+                  if (medicationController
+                          .medications.value.medicines?.isEmpty ==
+                      true)
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -105,13 +138,16 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                     ),
                 ] +
                 List<Widget>.generate(
-                  medicationController.medications.length,
+                  medicationController.medications.value.medicines?.length ?? 0,
                   (index) {
                     return Row(
                       children: [
                         Icon(FluentIcons.pill_24_regular),
                         Text(
-                          medicationController.medications[index].toJson(),
+                          medicationController
+                                  .medications.value.medicines?[index]
+                                  .toJson() ??
+                              "Empty",
                         ),
                       ],
                     );
@@ -128,6 +164,35 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             FluentIcons.add_24_regular,
           ),
           label: Text("Add Medicine"),
+        ),
+        Gap(10),
+        Text(
+          "Notes",
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Gap(5),
+        customTextFieldDecoration(
+          textFormField: TextFormField(
+            controller: medicationNotesController,
+            validator: (medicationNotes) {
+              if (medicationNotes == null || medicationNotes.isEmpty) {
+                return "Medication title can't ne empty";
+              }
+              return null;
+            },
+            onChanged: (medicationNotes) {
+              medicationController.medications.value.prescription =
+                  Prescription(
+                imageUrl: medicationController
+                    .medications.value.prescription?.imageUrl,
+                notes: medicationNotes,
+              );
+            },
+            decoration: InputDecoration(hintText: "type title here..."),
+          ),
         ),
         Gap(10),
         Row(
