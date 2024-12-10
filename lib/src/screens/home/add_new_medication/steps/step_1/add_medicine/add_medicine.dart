@@ -289,8 +289,10 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                       }
                     }
                   },
-                  icon: Icon(FluentIcons.add_24_regular),
-                  label: Text("Add"),
+                  icon: Icon(widget.index == null
+                      ? FluentIcons.add_24_regular
+                      : Icons.done),
+                  label: Text(widget.index == null ? "Add" : "Save Changes"),
                 ),
               ),
               Gap(20),

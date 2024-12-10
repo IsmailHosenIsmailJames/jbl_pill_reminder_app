@@ -21,7 +21,11 @@ class _TakeAPictureState extends State<TakeAPicture> {
   @override
   void initState() {
     super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.high);
+    controller = CameraController(
+      cameras[0],
+      ResolutionPreset.medium,
+      enableAudio: false,
+    );
     controller.initialize().then((_) {
       if (!mounted) {
         return;

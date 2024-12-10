@@ -228,6 +228,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                                     Get.to(
                                       () => AddNewMedicine(
                                         medicine: current!,
+                                        index: index,
                                       ),
                                     );
                                   },
