@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/camera/take_a_picture.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
-import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/textfieldinput_decoration.dart';
@@ -131,50 +131,129 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             ),
           ],
         ),
-        Container(
-          margin: const EdgeInsets.only(left: 10, top: 5, bottom: 5),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: MyAppColors.shadedGrey,
-            borderRadius: BorderRadius.circular(borderRadius - 2),
-          ),
-          child: Column(
-            children: <Widget>[
-                  if (medicationController
-                          .medications.value.medicines?.isEmpty ==
-                      true)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "No medicine added yet",
-                        style: TextStyle(
-                          color: Colors.grey,
+        Obx(
+          () => Container(
+            margin: const EdgeInsets.only(left: 10, top: 5, bottom: 5),
+            padding: EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: MyAppColors.shadedGrey,
+              borderRadius: BorderRadius.circular(borderRadius - 2),
+            ),
+            child: Column(
+              children: <Widget>[
+                    if ((medicationController.medications.value.medicines ?? [])
+                            .isEmpty ==
+                        true)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "No medicine added yet",
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-                ] +
-                List<Widget>.generate(
-                  medicationController.medications.value.medicines?.length ?? 0,
-                  (index) {
-                    return Row(
-                      children: [
-                        Icon(FluentIcons.pill_24_regular),
-                        Text(
-                          medicationController
-                                  .medications.value.medicines?[index]
-                                  .toJson() ??
-                              "Empty",
+                  ] +
+                  List<Widget>.generate(
+                    medicationController.medications.value.medicines?.length ??
+                        0,
+                    (index) {
+                      final current = medicationController
+                          .medications.value.medicines?[index];
+                      return Container(
+                        padding: const EdgeInsets.only(top: 2, bottom: 2),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: index == 0
+                                ? BorderSide.none
+                                : BorderSide(
+                                    color: Colors.grey.shade400,
+                                  ),
+                          ),
                         ),
-                      ],
-                    );
-                  },
-                ),
+                        child: Stack(
+                          children: [
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 15,
+                                    child: Text((index + 1).toString()),
+                                  ),
+                                  Gap(10),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(current?.name ?? ""),
+                                          Gap(5),
+                                          Text(
+                                            "( ${current?.type ?? ""})",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (current?.notes != null)
+                                        Text(
+                                          current?.notes ?? "",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: SizedBox(
+                                height: 30,
+                                width: 30,
+                                child: IconButton(
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: MyAppColors.primaryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    Get.to(
+                                      () => AddNewMedicine(
+                                        medicine: current!,
+                                      ),
+                                    );
+                                  },
+                                  icon: Icon(
+                                    Icons.navigate_next_rounded,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+            ),
           ),
         ),
         Gap(5),
         OutlinedButton.icon(
           onPressed: () {
-            Get.to(() => AddNewMedicine());
+            Get.to(
+              () => AddNewMedicine(
+                medicine: Medicine(),
+              ),
+            );
           },
           icon: Icon(
             FluentIcons.add_24_regular,
@@ -185,7 +264,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         Row(
           children: [
             Text(
-              "Notes",
+              "Note",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -202,12 +281,6 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         customTextFieldDecoration(
           textFormField: TextFormField(
             controller: medicationNotesController,
-            validator: (medicationNotes) {
-              if (medicationNotes == null || medicationNotes.isEmpty) {
-                return "Medication title can't ne empty";
-              }
-              return null;
-            },
             onChanged: (medicationNotes) {
               medicationController.medications.value.prescription =
                   Prescription(
@@ -285,7 +358,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
 
   takeAPhotoOfPrescription() async {
     String? imagePath = await Get.to(
-      () => TakeAPicture(),
+      () => TakeAPicture(
+        title: "Take picture of prescription",
+      ),
     );
     if (imagePath != null) {
       setState(() {

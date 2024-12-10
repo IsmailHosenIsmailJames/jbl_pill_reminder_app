@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/main.dart';
+import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:path_provider/path_provider.dart';
 
 class TakeAPicture extends StatefulWidget {
@@ -20,7 +21,7 @@ class _TakeAPictureState extends State<TakeAPicture> {
   @override
   void initState() {
     super.initState();
-    controller = CameraController(cameras[0], ResolutionPreset.medium);
+    controller = CameraController(cameras[0], ResolutionPreset.high);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -46,20 +47,16 @@ class _TakeAPictureState extends State<TakeAPicture> {
         return;
       }
 
-      // Ensure the camera is not taking another photo.
       if (controller.value.isTakingPicture) {
         return;
       }
 
-      // Capture the photo
       final XFile file = await controller.takePicture();
 
-      // Get the app's data directory
       final Directory appDir = await getApplicationDocumentsDirectory();
       final String filePath =
           '${appDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      // Save the captured photo to the app's data directory
       File savedImage = File(filePath);
       savedImage = await savedImage.writeAsBytes(await file.readAsBytes());
       Get.back(result: savedImage.path);
@@ -83,20 +80,29 @@ class _TakeAPictureState extends State<TakeAPicture> {
       appBar: AppBar(
         title: Text(widget.title ?? "Take picture"),
       ),
-      body: Column(
+      body: Stack(
         children: [
           AspectRatio(
             aspectRatio: 1 / controller.value.aspectRatio,
             child: CameraPreview(controller),
           ),
-          SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ElevatedButton.icon(
-                onPressed: takePhoto,
-                icon: const Icon(Icons.camera),
-                label: const Text('Capture Photo'),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(borderRadius),
+                    ),
+                  ),
+                  onPressed: takePhoto,
+                  icon: const Icon(Icons.camera),
+                  label: const Text('Capture Photo'),
+                ),
               ),
             ),
           ),
