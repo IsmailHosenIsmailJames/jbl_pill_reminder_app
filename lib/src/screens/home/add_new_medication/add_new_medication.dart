@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
+import 'package:jbl_pill_reminder_app/src/resources/keys.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_basic_info_of_medication.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
@@ -110,12 +111,12 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                           final sharedPrefs = SharedPrefs.prefs;
                           await sharedPrefs.reload();
                           List<String>? allMedication =
-                              sharedPrefs.getStringList("all_medication");
+                              sharedPrefs.getStringList(allPrescriptionKey);
                           allMedication ??= [];
                           allMedication.add(medication.toJson());
                           log("Going to save : $allMedication");
                           await sharedPrefs.setStringList(
-                              "all_medication", allMedication);
+                              allPrescriptionKey, allMedication);
                           final HomeController homeController = Get.find();
                           List<MedicationModel> allMedicationModel = [];
                           for (var element in allMedication) {

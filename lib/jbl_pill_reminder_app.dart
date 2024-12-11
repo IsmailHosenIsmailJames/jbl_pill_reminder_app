@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
+import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
+import 'package:jbl_pill_reminder_app/src/resources/keys.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/home_page.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
@@ -62,6 +66,7 @@ class JblPillReminderApp extends StatelessWidget {
         ),
         defaultTransition: Transition.leftToRight,
         onInit: () async {
+          final homeController = Get.put(HomeController());
           FlutterNativeSplash.remove();
 
           if (await isServiceRunning() == false) {
@@ -69,6 +74,15 @@ class JblPillReminderApp extends StatelessWidget {
             if (await requestPermissions()) {
               initService();
               await startService();
+            }
+          }
+          List<String>? allPrescription =
+              SharedPrefs.prefs.getStringList(allPrescriptionKey);
+          if (allPrescription != null) {
+            for (String prescription in allPrescription) {
+              homeController.listOfAllMedications.add(
+                MedicationModel.fromJson(prescription),
+              );
             }
           }
         },

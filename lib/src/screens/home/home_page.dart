@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
+import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
@@ -85,15 +87,12 @@ class _HomePageState extends State<HomePage> {
           ),
           const Gap(20),
           Obx(
-            () => Text(
-              isSameDay(homeController.selectedDay.value, DateTime.now()) ==
+            () => getTitlesForFields(
+              title: isSameDay(
+                          homeController.selectedDay.value, DateTime.now()) ==
                       true
                   ? "Today's Medication"
                   : "Medication on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
             ),
           ),
           const Gap(5),
@@ -141,12 +140,8 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const Gap(20),
-          const Text(
-            "All Medications",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+          getTitlesForFields(
+            title: "All Medications",
           ),
           const Gap(5),
           Obx(
@@ -156,13 +151,89 @@ class _HomePageState extends State<HomePage> {
                 children: List<Widget>.generate(
                       homeController.listOfAllMedications.length,
                       (index) {
-                        return const Text("data");
+                        MedicationModel current =
+                            homeController.listOfAllMedications[index];
+                        return Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.only(
+                              right: 10, top: 5, bottom: 5),
+                          height: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            color: MyAppColors.shadedMutedColor,
+                            borderRadius: BorderRadius.circular(
+                              borderRadius,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Title: ${current.title ?? ""}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Divider(
+                                height: 2,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                  "Start: ${DateFormat.yMMMMd().format(current.schedule!.startDate!)}"),
+                              const Divider(
+                                height: 2,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                  "End: ${DateFormat.yMMMMd().format(current.schedule!.endDate!)}"),
+                              const Divider(
+                                height: 2,
+                                color: Colors.white,
+                              ),
+                              if (current.reason != null)
+                                Text("Reason: ${current.reason ?? ""}"),
+                              if (current.reason != null)
+                                const Divider(
+                                  height: 2,
+                                  color: Colors.white,
+                                ),
+                              Text(
+                                "${current.medicines?.length.toString() ?? "0"} Medicines",
+                              ),
+                              const Divider(
+                                height: 2,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "Frequency: ${current.schedule?.frequency?.type}",
+                              ),
+                              const Divider(
+                                height: 2,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "Alarm: ${current.schedule?.times?.length}",
+                              ),
+                              if (current.schedule?.notes != null)
+                                const Divider(
+                                  height: 2,
+                                  color: Colors.white,
+                                ),
+                              if (current.schedule?.notes != null)
+                                Text(
+                                  "Notes: ${current.schedule?.notes}",
+                                ),
+                            ],
+                          ),
+                        );
                       },
                     ) +
                     <Widget>[
                       if (homeController.listOfAllMedications.isEmpty)
                         Container(
-                          height: 150,
+                          height: 300,
                           width: 100,
                           padding: const EdgeInsets.all(5),
                           margin: const EdgeInsets.only(
@@ -179,7 +250,7 @@ class _HomePageState extends State<HomePage> {
                           child: const Text("Empty"),
                         ),
                       SizedBox(
-                        height: 150,
+                        height: 200,
                         width: 100,
                         child: TextButton(
                           style: TextButton.styleFrom(
