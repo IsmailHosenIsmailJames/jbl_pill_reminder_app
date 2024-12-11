@@ -435,8 +435,9 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      scheduleModel.times![index].clock
-                                          .toString(),
+                                      clockFormat(scheduleModel
+                                              .times![index].clock!)
+                                          .format(context),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
