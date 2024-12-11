@@ -34,11 +34,11 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: const MyDrawer(),
       body: ListView(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         children: [
           Obx(
             () => Container(
-              padding: EdgeInsets.all(2),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(borderRadius),
                 color: MyAppColors.shadedMutedColor,
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                   CalendarFormat.week: 'Week',
                 },
                 startingDayOfWeek: StartingDayOfWeek.saturday,
-                headerStyle: HeaderStyle(
+                headerStyle: const HeaderStyle(
                   headerPadding: EdgeInsets.zero,
                   headerMargin: EdgeInsets.only(bottom: 5),
                   rightChevronPadding: EdgeInsets.all(5),
@@ -85,20 +85,20 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          Gap(20),
+          const Gap(20),
           Obx(
             () => Text(
               isSameDay(homeController.selectedDay.value, DateTime.now()) ==
                       true
                   ? "Today's Medication"
                   : "Medication on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Gap(5),
+          const Gap(5),
           Obx(
             () {
               if (homeController.listOfTodaysMedications.isNotEmpty) {
@@ -122,14 +122,14 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     color: MyAppColors.shadedMutedColor,
                     borderRadius: BorderRadius.circular(borderRadius),
-                    image: DecorationImage(
+                    image: const DecorationImage(
                       image: AssetImage(
                         "assets/img/pills.png",
                       ),
                       opacity: 0.1,
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       "No medication for this day",
                       style: TextStyle(
@@ -142,15 +142,15 @@ class _HomePageState extends State<HomePage> {
               }
             },
           ),
-          Gap(20),
-          Text(
+          const Gap(20),
+          const Text(
             "All Medications",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
           ),
-          Gap(5),
+          const Gap(5),
           Obx(
             () => SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
                 children: List<Widget>.generate(
                       homeController.listOfAllMedications.length,
                       (index) {
-                        return Text("data");
+                        return const Text("data");
                       },
                     ) +
                     <Widget>[
@@ -166,10 +166,11 @@ class _HomePageState extends State<HomePage> {
                         Container(
                           height: 150,
                           width: 100,
-                          padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(right: 5, bottom: 5, top: 5),
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.only(
+                              right: 5, bottom: 5, top: 5),
                           decoration: BoxDecoration(
-                            image: DecorationImage(
+                            image: const DecorationImage(
                               image: AssetImage("assets/img/box_empty.png"),
                               opacity: 0.1,
                             ),
@@ -177,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(borderRadius),
                           ),
                           alignment: Alignment.center,
-                          child: Text("Empty"),
+                          child: const Text("Empty"),
                         ),
                       SizedBox(
                         height: 150,
@@ -191,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                             backgroundColor: MyAppColors.shadedMutedColor,
                           ),
                           onPressed: () {
-                            Get.to(() => AddNewMedication());
+                            Get.to(() => const AddNewMedication());
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -202,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                                 size: 30,
                                 color: MyAppColors.primaryColor,
                               ),
-                              Text(
+                              const Text(
                                 "Add new",
                                 style: TextStyle(
                                   fontSize: 16,

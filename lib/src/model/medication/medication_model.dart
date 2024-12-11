@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:jbl_pill_reminder_app/src/model/medication/shedule_model.dart';
+import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 
 class MedicationModel {
   String? id;

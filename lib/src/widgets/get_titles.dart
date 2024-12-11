@@ -7,20 +7,20 @@ Widget getTitlesForFields(
     children: [
       Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.bold,
         ),
       ),
       if (isFieldRequired)
-        Text(
+        const Text(
           " *",
           style: TextStyle(
             color: Colors.red,
             fontSize: 15,
           ),
         ),
-      Gap(10),
+      const Gap(10),
       if (icon != null)
         Icon(
           icon,

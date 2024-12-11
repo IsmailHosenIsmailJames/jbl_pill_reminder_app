@@ -48,10 +48,10 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
         child: Form(
           key: formKey,
           child: ListView(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             children: [
-              Gap(10),
-              Center(
+              const Gap(10),
+              const Center(
                 child: Text(
                   "Add New Medicine",
                   style: TextStyle(
@@ -60,14 +60,14 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                   ),
                 ),
               ),
-              Divider(),
-              Gap(10),
+              const Divider(),
+              const Gap(10),
               getTitlesForFields(
                 title: "Medicine Name",
                 isFieldRequired: true,
                 icon: FluentIcons.edit_24_regular,
               ),
-              Gap(5),
+              const Gap(5),
               customTextFieldDecoration(
                 textFormField: TextFormField(
                   controller: medicineNameController,
@@ -82,16 +82,16 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration:
-                      InputDecoration(hintText: "type medicine name..."),
+                      const InputDecoration(hintText: "type medicine name..."),
                 ),
               ),
-              Gap(10),
+              const Gap(10),
               getTitlesForFields(
                 title: "Medicine Type",
                 isFieldRequired: true,
                 icon: FluentIcons.select_all_on_24_regular,
               ),
-              Gap(5),
+              const Gap(5),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -100,7 +100,7 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                     (index) {
                       return Container(
                         height: 30,
-                        padding: EdgeInsets.only(right: 5),
+                        padding: const EdgeInsets.only(right: 5),
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -121,7 +121,7 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                             });
                           },
                           icon: medicine.type == medicineTypeList[index]
-                              ? Icon(
+                              ? const Icon(
                                   Icons.done,
                                   size: 18,
                                 )
@@ -135,13 +135,13 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                   ),
                 ),
               ),
-              Gap(5),
-              Gap(10),
+              const Gap(5),
+              const Gap(10),
               getTitlesForFields(
                 title: "Notes",
                 icon: FluentIcons.note_24_regular,
               ),
-              Gap(5),
+              const Gap(5),
               customTextFieldDecoration(
                 textFormField: TextFormField(
                   minLines: 1,
@@ -151,15 +151,16 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                     medicine.notes = value;
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: InputDecoration(hintText: "type notes here..."),
+                  decoration:
+                      const InputDecoration(hintText: "type notes here..."),
                 ),
               ),
-              Gap(10),
+              const Gap(10),
               getTitlesForFields(
                 title: "Add Photo of Medicine",
                 icon: FluentIcons.image_add_24_regular,
               ),
-              Gap(5),
+              const Gap(5),
               SizedBox(
                 height: medicine.imageUrl == null ? 150 : null,
                 child: medicine.imageUrl != null
@@ -178,11 +179,11 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                             height: 40,
                             child: TextButton.icon(
                               onPressed: takeAPhotoOfMedicine,
-                              icon: Icon(
+                              icon: const Icon(
                                 FluentIcons.image_add_24_regular,
                                 size: 18,
                               ),
-                              label: Text("Change"),
+                              label: const Text("Change"),
                             ),
                           ),
                         ],
@@ -195,13 +196,13 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                           ),
                         ),
                         onPressed: takeAPhotoOfMedicine,
-                        child: Icon(
+                        child: const Icon(
                           FluentIcons.image_add_24_regular,
                           size: 36,
                         ),
                       ),
               ),
-              Gap(20),
+              const Gap(20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -224,9 +225,9 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                       log("Not Validate");
                       if (medicine.type == null) {
                         toastification.show(
-                          title: Text("Please select medicine type"),
+                          title: const Text("Please select medicine type"),
                           type: ToastificationType.info,
-                          autoCloseDuration: Duration(seconds: 2),
+                          autoCloseDuration: const Duration(seconds: 2),
                         );
                       }
                     }
@@ -237,7 +238,7 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                   label: Text(widget.index == null ? "Add" : "Save Changes"),
                 ),
               ),
-              Gap(20),
+              const Gap(20),
             ],
           ),
         ),
@@ -264,7 +265,7 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
 
   takeAPhotoOfMedicine() async {
     String? imagePath = await Get.to(
-      () => TakeAPicture(
+      () => const TakeAPicture(
         title: "Take picture of prescription",
       ),
     );

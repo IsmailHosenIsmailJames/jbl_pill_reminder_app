@@ -42,7 +42,7 @@ class JblPillReminderApp extends StatelessWidget {
               side: BorderSide(
                 color: MyAppColors.primaryColor,
               ),
-              textStyle: TextStyle(
+              textStyle: const TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),

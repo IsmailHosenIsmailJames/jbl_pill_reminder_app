@@ -47,14 +47,14 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
   Widget build(BuildContext context) {
     log(medicationController.medications.value.toJson().toString());
     return ListView(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       children: [
         getTitlesForFields(
           title: "Medication Title",
           isFieldRequired: true,
           icon: FluentIcons.edit_24_regular,
         ),
-        Gap(5),
+        const Gap(5),
         customTextFieldDecoration(
           textFormField: TextFormField(
             controller: medicationTitleController,
@@ -67,15 +67,15 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             onChanged: (medicationTitle) {
               medicationController.medications.value.title = medicationTitle;
             },
-            decoration: InputDecoration(hintText: "type title here..."),
+            decoration: const InputDecoration(hintText: "type title here..."),
           ),
         ),
-        Gap(15),
+        const Gap(15),
         getTitlesForFields(
           title: "Medication Reason",
           icon: FluentIcons.edit_24_regular,
         ),
-        Gap(5),
+        const Gap(5),
         customTextFieldDecoration(
           textFormField: TextFormField(
             controller: medicationReasonController,
@@ -88,11 +88,11 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             onChanged: (medicationReason) {
               medicationController.medications.value.reason = medicationReason;
             },
-            decoration:
-                InputDecoration(hintText: "type reason here. e.g. headache"),
+            decoration: const InputDecoration(
+                hintText: "type reason here. e.g. headache"),
           ),
         ),
-        Gap(15),
+        const Gap(15),
         getTitlesForFields(
           title: "Add Medicines",
           isFieldRequired: true,
@@ -101,7 +101,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         Obx(
           () => Container(
             margin: const EdgeInsets.only(left: 10, top: 5, bottom: 5),
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: MyAppColors.shadedGrey,
               borderRadius: BorderRadius.circular(borderRadius - 2),
@@ -111,7 +111,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                     if ((medicationController.medications.value.medicines ?? [])
                             .isEmpty ==
                         true)
-                      Align(
+                      const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           "No medicine added yet",
@@ -148,7 +148,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                                     radius: 15,
                                     child: Text((index + 1).toString()),
                                   ),
-                                  Gap(10),
+                                  const Gap(10),
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
@@ -157,10 +157,10 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                                       Row(
                                         children: [
                                           Text(current?.name ?? ""),
-                                          Gap(5),
+                                          const Gap(5),
                                           Text(
                                             "( ${current?.type ?? ""})",
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 12,
                                             ),
                                           ),
@@ -199,7 +199,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                                       ),
                                     );
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.navigate_next_rounded,
                                     size: 20,
                                   ),
@@ -214,7 +214,7 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             ),
           ),
         ),
-        Gap(5),
+        const Gap(5),
         OutlinedButton.icon(
           onPressed: () {
             Get.to(
@@ -223,17 +223,17 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
               ),
             );
           },
-          icon: Icon(
+          icon: const Icon(
             FluentIcons.add_24_regular,
           ),
-          label: Text("Add Medicine"),
+          label: const Text("Add Medicine"),
         ),
-        Gap(10),
+        const Gap(10),
         getTitlesForFields(
           title: "Note",
           icon: FluentIcons.note_24_regular,
         ),
-        Gap(5),
+        const Gap(5),
         customTextFieldDecoration(
           textFormField: TextFormField(
             controller: medicationNotesController,
@@ -245,15 +245,15 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                 notes: medicationNotes,
               );
             },
-            decoration: InputDecoration(hintText: "type title here..."),
+            decoration: const InputDecoration(hintText: "type title here..."),
           ),
         ),
-        Gap(10),
+        const Gap(10),
         getTitlesForFields(
           title: "Add Prescription Photo",
           icon: FluentIcons.image_add_24_regular,
         ),
-        Gap(5),
+        const Gap(5),
         SizedBox(
           height: medicationPrescriptionImage == null ? 150 : null,
           child: medicationPrescriptionImage != null
@@ -272,11 +272,11 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                       height: 40,
                       child: TextButton.icon(
                         onPressed: takeAPhotoOfPrescription,
-                        icon: Icon(
+                        icon: const Icon(
                           FluentIcons.image_add_24_regular,
                           size: 18,
                         ),
-                        label: Text("Change"),
+                        label: const Text("Change"),
                       ),
                     ),
                   ],
@@ -289,20 +289,20 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                     ),
                   ),
                   onPressed: takeAPhotoOfPrescription,
-                  child: Icon(
+                  child: const Icon(
                     FluentIcons.image_add_24_regular,
                     size: 36,
                   ),
                 ),
         ),
-        Gap(20),
+        const Gap(20),
       ],
     );
   }
 
   takeAPhotoOfPrescription() async {
     String? imagePath = await Get.to(
-      () => TakeAPicture(
+      () => const TakeAPicture(
         title: "Take picture of prescription",
       ),
     );

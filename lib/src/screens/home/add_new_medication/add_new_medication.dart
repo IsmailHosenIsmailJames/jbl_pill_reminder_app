@@ -21,7 +21,7 @@ class _AddNewMedicationState extends State<AddNewMedication> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add New Medication"),
+        title: const Text("Add New Medication"),
       ),
       body: Column(
         children: [
@@ -29,8 +29,8 @@ class _AddNewMedicationState extends State<AddNewMedication> {
             child: PageView(
               controller: pageController,
               children: [
-                AddBasicInfoOfMedication(),
-                SetMedicationSchedule(),
+                const AddBasicInfoOfMedication(),
+                const SetMedicationSchedule(),
               ],
             ),
           ),
@@ -60,11 +60,11 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                   child: OutlinedButton(
                     onPressed: () {
                       pageController.previousPage(
-                        duration: Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 500),
                         curve: Curves.easeIn,
                       );
                     },
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
@@ -77,16 +77,16 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                     ),
                   ),
                 ),
-                Gap(20),
+                const Gap(20),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
                       pageController.nextPage(
-                        duration: Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 500),
                         curve: Curves.easeIn,
                       );
                     },
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Next Step"),

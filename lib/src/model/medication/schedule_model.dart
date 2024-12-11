@@ -4,7 +4,7 @@ class ScheduleModel {
   DateTime? startDate;
   DateTime? endDate;
   Frequency? frequency;
-  List<Time>? times;
+  List<TimeModel>? times;
   String? notes;
 
   ScheduleModel({
@@ -19,7 +19,7 @@ class ScheduleModel {
     DateTime? startDate,
     DateTime? endDate,
     Frequency? frequency,
-    List<Time>? times,
+    List<TimeModel>? times,
     String? notes,
   }) =>
       ScheduleModel(
@@ -46,7 +46,8 @@ class ScheduleModel {
             : Frequency.fromMap(json["frequency"]),
         times: json["times"] == null
             ? []
-            : List<Time>.from(json["times"]!.map((x) => Time.fromMap(x))),
+            : List<TimeModel>.from(
+                json["times"]!.map((x) => TimeModel.fromMap(x))),
         notes: json["notes"],
       );
 
@@ -205,33 +206,33 @@ class Yearly {
       };
 }
 
-class Time {
+class TimeModel {
   String? clock;
   String? when;
   String? notes;
 
-  Time({
+  TimeModel({
     this.clock,
     this.when,
     this.notes,
   });
 
-  Time copyWith({
+  TimeModel copyWith({
     String? clock,
     String? when,
     String? notes,
   }) =>
-      Time(
+      TimeModel(
         clock: clock ?? this.clock,
         when: when ?? this.when,
         notes: notes ?? this.notes,
       );
 
-  factory Time.fromJson(String str) => Time.fromMap(json.decode(str));
+  factory TimeModel.fromJson(String str) => TimeModel.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory Time.fromMap(Map<String, dynamic> json) => Time(
+  factory TimeModel.fromMap(Map<String, dynamic> json) => TimeModel(
         clock: json["clock"],
         when: json["when"],
         notes: json["notes"],
