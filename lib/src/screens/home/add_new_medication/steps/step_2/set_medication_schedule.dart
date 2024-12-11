@@ -10,13 +10,28 @@ class SetMedicationSchedule extends StatefulWidget {
 class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return ListView(
       padding: EdgeInsets.all(10),
-      child: Column(
-        children: [
-          Text("Schedule under dev"),
-        ],
-      ),
+      children: [
+        Row(
+          children: [
+            Text(
+              "Medication Title",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              " *",
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

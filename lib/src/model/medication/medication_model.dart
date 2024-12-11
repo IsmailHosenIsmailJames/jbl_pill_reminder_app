@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:jbl_pill_reminder_app/src/model/medication/shedule_model.dart';
+
 class MedicationModel {
   String? id;
   String? title;
   String? reason;
   List<Medicine>? medicines;
-  Schedule? schedule;
+  ScheduleModel? schedule;
   Prescription? prescription;
 
   MedicationModel({
@@ -22,7 +24,7 @@ class MedicationModel {
     String? title,
     String? reason,
     List<Medicine>? medicines,
-    Schedule? schedule,
+    ScheduleModel? schedule,
     Prescription? prescription,
   }) =>
       MedicationModel(
@@ -49,7 +51,7 @@ class MedicationModel {
                 json["medicines"]!.map((x) => Medicine.fromMap(x))),
         schedule: json["schedule"] == null
             ? null
-            : Schedule.fromMap(json["schedule"]),
+            : ScheduleModel.fromMap(json["schedule"]),
         prescription: json["prescription"] == null
             ? null
             : Prescription.fromMap(json["prescription"]),
@@ -155,55 +157,6 @@ class Prescription {
   Map<String, dynamic> toMap() => {
         "image_url": imageUrl,
         "notes": notes,
-      };
-}
-
-class Schedule {
-  String? startDate;
-  String? endDate;
-  Frequency? frequency;
-  List<String>? times;
-
-  Schedule({
-    this.startDate,
-    this.endDate,
-    this.frequency,
-    this.times,
-  });
-
-  Schedule copyWith({
-    String? startDate,
-    String? endDate,
-    Frequency? frequency,
-    List<String>? times,
-  }) =>
-      Schedule(
-        startDate: startDate ?? this.startDate,
-        endDate: endDate ?? this.endDate,
-        frequency: frequency ?? this.frequency,
-        times: times ?? this.times,
-      );
-
-  factory Schedule.fromJson(String str) => Schedule.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory Schedule.fromMap(Map<String, dynamic> json) => Schedule(
-        startDate: json["start_date"],
-        endDate: json["end_date"],
-        frequency: json["frequency"] == null
-            ? null
-            : Frequency.fromMap(json["frequency"]),
-        times: json["times"] == null
-            ? []
-            : List<String>.from(json["times"]!.map((x) => x)),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "start_date": startDate,
-        "end_date": endDate,
-        "frequency": frequency?.toMap(),
-        "times": times == null ? [] : List<dynamic>.from(times!.map((x) => x)),
       };
 }
 

@@ -9,11 +9,11 @@
     },
     "medications": [
         {
-            "id": "medication_id", 
+            "id": "medication_id",
             "title": "title_of_medication",
             "medicines": [
                 {
-                    "id": "medicine_id", 
+                    "id": "medicine_id",
                     "name": "name_of_medicine",
                     "type": "pill, injection, capsule, etc.",
                     "image_url": "url_of_medicine_image",
@@ -25,18 +25,37 @@
                 "start_date": "10-12-2024",
                 "end_date": "10-12-2025",
                 "frequency": {
-                    "type": "daily, weekly, monthly, yearly",
+                    "type": "daily, every_x_days, weekly, monthly, yearly",
                     "weekly": {
-                        "days": ["monday", "tuesday"]
+                        "days": [
+                            "monday",
+                            "tuesday"
+                        ]
                     },
                     "monthly": {
-                        "dates": [1, 15]
+                        "dates": [
+                            1,
+                            15
+                        ]
                     },
                     "yearly": {
-                        "dates": ["01-01-2025"] 
-                    }
+                        "dates": [
+                            "01-01-2025"
+                        ]
+                    },
+                    "every_x_days": 5
                 },
-                "times": ["10:00 AM", "8:00 PM"]
+                "times": [
+                    {
+                        "clock": "10:00 AM",
+                        "when": "before food, after food, with food or custom text"
+                    },
+                    {
+                        "clock": "8:00 PM",
+                        "when": "before food, after food, with food or custom text"
+                    }
+                ],
+                "notes": "Notes specific to this time"
             },
             "prescription": {
                 "image_url": "url_of_prescription_image",
@@ -45,4 +64,3 @@
         }
     ]
 }
-
