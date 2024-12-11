@@ -78,7 +78,7 @@ class _TakeAPictureState extends State<TakeAPicture> {
   @override
   Widget build(BuildContext context) {
     if (!controller.value.isInitialized) {
-      return Scaffold(body: const Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
       appBar: AppBar(
@@ -99,7 +99,7 @@ class _TakeAPictureState extends State<TakeAPicture> {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.white),
+                      side: const BorderSide(color: Colors.white),
                       borderRadius: BorderRadius.circular(borderRadius),
                     ),
                   ),

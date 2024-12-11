@@ -3,7 +3,6 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
-import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
@@ -24,7 +23,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   final homeController = Get.put(HomeController());
-  final medicationController = Get.put(AddNewMedicationController());
 
   @override
   Widget build(BuildContext context) {

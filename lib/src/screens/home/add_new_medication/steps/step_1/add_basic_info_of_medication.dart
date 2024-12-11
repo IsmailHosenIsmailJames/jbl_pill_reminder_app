@@ -79,12 +79,6 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
         customTextFieldDecoration(
           textFormField: TextFormField(
             controller: medicationReasonController,
-            validator: (medicationReason) {
-              if (medicationReason == null || medicationReason.isEmpty) {
-                return "Medication reason can't ne empty";
-              }
-              return null;
-            },
             onChanged: (medicationReason) {
               medicationController.medications.value.reason = medicationReason;
             },

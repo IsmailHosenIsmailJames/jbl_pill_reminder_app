@@ -21,14 +21,9 @@ class SetMedicationSchedule extends StatefulWidget {
 
 class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
   final medicationController = Get.put(AddNewMedicationController());
-  late ScheduleModel scheduleModel;
 
-  @override
-  void initState() {
-    scheduleModel =
-        medicationController.medications.value.schedule ?? ScheduleModel();
-    super.initState();
-  }
+  late ScheduleModel scheduleModel =
+      medicationController.medications.value.schedule ?? ScheduleModel();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +46,7 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
             ).then((value) {
               setState(() {
                 scheduleModel.startDate = value;
+                medicationController.medications.value.schedule = scheduleModel;
               });
             });
           },
@@ -80,6 +76,7 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
             ).then((value) {
               setState(() {
                 scheduleModel.endDate = value;
+                medicationController.medications.value.schedule = scheduleModel;
               });
             });
           },
@@ -373,7 +370,8 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
           ),
         const Gap(10),
         getTitlesForFields(
-          title: "Alarm Times",
+          title: "Alarm Time for Medicine",
+          isFieldRequired: true,
           icon: FluentIcons.clock_alarm_24_regular,
         ),
         const Gap(5),
