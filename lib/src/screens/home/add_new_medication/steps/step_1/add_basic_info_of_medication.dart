@@ -11,6 +11,7 @@ import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/contro
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine/add_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
+import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/textfieldinput_decoration.dart';
 
 class AddBasicInfoOfMedication extends StatefulWidget {
@@ -48,23 +49,10 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
     return ListView(
       padding: EdgeInsets.all(10),
       children: [
-        Row(
-          children: [
-            Text(
-              "Medication Title",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              " *",
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 15,
-              ),
-            ),
-          ],
+        getTitlesForFields(
+          title: "Medication Title",
+          isFieldRequired: true,
+          icon: FluentIcons.edit_24_regular,
         ),
         Gap(5),
         customTextFieldDecoration(
@@ -83,12 +71,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ),
         ),
         Gap(15),
-        Text(
-          "Medication Reason",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
+        getTitlesForFields(
+          title: "Medication Reason",
+          icon: FluentIcons.edit_24_regular,
         ),
         Gap(5),
         customTextFieldDecoration(
@@ -108,28 +93,10 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ),
         ),
         Gap(15),
-        Row(
-          children: [
-            Text(
-              "Add Medicines",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              " *",
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 15,
-              ),
-            ),
-            Gap(10),
-            Icon(
-              FluentIcons.pill_24_regular,
-              size: 18,
-            ),
-          ],
+        getTitlesForFields(
+          title: "Add Medicines",
+          isFieldRequired: true,
+          icon: FluentIcons.pill_24_regular,
         ),
         Obx(
           () => Container(
@@ -262,21 +229,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           label: Text("Add Medicine"),
         ),
         Gap(10),
-        Row(
-          children: [
-            Text(
-              "Note",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Gap(10),
-            Icon(
-              FluentIcons.note_24_regular,
-              size: 18,
-            )
-          ],
+        getTitlesForFields(
+          title: "Note",
+          icon: FluentIcons.note_24_regular,
         ),
         Gap(5),
         customTextFieldDecoration(
@@ -294,21 +249,9 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
           ),
         ),
         Gap(10),
-        Row(
-          children: [
-            Text(
-              "Add Prescription Photo",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Gap(10),
-            Icon(
-              FluentIcons.image_add_24_regular,
-              size: 18,
-            ),
-          ],
+        getTitlesForFields(
+          title: "Add Prescription Photo",
+          icon: FluentIcons.image_add_24_regular,
         ),
         Gap(5),
         SizedBox(

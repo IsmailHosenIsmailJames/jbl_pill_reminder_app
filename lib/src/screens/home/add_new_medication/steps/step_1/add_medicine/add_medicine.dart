@@ -9,6 +9,7 @@ import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart
 import 'package:jbl_pill_reminder_app/src/screens/camera/take_a_picture.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
+import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/textfieldinput_decoration.dart';
 import 'package:toastification/toastification.dart';
 
@@ -60,28 +61,11 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                 ),
               ),
               Divider(),
-              Row(
-                children: [
-                  Text(
-                    "Medicine Name",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    " *",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 15,
-                    ),
-                  ),
-                  Gap(10),
-                  Icon(
-                    FluentIcons.edit_24_regular,
-                    size: 18,
-                  ),
-                ],
+              Gap(10),
+              getTitlesForFields(
+                title: "Medicine Name",
+                isFieldRequired: true,
+                icon: FluentIcons.edit_24_regular,
               ),
               Gap(5),
               customTextFieldDecoration(
@@ -102,28 +86,10 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                 ),
               ),
               Gap(10),
-              Row(
-                children: [
-                  Text(
-                    "Medicine Type",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    " *",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 15,
-                    ),
-                  ),
-                  Gap(10),
-                  Icon(
-                    FluentIcons.select_all_on_24_regular,
-                    size: 18,
-                  ),
-                ],
+              getTitlesForFields(
+                title: "Medicine Type",
+                isFieldRequired: true,
+                icon: FluentIcons.select_all_on_24_regular,
               ),
               Gap(5),
               SingleChildScrollView(
@@ -171,21 +137,9 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
               ),
               Gap(5),
               Gap(10),
-              Row(
-                children: [
-                  Text(
-                    "Notes",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Gap(10),
-                  Icon(
-                    FluentIcons.note_24_regular,
-                    size: 18,
-                  ),
-                ],
+              getTitlesForFields(
+                title: "Notes",
+                icon: FluentIcons.note_24_regular,
               ),
               Gap(5),
               customTextFieldDecoration(
@@ -201,21 +155,9 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
                 ),
               ),
               Gap(10),
-              Row(
-                children: [
-                  Text(
-                    "Add Photo of Medicine",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Gap(10),
-                  Icon(
-                    FluentIcons.image_add_24_regular,
-                    size: 18,
-                  ),
-                ],
+              getTitlesForFields(
+                title: "Add Photo of Medicine",
+                icon: FluentIcons.image_add_24_regular,
               ),
               Gap(5),
               SizedBox(
