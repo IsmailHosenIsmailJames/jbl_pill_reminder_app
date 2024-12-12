@@ -1,14 +1,18 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
+import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
+import 'package:path/path.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
@@ -139,93 +143,214 @@ class _HomePageState extends State<HomePage> {
               }
             },
           ),
-          const Gap(20),
-          getTitlesForFields(
-            title: "All Medications",
+          const Gap(15),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              getTitlesForFields(
+                title: "All Medications",
+              ),
+              SizedBox(
+                height: 30,
+                width: 50,
+                child: IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: MyAppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.zero,
+                  ),
+                  onPressed: () {
+                    Get.to(() => const AddNewMedication());
+                  },
+                  icon: const Icon(
+                    Icons.add,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const Gap(5),
           Obx(
-            () => SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+            () {
+              return Column(
                 children: List<Widget>.generate(
                       homeController.listOfAllMedications.length,
                       (index) {
-                        MedicationModel current =
+                        MedicationModel currentMedication =
                             homeController.listOfAllMedications[index];
-                        return Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.only(
-                              right: 10, top: 5, bottom: 5),
-                          height: 200,
-                          width: 200,
-                          decoration: BoxDecoration(
-                            color: MyAppColors.shadedMutedColor,
-                            borderRadius: BorderRadius.circular(
-                              borderRadius,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Title: ${current.title ?? ""}",
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const Divider(
-                                height: 2,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                  "Start: ${DateFormat.yMMMMd().format(current.schedule!.startDate!)}"),
-                              const Divider(
-                                height: 2,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                  "End: ${DateFormat.yMMMMd().format(current.schedule!.endDate!)}"),
-                              const Divider(
-                                height: 2,
-                                color: Colors.white,
-                              ),
-                              if (current.reason != null)
-                                Text("Reason: ${current.reason ?? ""}"),
-                              if (current.reason != null)
-                                const Divider(
-                                  height: 2,
-                                  color: Colors.white,
-                                ),
-                              Text(
-                                "${current.medicines?.length.toString() ?? "0"} Medicines",
-                              ),
-                              const Divider(
-                                height: 2,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                "Frequency: ${current.schedule?.frequency?.type}",
-                              ),
-                              const Divider(
-                                height: 2,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                "Alarm: ${current.schedule?.times?.length}",
-                              ),
-                              if (current.schedule?.notes != null)
-                                const Divider(
-                                  height: 2,
-                                  color: Colors.white,
-                                ),
-                              if (current.schedule?.notes != null)
+                        DateTime? startDate =
+                            currentMedication.schedule!.startDate;
+                        DateTime? endDate = currentMedication.schedule?.endDate;
+
+                        String? frequencyType =
+                            currentMedication.schedule?.frequency?.type;
+
+                        String listOfFrequencyDay = "";
+                        if (frequencyType == frequencyTypeList[1]) {
+                          int? distance =
+                              currentMedication.schedule?.frequency?.everyXDays;
+                          listOfFrequencyDay += (distance ?? "").toString();
+                        } else if (frequencyType == frequencyTypeList[2]) {
+                          List<String> listOfDay = (currentMedication
+                                  .schedule?.frequency?.weekly?.days) ??
+                              [];
+                          listOfFrequencyDay += listOfDay
+                              .toString()
+                              .replaceAll('[', '')
+                              .replaceAll(']', '');
+                        } else if (frequencyType == frequencyTypeList[3]) {
+                          List<int> listOfDay = (currentMedication
+                                  .schedule?.frequency?.monthly?.dates) ??
+                              [];
+                          listOfFrequencyDay += listOfDay
+                              .toString()
+                              .replaceAll('[', '')
+                              .replaceAll(']', '');
+                        } else if (frequencyType == frequencyTypeList[4]) {
+                          List<DateTime> listOfDay = (currentMedication
+                                  .schedule?.frequency?.yearly?.dates) ??
+                              [];
+                          for (var element in listOfDay) {
+                            listOfFrequencyDay +=
+                                "${DateFormat.yMMMd().format(element)},";
+                          }
+                        }
+
+                        final medicine = currentMedication.medicines ?? [];
+
+                        final alarm = currentMedication.schedule?.times ?? [];
+
+                        return Card(
+                          elevation: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
                                 Text(
-                                  "Notes: ${current.schedule?.notes}",
+                                  "currentMedication.title",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: MyAppColors.primaryColor,
+                                  ),
                                 ),
-                            ],
+                                const Divider(),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      FluentIcons.calendar_24_regular,
+                                    ),
+                                    const Gap(10),
+                                    Text(DateFormat.yMMMd().format(startDate!)),
+                                    const Gap(5),
+                                    const Text("to"),
+                                    const Gap(5),
+                                    Text(DateFormat.yMMMd().format(endDate!)),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      FluentIcons.arrow_repeat_all_24_regular,
+                                    ),
+                                    const Gap(10),
+                                    Text(frequencyType!),
+                                    const Gap(10),
+                                    if (listOfFrequencyDay.isNotEmpty)
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.6,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          color: MyAppColors.shadedMutedColor,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Text(
+                                            "on $listOfFrequencyDay",
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      FluentIcons.pill_24_regular,
+                                    ),
+                                    const Gap(10),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: List.generate(
+                                        medicine.length,
+                                        (index) {
+                                          return Row(
+                                            children: [
+                                              Text(
+                                                medicine[index].name ?? "",
+                                              ),
+                                              const Gap(5),
+                                              Text(
+                                                "( ${medicine[index].type ?? ""} )",
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      FluentIcons.clock_alarm_24_regular,
+                                    ),
+                                    const Gap(10),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: List.generate(
+                                        alarm.length,
+                                        (index) {
+                                          return Row(
+                                            children: [
+                                              Text(
+                                                alarm[index].clock ?? "",
+                                              ),
+                                              const Gap(5),
+                                              Text(
+                                                "( ${alarm[index].when ?? ""} )",
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -233,8 +358,7 @@ class _HomePageState extends State<HomePage> {
                     <Widget>[
                       if (homeController.listOfAllMedications.isEmpty)
                         Container(
-                          height: 300,
-                          width: 100,
+                          width: MediaQuery.of(context).size.width,
                           padding: const EdgeInsets.all(5),
                           margin: const EdgeInsets.only(
                               right: 5, bottom: 5, top: 5),
@@ -249,43 +373,9 @@ class _HomePageState extends State<HomePage> {
                           alignment: Alignment.center,
                           child: const Text("Empty"),
                         ),
-                      SizedBox(
-                        height: 200,
-                        width: 100,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(borderRadius),
-                            ),
-                            backgroundColor: MyAppColors.shadedMutedColor,
-                          ),
-                          onPressed: () {
-                            Get.to(() => const AddNewMedication());
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                size: 30,
-                                color: MyAppColors.primaryColor,
-                              ),
-                              const Text(
-                                "Add new",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
