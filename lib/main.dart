@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:alarm/alarm.dart';
 import 'package:camera/camera.dart';
@@ -18,15 +17,16 @@ Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   FlutterForegroundTask.initCommunicationPort();
-  if (await checkPermissions()) {
-    log("Form main");
+  if (await checkNotificationPermissions()) {
     initService();
     await startService();
+    await LocalNotifications.initializeService();
   }
 
-  await SharedPrefs.init();
-  await LocalNotifications.initializeService();
-  cameras = await availableCameras();
   await Alarm.init();
+
+  cameras = await availableCameras();
+
+  await SharedPrefs.init();
   runApp(const JblPillReminderApp());
 }

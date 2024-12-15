@@ -6,15 +6,15 @@ void startCallback() {
   FlutterForegroundTask.setTaskHandler(MyForegroundTaskHandler());
 }
 
-Future<bool> requestPermissions() async {
-  if (await checkPermissions() == false) {
+Future<bool> requestNotificationPermissions() async {
+  if (await checkNotificationPermissions() == false) {
     await FlutterForegroundTask.requestNotificationPermission();
   }
   return (await FlutterForegroundTask.checkNotificationPermission()) ==
       NotificationPermission.granted;
 }
 
-Future<bool> checkPermissions() async {
+Future<bool> checkNotificationPermissions() async {
   return (await FlutterForegroundTask.checkNotificationPermission()) ==
       NotificationPermission.granted;
 }

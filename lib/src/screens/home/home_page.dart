@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
-import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
@@ -12,7 +11,6 @@ import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
-import 'package:path/path.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
