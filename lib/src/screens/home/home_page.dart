@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/core/functions/functions.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/add_alarm_times.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
-import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomePage extends StatefulWidget {
@@ -89,51 +90,56 @@ class _HomePageState extends State<HomePage> {
           ),
           const Gap(20),
           Obx(
-            () => getTitlesForFields(
-              title: isSameDay(
-                          homeController.selectedDay.value, DateTime.now()) ==
+            () => Text(
+              isSameDay(homeController.selectedDay.value, DateTime.now()) ==
                       true
                   ? "Today's Medication"
                   : "Medication on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const Gap(5),
           Obx(
             () {
               if (homeController.listOfTodaysMedications.isNotEmpty) {
-                return SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(
-                      homeController.listOfTodaysMedications.length,
-                      (index) {
-                        return Text(
-                          homeController.listOfTodaysMedications[index]
-                              .toJson(),
-                        );
-                      },
-                    ),
+                return Column(
+                  children: List.generate(
+                    homeController.listOfTodaysMedications.length,
+                    (index) {
+                      return cardOfMedicineForSummary(index, context);
+                    },
                   ),
                 );
               } else {
-                return Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: MyAppColors.shadedMutedColor,
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(borderRadius),
-                    image: const DecorationImage(
-                      image: AssetImage(
-                        "assets/img/pills.png",
-                      ),
-                      opacity: 0.1,
+                    side: BorderSide(
+                      color: MyAppColors.shadedMutedColor,
                     ),
                   ),
-                  child: const Center(
-                    child: Text(
-                      "No medication for this day",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      image: const DecorationImage(
+                        image: AssetImage(
+                          "assets/img/pills.png",
+                        ),
+                        opacity: 0.1,
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "No medication for this day",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
@@ -146,8 +152,12 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              getTitlesForFields(
-                title: "All Medications",
+              const Text(
+                "All Medications",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(
                 height: 30,
@@ -174,183 +184,7 @@ class _HomePageState extends State<HomePage> {
                 children: List<Widget>.generate(
                       homeController.listOfAllMedications.length,
                       (index) {
-                        MedicationModel currentMedication =
-                            homeController.listOfAllMedications[index];
-                        DateTime? startDate =
-                            currentMedication.schedule!.startDate;
-                        DateTime? endDate = currentMedication.schedule?.endDate;
-
-                        String? frequencyType =
-                            currentMedication.schedule?.frequency?.type;
-
-                        String listOfFrequencyDay = "";
-                        if (frequencyType == frequencyTypeList[1]) {
-                          int? distance =
-                              currentMedication.schedule?.frequency?.everyXDays;
-                          listOfFrequencyDay += (distance ?? "").toString();
-                        } else if (frequencyType == frequencyTypeList[2]) {
-                          List<String> listOfDay = (currentMedication
-                                  .schedule?.frequency?.weekly?.days) ??
-                              [];
-                          listOfFrequencyDay += listOfDay
-                              .toString()
-                              .replaceAll('[', '')
-                              .replaceAll(']', '');
-                        } else if (frequencyType == frequencyTypeList[3]) {
-                          List<int> listOfDay = (currentMedication
-                                  .schedule?.frequency?.monthly?.dates) ??
-                              [];
-                          listOfFrequencyDay += listOfDay
-                              .toString()
-                              .replaceAll('[', '')
-                              .replaceAll(']', '');
-                        } else if (frequencyType == frequencyTypeList[4]) {
-                          List<DateTime> listOfDay = (currentMedication
-                                  .schedule?.frequency?.yearly?.dates) ??
-                              [];
-                          for (var element in listOfDay) {
-                            listOfFrequencyDay +=
-                                "${DateFormat.yMMMd().format(element)},";
-                          }
-                        }
-
-                        final medicine = currentMedication.medicines ?? [];
-
-                        final alarm = currentMedication.schedule?.times ?? [];
-
-                        return Card(
-                          elevation: 3,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "currentMedication.title",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: MyAppColors.primaryColor,
-                                  ),
-                                ),
-                                const Divider(),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      FluentIcons.calendar_24_regular,
-                                    ),
-                                    const Gap(10),
-                                    Text(DateFormat.yMMMd().format(startDate!)),
-                                    const Gap(5),
-                                    const Text("to"),
-                                    const Gap(5),
-                                    Text(DateFormat.yMMMd().format(endDate!)),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      FluentIcons.arrow_repeat_all_24_regular,
-                                    ),
-                                    const Gap(10),
-                                    Text(frequencyType!),
-                                    const Gap(10),
-                                    if (listOfFrequencyDay.isNotEmpty)
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.6,
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          color: MyAppColors.shadedMutedColor,
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: Text(
-                                            "on $listOfFrequencyDay",
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      FluentIcons.pill_24_regular,
-                                    ),
-                                    const Gap(10),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: List.generate(
-                                        medicine.length,
-                                        (index) {
-                                          return Row(
-                                            children: [
-                                              Text(
-                                                medicine[index].name ?? "",
-                                              ),
-                                              const Gap(5),
-                                              Text(
-                                                "( ${medicine[index].type ?? ""} )",
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade600,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      FluentIcons.clock_alarm_24_regular,
-                                    ),
-                                    const Gap(10),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: List.generate(
-                                        alarm.length,
-                                        (index) {
-                                          return Row(
-                                            children: [
-                                              Text(
-                                                alarm[index].clock ?? "",
-                                              ),
-                                              const Gap(5),
-                                              Text(
-                                                "( ${alarm[index].when ?? ""} )",
-                                                style: TextStyle(
-                                                  color: Colors.grey.shade600,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
+                        return cardOfMedicineForSummary(index, context);
                       },
                     ) +
                     <Widget>[
@@ -376,6 +210,224 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Card cardOfMedicineForSummary(int index, BuildContext context) {
+    MedicationModel currentMedication =
+        homeController.listOfAllMedications[index];
+    DateTime? startDate = currentMedication.schedule!.startDate;
+    DateTime? endDate = currentMedication.schedule?.endDate;
+
+    String? frequencyType = currentMedication.schedule?.frequency?.type;
+
+    String listOfFrequencyDay = "";
+    if (frequencyType == frequencyTypeList[1]) {
+      int? distance = currentMedication.schedule?.frequency?.everyXDays;
+      listOfFrequencyDay += (distance ?? "").toString();
+    } else if (frequencyType == frequencyTypeList[2]) {
+      List<String> listOfDay =
+          (currentMedication.schedule?.frequency?.weekly?.days) ?? [];
+      listOfFrequencyDay +=
+          listOfDay.toString().replaceAll('[', '').replaceAll(']', '');
+    } else if (frequencyType == frequencyTypeList[3]) {
+      List<int> listOfDay =
+          (currentMedication.schedule?.frequency?.monthly?.dates) ?? [];
+      listOfFrequencyDay +=
+          listOfDay.toString().replaceAll('[', '').replaceAll(']', '');
+    } else if (frequencyType == frequencyTypeList[4]) {
+      List<DateTime> listOfDay =
+          (currentMedication.schedule?.frequency?.yearly?.dates) ?? [];
+      for (var element in listOfDay) {
+        listOfFrequencyDay += "${DateFormat.yMMMd().format(element)},";
+      }
+    }
+
+    final medicine = currentMedication.medicines ?? [];
+
+    final alarm = currentMedication.schedule?.times ?? [];
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            borderRadius,
+          ),
+          side: BorderSide(
+            color: MyAppColors.shadedMutedColor,
+          )),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text(
+                  substringSafe("${currentMedication.title}", 35),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Divider(
+              height: 7,
+              color: MyAppColors.shadedMutedColor,
+            ),
+            Row(
+              children: [
+                const Icon(
+                  FluentIcons.calendar_24_regular,
+                ),
+                const Gap(10),
+                Text(DateFormat.yMMMd().format(startDate!)),
+                const Gap(5),
+                const Text("to"),
+                const Gap(5),
+                Text(DateFormat.yMMMd().format(endDate!)),
+              ],
+            ),
+            const Gap(7),
+            Row(
+              children: [
+                const Icon(
+                  FluentIcons.arrow_repeat_all_24_regular,
+                ),
+                const Gap(10),
+                Text(frequencyType!),
+                const Gap(10),
+                if (listOfFrequencyDay.isNotEmpty)
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: MyAppColors.shadedMutedColor,
+                    ),
+                    alignment: Alignment.center,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                      ),
+                      child: Text(
+                        "on $listOfFrequencyDay",
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const Gap(7),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  FluentIcons.pill_24_regular,
+                ),
+                const Gap(10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(
+                    medicine.length,
+                    (index) {
+                      return Row(
+                        children: [
+                          Text(
+                            medicine[index].name ?? "",
+                          ),
+                          const Gap(5),
+                          Text(
+                            "( ${medicine[index].type ?? ""} )",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const Gap(7),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  FluentIcons.clock_alarm_24_regular,
+                ),
+                const Gap(10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(
+                    alarm.length,
+                    (index) {
+                      return Row(
+                        children: [
+                          Text(
+                            clockFormat(alarm[index].clock ?? "")
+                                .format(context),
+                          ),
+                          const Gap(5),
+                          if (alarm[index].when != null)
+                            Text(
+                              "( ${alarm[index].when} )",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const Gap(7),
+            SizedBox(
+              height: 30,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: MyAppColors.shadedMutedColor,
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () {},
+                    icon: Icon(
+                      FluentIcons.edit_24_regular,
+                      size: 18,
+                      color: MyAppColors.primaryColor,
+                    ),
+                  ),
+                  const Gap(5),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.red.shade100,
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () {},
+                    icon: const Icon(
+                      FluentIcons.delete_24_regular,
+                      size: 18,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

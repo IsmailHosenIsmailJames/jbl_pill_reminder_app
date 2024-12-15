@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/core/functions/functions.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/add_alarm_times.dart';
@@ -450,14 +451,18 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
                                     ),
                                   ],
                                 ),
-                                if (scheduleModel.times![index].notes != null ||
+                                if (scheduleModel.times?[index].notes != null ||
                                     scheduleModel
-                                        .times![index].notes!.isNotEmpty)
+                                            .times?[index].notes?.isNotEmpty ==
+                                        true)
                                   Row(
                                     children: [
                                       Text(
-                                        scheduleModel.times![index].notes
-                                            .toString(),
+                                        substringSafe(
+                                          scheduleModel.times![index].notes
+                                              .toString(),
+                                          40,
+                                        ),
                                         style: const TextStyle(
                                           fontSize: 12,
                                         ),
