@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/core/functions/find_date_medicine.dart';
 import 'package:jbl_pill_reminder_app/src/core/functions/functions.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
@@ -22,12 +23,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final homeController = Get.put(HomeController());
+
   @override
   void initState() {
+    List<MedicationModel> allMedication = homeController.listOfAllMedications;
+
+    homeController.listOfTodaysMedications.value =
+        findDateMedicine(allMedication, DateTime.now());
+
     super.initState();
   }
-
-  final homeController = Get.put(HomeController());
 
   @override
   Widget build(BuildContext context) {
@@ -46,46 +52,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(borderRadius),
                 color: MyAppColors.shadedMutedColor,
               ),
-              child: TableCalendar(
-                onDaySelected: (selectedDay, focusedDay) {
-                  homeController.selectedDay.value = selectedDay;
-                  setState(() {});
-                },
-                firstDay: DateTime.utc(2010, 10, 16),
-                lastDay: DateTime.utc(2030, 3, 14),
-                focusedDay: homeController.selectedDay.value,
-                selectedDayPredicate: (day) {
-                  return isSameDay(homeController.selectedDay.value, day);
-                },
-                currentDay: DateTime.now(),
-                rowHeight: 40,
-                calendarFormat: CalendarFormat.week,
-                availableCalendarFormats: {
-                  CalendarFormat.week: 'Week',
-                },
-                startingDayOfWeek: StartingDayOfWeek.saturday,
-                headerStyle: const HeaderStyle(
-                  headerPadding: EdgeInsets.zero,
-                  headerMargin: EdgeInsets.only(bottom: 5),
-                  rightChevronPadding: EdgeInsets.all(5),
-                  leftChevronPadding: EdgeInsets.all(5),
-                  titleCentered: true,
-                  formatButtonVisible: false,
-                ),
-                calendarStyle: CalendarStyle(
-                  selectedDecoration: BoxDecoration(
-                    color: isSameDay(
-                            homeController.selectedDay.value, DateTime.now())
-                        ? MyAppColors.primaryColor
-                        : MyAppColors.secondaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                  todayDecoration: BoxDecoration(
-                    color: MyAppColors.primaryColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
+              child: tableCalendar(),
             ),
           ),
           const Gap(20),
@@ -109,7 +76,9 @@ class _HomePageState extends State<HomePage> {
                   children: List.generate(
                     homeController.listOfTodaysMedications.length,
                     (index) {
-                      return cardOfMedicineForSummary(index, context);
+                      return cardOfMedicineForSummary(
+                          homeController.listOfTodaysMedications[index],
+                          context);
                     },
                   ),
                 );
@@ -184,7 +153,9 @@ class _HomePageState extends State<HomePage> {
                 children: List<Widget>.generate(
                       homeController.listOfAllMedications.length,
                       (index) {
-                        return cardOfMedicineForSummary(index, context);
+                        return cardOfMedicineForSummary(
+                            homeController.listOfAllMedications[index],
+                            context);
                       },
                     ) +
                     <Widget>[
@@ -214,9 +185,53 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Card cardOfMedicineForSummary(int index, BuildContext context) {
-    MedicationModel currentMedication =
-        homeController.listOfAllMedications[index];
+  TableCalendar<dynamic> tableCalendar() {
+    return TableCalendar(
+      onDaySelected: (selectedDay, focusedDay) {
+        homeController.selectedDay.value = selectedDay;
+        List<MedicationModel> todaysMedication =
+            findDateMedicine(homeController.listOfAllMedications, selectedDay);
+
+        homeController.listOfTodaysMedications.value = todaysMedication;
+      },
+      selectedDayPredicate: (day) {
+        return isSameDay(homeController.selectedDay.value, day);
+      },
+      firstDay: DateTime.utc(2010, 10, 16),
+      lastDay: DateTime.utc(2030, 3, 14),
+      focusedDay: homeController.selectedDay.value,
+      currentDay: DateTime.now(),
+      rowHeight: 40,
+      calendarFormat: CalendarFormat.week,
+      availableCalendarFormats: {
+        CalendarFormat.week: 'Week',
+      },
+      startingDayOfWeek: StartingDayOfWeek.saturday,
+      headerStyle: const HeaderStyle(
+        headerPadding: EdgeInsets.zero,
+        headerMargin: EdgeInsets.only(bottom: 5),
+        rightChevronPadding: EdgeInsets.all(5),
+        leftChevronPadding: EdgeInsets.all(5),
+        titleCentered: true,
+        formatButtonVisible: false,
+      ),
+      calendarStyle: CalendarStyle(
+        selectedDecoration: BoxDecoration(
+          color: isSameDay(homeController.selectedDay.value, DateTime.now())
+              ? MyAppColors.primaryColor
+              : MyAppColors.secondaryColor,
+          shape: BoxShape.circle,
+        ),
+        todayDecoration: BoxDecoration(
+          color: MyAppColors.primaryColor,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
+  Card cardOfMedicineForSummary(
+      MedicationModel currentMedication, BuildContext context) {
     DateTime? startDate = currentMedication.schedule!.startDate;
     DateTime? endDate = currentMedication.schedule?.endDate;
 
@@ -300,7 +315,9 @@ class _HomePageState extends State<HomePage> {
                 const Gap(10),
                 if (listOfFrequencyDay.isNotEmpty)
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.6,
+                    width: frequencyType == frequencyTypeList[1]
+                        ? MediaQuery.of(context).size.width * 0.48
+                        : MediaQuery.of(context).size.width * 0.58,
                     height: 30,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30),
@@ -314,7 +331,9 @@ class _HomePageState extends State<HomePage> {
                         right: 10,
                       ),
                       child: Text(
-                        "on $listOfFrequencyDay",
+                        frequencyType == frequencyTypeList[1]
+                            ? "every $listOfFrequencyDay days"
+                            : "on $listOfFrequencyDay",
                       ),
                     ),
                   ),
