@@ -77,8 +77,10 @@ class _HomePageState extends State<HomePage> {
                     homeController.listOfTodaysMedications.length,
                     (index) {
                       return cardOfMedicineForSummary(
-                          homeController.listOfTodaysMedications[index],
-                          context);
+                        homeController.listOfTodaysMedications[index],
+                        context,
+                        isSelectedToday: true,
+                      );
                     },
                   ),
                 );
@@ -231,7 +233,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Card cardOfMedicineForSummary(
-      MedicationModel currentMedication, BuildContext context) {
+      MedicationModel currentMedication, BuildContext context,
+      {bool isSelectedToday = false}) {
     DateTime? startDate = currentMedication.schedule!.startDate;
     DateTime? endDate = currentMedication.schedule?.endDate;
 
@@ -270,7 +273,9 @@ class _HomePageState extends State<HomePage> {
             borderRadius,
           ),
           side: BorderSide(
-            color: MyAppColors.shadedMutedColor,
+            color: isSelectedToday
+                ? MyAppColors.primaryColor.withValues(alpha: 0.5)
+                : MyAppColors.shadedMutedColor,
           )),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
