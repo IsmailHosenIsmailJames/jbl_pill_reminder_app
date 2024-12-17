@@ -14,7 +14,20 @@ class MyDrawer extends StatelessWidget {
           Container(
             height: 200,
             decoration: BoxDecoration(
-              color: MyAppColors.primaryColor,
+              color: MyAppColors.shadedMutedColor,
+              image: const DecorationImage(
+                image: AssetImage(
+                  "assets/app_logo.png",
+                ),
+                fit: BoxFit.fitHeight,
+              ),
+            ),
+            child: const Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text("v1.0.0-dev.2+2"),
+              ),
             ),
           ),
           const Gap(20),

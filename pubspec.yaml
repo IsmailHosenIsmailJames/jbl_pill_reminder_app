@@ -51,7 +51,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/shaking-pill-bottle.mp3
+    - assets/
     - assets/img/
 
 icons_launcher:
