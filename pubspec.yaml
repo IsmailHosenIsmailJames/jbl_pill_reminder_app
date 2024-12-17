@@ -1,8 +1,8 @@
 name: jbl_pill_reminder_app
-description: "A new Flutter project."
+description: "An App from JBL to Reminder medication times to users."
 publish_to: 'none'
 
-version: 1.0.0-dev.1+1
+version: 1.0.0-dev.2+2
 
 environment:
   sdk: ^3.5.4
@@ -50,21 +50,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/shaking-pill-bottle.mp3
     - assets/img/
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
 
 icons_launcher:
   image_path: "assets/app_logo.png"

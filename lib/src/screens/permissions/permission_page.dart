@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:jbl_pill_reminder_app/src/core/notifications/initialize_notifications_service.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:toastification/toastification.dart';
 
+import '../../core/foreground_service/foreground_task_manager.dart';
 import '../../data/check/auth_check.dart';
 import '../auth/login/login_page.dart';
 import '../home/home_page.dart';
@@ -73,6 +75,11 @@ class _PermissionPageState extends State<PermissionPage> {
                     }
 
                     if (await Permission.notification.isGranted) {
+                      // Start the service
+                      initService();
+                      await startService();
+                      await LocalNotifications.initializeService();
+                      // Check auth and rote
                       AuthCheck.isLoggedIn()
                           ? Get.to(() => const HomePage())
                           : Get.to(() => const LoginPage());
