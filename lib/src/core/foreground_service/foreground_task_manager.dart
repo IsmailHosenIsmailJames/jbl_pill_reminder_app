@@ -26,10 +26,10 @@ Future<bool> isServiceRunning() async {
 void initService() {
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
-      channelId: 'foreground_service',
-      channelName: 'Foreground Service Notification',
+      channelId: 'JBL_Pill_Reminder_App',
+      channelName: 'JBL Pill Reminder App Foreground Service',
       channelDescription:
-          'This notification appears when the foreground service is running.',
+          'This channel is used to notify the user that JBL Pill Reminder App is running in foreground',
       onlyAlertOnce: true,
     ),
     iosNotificationOptions: const IOSNotificationOptions(
@@ -52,12 +52,8 @@ Future<ServiceRequestResult> startService() async {
   } else {
     return FlutterForegroundTask.startService(
       serviceId: 256,
-      notificationTitle: 'Foreground Service is running',
-      notificationText: 'Tap to return to the app',
-      notificationButtons: [
-        const NotificationButton(id: 'btn_hello', text: 'hello'),
-      ],
-      notificationInitialRoute: '/second',
+      notificationTitle: 'JBL Pill Reminder App',
+      notificationText: 'Tap to see your medication details',
       callback: startCallback,
     );
   }
