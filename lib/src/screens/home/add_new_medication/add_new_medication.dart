@@ -107,6 +107,7 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                         String? error = checkValidityOfMedication(
                           medication,
                         );
+
                         if (error == null) {
                           final sharedPrefs = SharedPrefs.prefs;
                           await sharedPrefs.reload();
@@ -165,6 +166,10 @@ class _AddNewMedicationState extends State<AddNewMedication> {
 
   String? checkValidityOfMedication(MedicationModel medication) {
     // check form validity
+    if (medication.schedule?.startDate == null ||
+        medication.schedule?.endDate == null) {
+      return "Please pick start and end date";
+    }
     if (medication.title != null || medication.title?.isNotEmpty == true) {
       log("Pass form validation");
     } else {
