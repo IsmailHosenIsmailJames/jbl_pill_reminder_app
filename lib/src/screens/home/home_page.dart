@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
               if (homeController.listOfAllMedications.isNotEmpty) {
                 return GestureDetector(
                   onTap: () {
-                    const TakeMedicinePage();
+                    Get.to(() => const TakeMedicinePage());
                   },
                   child: cardOfMedicineForSummary(
                     homeController.listOfAllMedications[0],
