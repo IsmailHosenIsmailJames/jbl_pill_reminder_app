@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class TakeMedicinePage extends StatefulWidget {
   final String? title;
-  const TakeMedicinePage({super.key, this.title});
+  final String? payload;
+  const TakeMedicinePage({
+    super.key,
+    this.title,
+    this.payload,
+  });
 
   @override
   State<TakeMedicinePage> createState() => _TakeMedicinePageState();

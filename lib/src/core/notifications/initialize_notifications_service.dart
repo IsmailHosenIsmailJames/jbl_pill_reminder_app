@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/core/common.dart';
 import 'package:jbl_pill_reminder_app/src/screens/notifications_response/notifications_response_page.dart';
+import 'package:jbl_pill_reminder_app/src/screens/take_medicine/take_medicine_page.dart';
 
 class LocalNotifications {
   static AndroidNotificationChannel notificationChannel =
@@ -42,11 +43,21 @@ class LocalNotifications {
   static void onDidReceiveNotificationResponse(
       NotificationResponse notificationResponse) async {
     final String? payload = notificationResponse.payload;
-    await Get.to(
-      () => NotificationsResponsePage(
-        payload: payload,
-      ),
-    );
+
+    if (payload == "take_medicine") {
+      await Get.to(
+        () => TakeMedicinePage(
+          title: "Take Medicine",
+          payload: payload,
+        ),
+      );
+    } else {
+      await Get.to(
+        () => NotificationsResponsePage(
+          payload: payload,
+        ),
+      );
+    }
   }
 
   static void onDidReceiveBackgroundNotificationResponse(
