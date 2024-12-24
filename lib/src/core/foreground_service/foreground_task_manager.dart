@@ -37,7 +37,7 @@ void initService() {
       playSound: false,
     ),
     foregroundTaskOptions: ForegroundTaskOptions(
-      eventAction: ForegroundTaskEventAction.repeat(1000),
+      eventAction: ForegroundTaskEventAction.repeat(30000),
       autoRunOnBoot: true,
       autoRunOnMyPackageReplaced: true,
       allowWakeLock: true,

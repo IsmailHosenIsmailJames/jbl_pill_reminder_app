@@ -8,6 +8,7 @@ import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/drawer/my_drawer.dart';
+import 'package:jbl_pill_reminder_app/src/screens/take_medicine/take_medicine_page.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -53,6 +54,51 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const Gap(20),
+          const Text(
+            "Next Medication",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Gap(5),
+          Obx(
+            () {
+              if (homeController.listOfAllMedications.isNotEmpty) {
+                return GestureDetector(
+                  onTap: () {
+                    const TakeMedicinePage();
+                  },
+                  child: cardOfMedicineForSummary(
+                    homeController.listOfAllMedications[0],
+                    context,
+                    isSelectedToday: true,
+                  ),
+                );
+              } else {
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    side: BorderSide(
+                      color: MyAppColors.shadedMutedColor,
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      "No Medication Scheduled",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: MyAppColors.secondaryColor,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          const Gap(15),
           Obx(
             () => Text(
               isSameDay(homeController.selectedDay.value, DateTime.now()) ==

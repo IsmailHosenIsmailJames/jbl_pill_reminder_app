@@ -4,31 +4,43 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:jbl_pill_reminder_app/src/core/common.dart';
 import 'package:jbl_pill_reminder_app/src/core/notifications/initialize_notifications_service.dart';
+import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
+import 'package:jbl_pill_reminder_app/src/resources/keys.dart';
 
 class MyForegroundTaskHandler extends TaskHandler {
   static const String incrementCountCommand = 'incrementCount';
-  int count = 0;
 
-  void handleAllBackgroundTask() {
-    log(count.toString());
-    count++;
-    bool isTimeForDemoNotification = DateTime.now().second == 1;
-    if (isTimeForDemoNotification) {
-      LocalNotifications.flutterLocalNotificationsPlugin.show(
-        idForMedication,
-        "Take your medicine now!",
-        "You have a medication at 12:15 PM. It's time to take it.",
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            notificationChannelId,
-            'JBL Pill Reminder',
-            channelDescription: 'Notification for JBL Pill Reminder App',
-            priority: Priority.max,
-          ),
-        ),
-        payload: "take_medicine",
-      );
+  void handleAllBackgroundTask() async {
+    log('handleAllBackgroundTask');
+    try {
+      await SharedPrefs.init();
+      await SharedPrefs.prefs.reload();
+      List<String>? allPrescription =
+          SharedPrefs.prefs.getStringList(allPrescriptionKey);
+      log("allPrescription: ${allPrescription?.length}");
+
+      if (allPrescription == null || allPrescription.isEmpty) {
+        return;
+      }
+    } catch (e) {
+      log(e.toString());
+      return;
     }
+
+    LocalNotifications.flutterLocalNotificationsPlugin.show(
+      idForMedication,
+      "Take your medicine now!",
+      "You have a medication at 12:15 PM. It's time to take it.",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          notificationChannelId,
+          'JBL Pill Reminder',
+          channelDescription: 'Notification for JBL Pill Reminder App',
+          priority: Priority.max,
+        ),
+      ),
+      payload: "take_medicine",
+    );
 
     // Update notification content.
     FlutterForegroundTask.updateService(
