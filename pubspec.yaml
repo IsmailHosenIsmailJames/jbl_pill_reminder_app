@@ -2,7 +2,7 @@ name: jbl_pill_reminder_app
 description: "An App from JBL to Reminder medication times to users."
 publish_to: 'none'
 
-version: 1.0.0-dev.2+2
+version: 1.0.0-dev.3+3
 
 environment:
   sdk: ^3.5.4
