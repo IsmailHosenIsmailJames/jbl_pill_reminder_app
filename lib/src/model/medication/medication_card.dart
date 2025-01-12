@@ -86,7 +86,7 @@ Card cardOfMedicineForSummary(
                 FluentIcons.calendar_24_regular,
               ),
               const Gap(10),
-              Text(DateFormat.yMMMd().format(startDate!)),
+              Text(DateFormat.yMMMd().format(startDate)),
               const Gap(5),
               const Text("to"),
               const Gap(5),
@@ -180,6 +180,8 @@ Card cardOfMedicineForSummary(
                   (index) {
                     return Row(
                       children: [
+                        Text(alarm[index].timeOnDay ?? ""),
+                        const Text(" at "),
                         Text(
                           clockFormat(alarm[index].clock ?? "").format(context),
                         ),

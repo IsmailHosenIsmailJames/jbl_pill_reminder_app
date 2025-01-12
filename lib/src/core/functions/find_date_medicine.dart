@@ -14,7 +14,7 @@ List<MedicationModel> findDateMedicine(
       if (medicationModel.schedule?.startDate != null &&
           medicationModel.schedule?.endDate != null) {
         // is between start and end Date
-        if (!(date.isAfter(medicationModel.schedule!.startDate!) &&
+        if (!(date.isAfter(medicationModel.schedule!.startDate) &&
             date.isBefore(medicationModel.schedule!.endDate!))) {
           continue;
         }

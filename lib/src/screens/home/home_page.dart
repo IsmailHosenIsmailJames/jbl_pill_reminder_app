@@ -53,51 +53,6 @@ class _HomePageState extends State<HomePage> {
               child: tableCalendar(),
             ),
           ),
-          const Gap(20),
-          const Text(
-            "Next Medication",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Gap(5),
-          Obx(
-            () {
-              if (homeController.listOfAllMedications.isNotEmpty) {
-                return GestureDetector(
-                  onTap: () {
-                    Get.to(() => const TakeMedicinePage());
-                  },
-                  child: cardOfMedicineForSummary(
-                    homeController.listOfAllMedications[0],
-                    context,
-                    isSelectedToday: true,
-                  ),
-                );
-              } else {
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    side: BorderSide(
-                      color: MyAppColors.shadedMutedColor,
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      "No Medication Scheduled",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: MyAppColors.secondaryColor,
-                      ),
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
           const Gap(15),
           Obx(
             () => Text(
@@ -154,6 +109,51 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          const Gap(20),
+          const Text(
+            "Next Medication",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Gap(5),
+          Obx(
+            () {
+              if (homeController.listOfAllMedications.isNotEmpty) {
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(() => const TakeMedicinePage());
+                  },
+                  child: cardOfMedicineForSummary(
+                    homeController.listOfAllMedications[0],
+                    context,
+                    isSelectedToday: true,
+                  ),
+                );
+              } else {
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(borderRadius),
+                    side: BorderSide(
+                      color: MyAppColors.shadedMutedColor,
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      "No Medication Scheduled",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: MyAppColors.secondaryColor,
                       ),
                     ),
                   ),

@@ -9,6 +9,7 @@ import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart
 import 'package:jbl_pill_reminder_app/src/screens/camera/take_a_picture.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_1/add_medicine/add_medicine.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
 import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
 import 'package:jbl_pill_reminder_app/src/widgets/get_titles.dart';
@@ -70,22 +71,22 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
             decoration: const InputDecoration(hintText: "type title here..."),
           ),
         ),
-        const Gap(15),
-        getTitlesForFields(
-          title: "Medication Reason",
-          icon: FluentIcons.edit_24_regular,
-        ),
-        const Gap(5),
-        customTextFieldDecoration(
-          textFormField: TextFormField(
-            controller: medicationReasonController,
-            onChanged: (medicationReason) {
-              medicationController.medications.value.reason = medicationReason;
-            },
-            decoration: const InputDecoration(
-                hintText: "type reason here. e.g. headache"),
-          ),
-        ),
+        // const Gap(15),
+        // getTitlesForFields(
+        //   title: "Medication Reason",
+        //   icon: FluentIcons.edit_24_regular,
+        // ),
+        // const Gap(5),
+        // customTextFieldDecoration(
+        //   textFormField: TextFormField(
+        //     controller: medicationReasonController,
+        //     onChanged: (medicationReason) {
+        //       medicationController.medications.value.reason = medicationReason;
+        //     },
+        //     decoration: const InputDecoration(
+        //         hintText: "type reason here. e.g. headache"),
+        //   ),
+        // ),
         const Gap(15),
         getTitlesForFields(
           title: "Add Medicines",
@@ -289,7 +290,8 @@ class _AddBasicInfoOfMedicationState extends State<AddBasicInfoOfMedication> {
                   ),
                 ),
         ),
-        const Gap(20),
+        const Gap(10),
+        const SetMedicationSchedule()
       ],
     );
   }

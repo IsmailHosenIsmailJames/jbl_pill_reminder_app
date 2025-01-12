@@ -29,6 +29,8 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
     super.initState();
   }
 
+  Map<String, int>? timeRangeOnSelectedDay;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,33 +56,92 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
               icon: FluentIcons.clock_alarm_24_regular,
             ),
             const Gap(5),
-            OutlinedButton.icon(
-              onPressed: () {
-                showTimePicker(
-                  context: context,
-                  initialTime: timeModel.clock == null
-                      ? TimeOfDay.now()
-                      : clockFormat(timeModel.clock!),
-                ).then(
-                  (value) {
-                    if (value != null) {
-                      setState(() {
-                        timeModel.clock = "${value.hour}:${value.minute}";
-                      });
-                    }
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(
+                  medicineScheduleTimeName.length,
+                  (index) {
+                    String key = medicineScheduleTimeName.keys.toList()[index];
+                    Map<String, int> value =
+                        medicineScheduleTimeName.values.toList()[index];
+                    bool isSelected = key == timeModel.timeOnDay;
+                    return Container(
+                      height: 30,
+                      padding: const EdgeInsets.only(right: 5),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSelected
+                              ? MyAppColors.primaryColor
+                              : MyAppColors.shadedMutedColor,
+                          foregroundColor: isSelected
+                              ? Colors.white
+                              : MyAppColors.primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            timeModel.timeOnDay = key;
+                            timeRangeOnSelectedDay = value;
+                            int avg =
+                                (value["start_time"]! + value["end_time"]!) ~/
+                                    2;
+                            timeModel.clock = "$avg:00";
+                          });
+                        },
+                        icon: isSelected
+                            ? const Icon(
+                                Icons.done,
+                                size: 18,
+                              )
+                            : null,
+                        label: Text(
+                          key,
+                        ),
+                      ),
+                    );
                   },
-                );
-              },
-              icon: const Icon(
-                FluentIcons.clock_24_regular,
-                size: 18,
-              ),
-              label: Text(
-                timeModel.clock == null
-                    ? "Pick a Time"
-                    : clockFormat(timeModel.clock!).format(context),
+                ),
               ),
             ),
+            if (timeModel.clock != null)
+              Row(
+                children: [
+                  const Text(
+                    "Time:",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Gap(10),
+                  Text(clockFormat(timeModel.clock!).format(context)),
+                  const Gap(10),
+                  TextButton(
+                    onPressed: () {
+                      showTimePicker(
+                        context: context,
+                        initialTime: timeModel.clock == null
+                            ? TimeOfDay.now()
+                            : clockFormat(timeModel.clock!),
+                      ).then(
+                        (value) {
+                          if (value != null) {
+                            setState(() {
+                              timeModel.clock = "${value.hour}:${value.minute}";
+                            });
+                          }
+                        },
+                      );
+                    },
+                    child: const Text(
+                      "Change",
+                    ),
+                  ),
+                ],
+              ),
             const Gap(10),
             getTitlesForFields(
               title: "When",
@@ -175,6 +236,7 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
                         .medications.value.schedule
                         ?.copyWith(times: times) ??
                     ScheduleModel(
+                      startDate: DateTime.now(),
                       times: times,
                     );
                 medicationController.medications.value =
@@ -196,11 +258,11 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
   }
 }
 
-  TimeOfDay clockFormat(String time) {
-    List<String> splitedTime = time.split(":");
-    return TimeOfDay(
-        hour: int.parse(splitedTime[0]), minute: int.parse(splitedTime[1]));
-  }
+TimeOfDay clockFormat(String time) {
+  List<String> splitedTime = time.split(":");
+  return TimeOfDay(
+      hour: int.parse(splitedTime[0]), minute: int.parse(splitedTime[1]));
+}
 
 List<String> whenTakeMedicine = [
   "After food",
@@ -208,3 +270,22 @@ List<String> whenTakeMedicine = [
   "With Food",
   "Custom"
 ];
+
+Map<String, Map<String, int>> medicineScheduleTimeName = {
+  "Morning": {
+    "start_time": 06,
+    "end_time": 12,
+  },
+  "Afternoon": {
+    "start_time": 12,
+    "end_time": 16,
+  },
+  "Evening": {
+    "start_time": 16,
+    "end_time": 22,
+  },
+  "Night": {
+    "start_time": 19,
+    "end_time": 24,
+  }
+};

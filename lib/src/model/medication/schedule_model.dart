@@ -1,18 +1,16 @@
 import 'dart:convert';
 
 class ScheduleModel {
-  DateTime? startDate;
+  DateTime startDate = DateTime.now();
   DateTime? endDate;
   Frequency? frequency;
   List<TimeModel>? times;
-  String? notes;
 
   ScheduleModel({
-    this.startDate,
+    required this.startDate,
     this.endDate,
     this.frequency,
     this.times,
-    this.notes,
   });
 
   ScheduleModel copyWith({
@@ -27,7 +25,6 @@ class ScheduleModel {
         endDate: endDate ?? this.endDate,
         frequency: frequency ?? this.frequency,
         times: times ?? this.times,
-        notes: notes ?? this.notes,
       );
 
   factory ScheduleModel.fromJson(String str) =>
@@ -36,9 +33,9 @@ class ScheduleModel {
   String toJson() => json.encode(toMap());
 
   factory ScheduleModel.fromMap(Map<String, dynamic> json) => ScheduleModel(
-        startDate: json["start_date"] == null
-            ? null
-            : DateTime.parse(json["start_date"]),
+        startDate: json["start_date"] != null
+            ? DateTime.parse(json["start_date"])
+            : DateTime.now(),
         endDate:
             json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
         frequency: json["frequency"] == null
@@ -48,19 +45,17 @@ class ScheduleModel {
             ? []
             : List<TimeModel>.from(
                 json["times"]!.map((x) => TimeModel.fromMap(x))),
-        notes: json["notes"],
       );
 
   Map<String, dynamic> toMap() => {
         "start_date":
-            "${startDate?.year.toString().padLeft(4, '0')}-${startDate?.month.toString().padLeft(2, '0')}-${startDate?.day.toString().padLeft(2, '0')}",
+            "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
         "end_date":
             "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}",
         "frequency": frequency?.toMap(),
         "times": times == null
             ? []
             : List<dynamic>.from(times!.map((x) => x.toMap())),
-        "notes": notes,
       };
 }
 
@@ -207,22 +202,26 @@ class Yearly {
 }
 
 class TimeModel {
+  String? timeOnDay;
   String? clock;
   String? when;
   String? notes;
 
   TimeModel({
+    this.timeOnDay,
     this.clock,
     this.when,
     this.notes,
   });
 
   TimeModel copyWith({
+    String? timeOnDay,
     String? clock,
     String? when,
     String? notes,
   }) =>
       TimeModel(
+        timeOnDay: timeOnDay ?? this.timeOnDay,
         clock: clock ?? this.clock,
         when: when ?? this.when,
         notes: notes ?? this.notes,
@@ -233,12 +232,14 @@ class TimeModel {
   String toJson() => json.encode(toMap());
 
   factory TimeModel.fromMap(Map<String, dynamic> json) => TimeModel(
+        timeOnDay: json["time_on_day"],
         clock: json["clock"],
         when: json["when"],
         notes: json["notes"],
       );
 
   Map<String, dynamic> toMap() => {
+        "time_on_day": timeOnDay,
         "clock": clock,
         "when": when,
         "notes": notes,

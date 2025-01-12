@@ -24,71 +24,47 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
   final medicationController = Get.put(AddNewMedicationController());
 
   late ScheduleModel scheduleModel =
-      medicationController.medications.value.schedule ?? ScheduleModel();
+      medicationController.medications.value.schedule ??
+          ScheduleModel(startDate: DateTime.now());
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(10),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        getTitlesForFields(
-          title: "Starting Date of Medication",
-          isFieldRequired: true,
-          icon: FluentIcons.calendar_24_regular,
-        ),
-        const Gap(5),
-        OutlinedButton.icon(
-          onPressed: () {
-            showDatePicker(
-              context: context,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2030),
-              initialDate: scheduleModel.startDate ?? DateTime.now(),
-            ).then((value) {
-              setState(() {
-                scheduleModel.startDate = value;
-                medicationController.medications.value.schedule = scheduleModel;
-              });
-            });
-          },
-          icon: const Icon(
-            FluentIcons.calendar_24_regular,
-            size: 18,
-          ),
-          label: Text(
-            scheduleModel.startDate == null
-                ? "Pick a Date"
-                : DateFormat.yMMMEd().format(scheduleModel.startDate!),
-          ),
-        ),
         const Gap(10),
         getTitlesForFields(
-          title: "Starting Date of Medication",
+          title: "Ending Date of Medication",
           isFieldRequired: true,
           icon: FluentIcons.calendar_24_regular,
         ),
         const Gap(5),
-        OutlinedButton.icon(
-          onPressed: () {
-            showDatePicker(
-              context: context,
-              firstDate: DateTime.now(),
-              lastDate: DateTime(2030),
-            ).then((value) {
-              setState(() {
-                scheduleModel.endDate = value;
-                medicationController.medications.value.schedule = scheduleModel;
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              showDatePicker(
+                context: context,
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2030),
+              ).then((value) {
+                setState(() {
+                  scheduleModel.endDate = value;
+                  medicationController.medications.value.schedule =
+                      scheduleModel;
+                });
               });
-            });
-          },
-          icon: const Icon(
-            FluentIcons.calendar_24_regular,
-            size: 18,
-          ),
-          label: Text(
-            scheduleModel.endDate == null
-                ? "Pick a Date"
-                : DateFormat.yMMMEd().format(scheduleModel.endDate!),
+            },
+            icon: const Icon(
+              FluentIcons.calendar_24_regular,
+              size: 18,
+            ),
+            label: Text(
+              scheduleModel.endDate == null
+                  ? "Pick a Date"
+                  : DateFormat.yMMMEd().format(scheduleModel.endDate!),
+            ),
           ),
         ),
         const Gap(10),
@@ -380,7 +356,7 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
           () {
             final scheduleModel =
                 medicationController.medications.value.schedule ??
-                    ScheduleModel();
+                    ScheduleModel(startDate: DateTime.now());
 
             return Container(
               margin:
@@ -496,20 +472,20 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
             );
           },
         ),
-        const Gap(10),
-        getTitlesForFields(
-          title: "Note",
-          icon: FluentIcons.note_24_regular,
-        ),
-        const Gap(5),
-        customTextFieldDecoration(
-          textFormField: TextFormField(
-            onChanged: (value) {
-              scheduleModel.notes = value;
-            },
-            decoration: const InputDecoration(hintText: "type note here..."),
-          ),
-        ),
+        // const Gap(10),
+        // getTitlesForFields(
+        //   title: "Note",
+        //   icon: FluentIcons.note_24_regular,
+        // ),
+        // const Gap(5),
+        // customTextFieldDecoration(
+        //   textFormField: TextFormField(
+        //     onChanged: (value) {
+        //       scheduleModel.notes = value;
+        //     },
+        //     decoration: const InputDecoration(hintText: "type note here..."),
+        //   ),
+        // ),
         const Gap(10),
       ],
     );
