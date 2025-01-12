@@ -1,1 +1,1 @@
-String allPrescriptionKey = "all_medication";
+String allMedicationKey = "all_medication";

@@ -56,12 +56,12 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                   final sharedPrefs = SharedPrefs.prefs;
                   await sharedPrefs.reload();
                   List<String>? allMedication =
-                      sharedPrefs.getStringList(allPrescriptionKey);
+                      sharedPrefs.getStringList(allMedicationKey);
                   allMedication ??= [];
                   allMedication.add(medication.toJson());
                   log("Going to save : $allMedication");
                   await sharedPrefs.setStringList(
-                      allPrescriptionKey, allMedication);
+                      allMedicationKey, allMedication);
                   final HomeController homeController = Get.find();
                   List<MedicationModel> allMedicationModel = [];
                   for (var element in allMedication) {

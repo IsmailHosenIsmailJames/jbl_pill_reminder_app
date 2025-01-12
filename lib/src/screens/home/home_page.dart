@@ -182,8 +182,9 @@ class _HomePageState extends State<HomePage> {
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.zero,
                   ),
-                  onPressed: () {
-                    Get.to(() => const AddNewMedication());
+                  onPressed: () async {
+                    await Get.to(() => const AddNewMedication());
+                    setState(() {});
                   },
                   icon: const Icon(
                     Icons.add,

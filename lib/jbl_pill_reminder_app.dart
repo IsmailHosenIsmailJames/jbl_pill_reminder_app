@@ -73,7 +73,7 @@ class JblPillReminderApp extends StatelessWidget {
           FlutterNativeSplash.remove();
 
           List<String>? allPrescription =
-              SharedPrefs.prefs.getStringList(allPrescriptionKey);
+              SharedPrefs.prefs.getStringList(allMedicationKey);
           if (allPrescription != null) {
             for (String prescription in allPrescription) {
               homeController.listOfAllMedications.add(

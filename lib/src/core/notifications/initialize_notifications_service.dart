@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -43,6 +44,8 @@ class LocalNotifications {
   static void onDidReceiveNotificationResponse(
       NotificationResponse notificationResponse) async {
     final String? payload = notificationResponse.payload;
+
+    log("message");
 
     if (payload == "take_medicine") {
       await Get.to(
