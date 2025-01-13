@@ -1,9 +1,15 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/add_new_medication.dart';
+import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../core/functions/functions.dart';
+import '../../data/local_cache/shared_prefs.dart';
+import '../../resources/keys.dart';
 import '../../screens/home/add_new_medication/steps/step_2/add_alarm_times.dart';
 import '../../screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
 import '../../theme/colors.dart';
@@ -213,7 +219,18 @@ Card cardOfMedicineForSummary(
                       backgroundColor: MyAppColors.shadedMutedColor,
                       padding: EdgeInsets.zero,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      final addMedicationController =
+                          Get.put(AddNewMedicationController());
+                      addMedicationController.medications.value =
+                          currentMedication;
+
+                      Get.to(
+                        () => const AddNewMedication(
+                          isEditMode: true,
+                        ),
+                      );
+                    },
                     icon: Icon(
                       FluentIcons.edit_24_regular,
                       size: 18,
@@ -226,7 +243,60 @@ Card cardOfMedicineForSummary(
                       backgroundColor: Colors.red.shade100,
                       padding: EdgeInsets.zero,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Are you sure?"),
+                            content: const Text(
+                                "Once you delete, you can't recover it again."),
+                            actions: [
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.cancel),
+                                label: const Text("Cancel"),
+                              ),
+                              ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    String id = currentMedication.id;
+                                    List<String>? allPrescription = SharedPrefs
+                                        .prefs
+                                        .getStringList(allMedicationKey);
+                                    if (allPrescription != null) {
+                                      allPrescription.removeWhere(
+                                        (element) {
+                                          return MedicationModel.fromJson(
+                                                      element)
+                                                  .id ==
+                                              id;
+                                        },
+                                      );
+                                      SharedPrefs.prefs.setStringList(
+                                          allMedicationKey, allPrescription);
+                                      toastification.show(
+                                        context: context,
+                                        title:
+                                            const Text("Successfully deleted"),
+                                        type: ToastificationType.success,
+                                      );
+                                    }
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                  label: const Text("Delete"))
+                            ],
+                          );
+                        },
+                      );
+                    },
                     icon: const Icon(
                       FluentIcons.delete_24_regular,
                       size: 18,

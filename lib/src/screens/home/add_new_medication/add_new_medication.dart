@@ -13,16 +13,15 @@ import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controlle
 import 'package:toastification/toastification.dart';
 
 class AddNewMedication extends StatefulWidget {
-  const AddNewMedication({super.key});
+  final bool isEditMode;
+  const AddNewMedication({super.key, required this.isEditMode});
 
   @override
   State<AddNewMedication> createState() => _AddNewMedicationState();
 }
 
 class _AddNewMedicationState extends State<AddNewMedication> {
-  final medicationController = Get.put(AddNewMedicationController());
-  PageController pageController =
-      PageController(keepPage: true, initialPage: 0);
+  final addMedicationController = Get.put(AddNewMedicationController());
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,7 @@ class _AddNewMedicationState extends State<AddNewMedication> {
             ),
             child: ElevatedButton(
               onPressed: () async {
-                final medication = medicationController.medications.value;
+                final medication = addMedicationController.medications.value;
 
                 String? error = checkValidityOfMedication(
                   medication,

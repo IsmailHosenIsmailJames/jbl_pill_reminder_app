@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -18,7 +20,8 @@ class AddAlarmTimes extends StatefulWidget {
 }
 
 class _AddAlarmTimesState extends State<AddAlarmTimes> {
-  late TimeModel timeModel = widget.time ?? TimeModel();
+  late TimeModel timeModel = widget.time ??
+      TimeModel(id: "${Random().nextInt(100000000) + 100000000}");
 
   final medicationController = Get.put(AddNewMedicationController());
 
@@ -231,7 +234,16 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
                 List<TimeModel> times =
                     medicationController.medications.value.schedule?.times ??
                         [];
-                times.add(timeModel);
+                int indexToReplace = times.indexWhere(
+                  (element) {
+                    return element.id == widget.time?.id;
+                  },
+                );
+                if (indexToReplace != -1) {
+                  times[indexToReplace] = timeModel;
+                } else {
+                  times.add(timeModel);
+                }
                 ScheduleModel scheduleModel = medicationController
                         .medications.value.schedule
                         ?.copyWith(times: times) ??
@@ -245,11 +257,11 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
                 );
                 Get.back();
               },
-              icon: const Icon(
-                FluentIcons.add_24_regular,
+              icon: Icon(
+                widget.time == null ? FluentIcons.add_24_regular : Icons.done,
                 size: 18,
               ),
-              label: const Text("Add"),
+              label: Text(widget.time == null ? "Add" : "Save Changes"),
             ),
           ],
         ),

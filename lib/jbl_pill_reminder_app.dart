@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'package:jbl_pill_reminder_app/src/data/check/auth_check.dart';
 import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
@@ -37,7 +37,7 @@ class JblPillReminderApp extends StatelessWidget {
             brightness: Brightness.light,
             seedColor: MyAppColors.primaryColor,
           ),
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          // textTheme: GoogleFonts.poppinsTextTheme(),
           outlinedButtonTheme: OutlinedButtonThemeData(
             style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(

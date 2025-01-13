@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 
 class MedicationModel {
-  String? id;
+  String id;
   String? title;
   String? reason;
   List<Medicine>? medicines;
@@ -11,7 +11,7 @@ class MedicationModel {
   Prescription? prescription;
 
   MedicationModel({
-    this.id,
+    required this.id,
     this.title,
     this.reason,
     this.medicines,

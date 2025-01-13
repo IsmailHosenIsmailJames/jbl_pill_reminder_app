@@ -202,12 +202,14 @@ class Yearly {
 }
 
 class TimeModel {
+  String id;
   String? timeOnDay;
   String? clock;
   String? when;
   String? notes;
 
   TimeModel({
+    required this.id,
     this.timeOnDay,
     this.clock,
     this.when,
@@ -215,12 +217,14 @@ class TimeModel {
   });
 
   TimeModel copyWith({
+    String? id,
     String? timeOnDay,
     String? clock,
     String? when,
     String? notes,
   }) =>
       TimeModel(
+        id: id ?? this.id,
         timeOnDay: timeOnDay ?? this.timeOnDay,
         clock: clock ?? this.clock,
         when: when ?? this.when,
@@ -232,6 +236,7 @@ class TimeModel {
   String toJson() => json.encode(toMap());
 
   factory TimeModel.fromMap(Map<String, dynamic> json) => TimeModel(
+        id: json["id"],
         timeOnDay: json["time_on_day"],
         clock: json["clock"],
         when: json["when"],
@@ -239,6 +244,7 @@ class TimeModel {
       );
 
   Map<String, dynamic> toMap() => {
+        "id": id,
         "time_on_day": timeOnDay,
         "clock": clock,
         "when": when,

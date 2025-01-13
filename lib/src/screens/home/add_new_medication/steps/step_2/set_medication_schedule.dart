@@ -397,9 +397,12 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.radio_button_checked,
-                              size: 12,
+                            const Padding(
+                              padding: EdgeInsets.only(top: 6),
+                              child: Icon(
+                                Icons.radio_button_checked,
+                                size: 12,
+                              ),
                             ),
                             const Gap(10),
                             Column(
@@ -425,6 +428,25 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
                                         color: Colors.grey.shade600,
                                       ),
                                     ),
+                                    const Gap(10),
+                                    SizedBox(
+                                      height: 25,
+                                      child: IconButton(
+                                        style: IconButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            iconSize: 15),
+                                        onPressed: () {
+                                          Get.to(
+                                            () => AddAlarmTimes(
+                                              time: scheduleModel.times![index],
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(
+                                          Icons.edit,
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                                 if (scheduleModel.times?[index].notes != null ||

@@ -48,18 +48,31 @@ class MyForegroundTaskHandler extends TaskHandler {
             log("Today there is medication");
             // check the time and show notification. Notification will start showing before 30 mins and every 5 mins until the time arrived or medicine taken.
             scheduleModel.times?.forEach((time) {
-              TimeOfDay now = TimeOfDay.now();
-              TimeOfDay alarmTime = clockFormat(time.clock!);
-              int minutesDifference = alarmTime.minute - now.minute;
+              DateTime now = DateTime.now();
+              TimeOfDay alarmClock = clockFormat(time.clock!);
+              DateTime alarmTime = DateTime(now.year, now.month, now.day,
+                  alarmClock.hour, alarmClock.minute);
+              int minutesDifference = now.difference(alarmTime).inMinutes;
+              log('minutesDifference: $minutesDifference');
+              if (now.isAfter(alarmTime)) {
+                minutesDifference = minutesDifference * -1;
+              }
+              log(minutesDifference.toString());
+
               if (alarmTime.hour == now.hour &&
-                  (minutesDifference).abs() <= 30) {
+                  (minutesDifference).abs() <= 100) {
                 int gap = 5;
                 String notificationTitle =
                     "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
                 String subTitle =
                     "You upcoming medicine at ${formatClockWithoutContext(clockFormat(time.clock!))}. Tap to see details.";
-
-                if (minutesDifference >= 5 && minutesDifference <= 10) {
+                if (minutesDifference > 10) {
+                  gap = 5;
+                  notificationTitle = notificationTitle =
+                      "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
+                  subTitle =
+                      "You have $minutesDifference minutes left for next medication. Tap to see details.";
+                } else if (minutesDifference >= 5 && minutesDifference <= 10) {
                   gap = 3;
                   notificationTitle =
                       "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
@@ -73,17 +86,17 @@ class MyForegroundTaskHandler extends TaskHandler {
                   subTitle =
                       "Please take your medicine now. Tap to see details.";
                 } else if (minutesDifference <= -10) {
-                  gap = 1;
+                  gap = 5;
                   notificationTitle =
                       "You missed your \"$medicationTitle\" medicine.";
                   subTitle =
-                      "Please take your medicine now. Tap to see details.";
+                      "Please take your medicine now that was need to take at ${formatClockWithoutContext(clockFormat(time.clock!))}. Tap to see details.";
                 } else {
-                  gap = 3;
-                  notificationTitle =
-                      "It's time to take \"$medicationTitle\" medicine.";
+                  gap = 10;
+                  notificationTitle = notificationTitle =
+                      "You missed your \"$medicationTitle\" medicine.";
                   subTitle =
-                      "Please take your medicine now. Tap to see details.";
+                      "Your missed \"$medicationTitle\" that was needed to take $minutesDifference minutes earlier. Tap to see details.";
                 }
 
                 if (minutesDifference.abs() % gap == 0) {
@@ -122,7 +135,13 @@ class MyForegroundTaskHandler extends TaskHandler {
                   );
                 }
               } else {
-                int distanceInHour = now.hour - alarmTime.hour;
+                int distanceInHour = now.difference(alarmTime).inHours;
+                log("distanceInHour: $distanceInHour");
+                if (now.isAfter(alarmTime)) {
+                  distanceInHour = distanceInHour * -1;
+                }
+                log("distanceInHour: $distanceInHour");
+
                 if (distanceInHour >= 0) {
                   FlutterForegroundTask.updateService(
                     notificationTitle:
