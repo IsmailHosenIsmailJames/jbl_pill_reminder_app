@@ -47,9 +47,7 @@ class _AddNewMedicationState extends State<AddNewMedication> {
               onPressed: () async {
                 final medication = addMedicationController.medications.value;
 
-                String? error = checkValidityOfMedication(
-                  medication,
-                );
+                String? error = checkValidityOfMedication(medication);
 
                 if (error == null) {
                   final sharedPrefs = SharedPrefs.prefs;
@@ -57,8 +55,22 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                   List<String>? allMedication =
                       sharedPrefs.getStringList(allMedicationKey);
                   allMedication ??= [];
-                  allMedication.add(medication.toJson());
-                  log("Going to save : $allMedication");
+                  int indexToReplace = -1;
+                  if (widget.isEditMode) {
+                    indexToReplace = allMedication.indexWhere(
+                      (element) {
+                        return MedicationModel.fromJson(element).id ==
+                            medication.id;
+                      },
+                    );
+                  }
+
+                  if (indexToReplace != -1) {
+                    allMedication[indexToReplace] = medication.toJson();
+                  } else {
+                    allMedication.add(medication.toJson());
+                  }
+
                   await sharedPrefs.setStringList(
                       allMedicationKey, allMedication);
                   final HomeController homeController = Get.find();
@@ -82,15 +94,15 @@ class _AddNewMedicationState extends State<AddNewMedication> {
                   );
                 }
               },
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.done,
                     size: 16,
                   ),
-                  Gap(10),
-                  Text("Save"),
+                  const Gap(10),
+                  Text(widget.isEditMode ? "Save Changes" : "Save"),
                 ],
               ),
             ),
