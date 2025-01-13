@@ -127,19 +127,23 @@ class Medicine {
 }
 
 class Prescription {
+  String id;
   String? imageUrl;
   String? notes;
 
   Prescription({
+    required this.id,
     this.imageUrl,
     this.notes,
   });
 
   Prescription copyWith({
+    String? id,
     String? imageUrl,
     String? notes,
   }) =>
       Prescription(
+        id: id ?? this.id,
         imageUrl: imageUrl ?? this.imageUrl,
         notes: notes ?? this.notes,
       );
@@ -150,23 +154,27 @@ class Prescription {
   String toJson() => json.encode(toMap());
 
   factory Prescription.fromMap(Map<String, dynamic> json) => Prescription(
+        id: json["id"],
         imageUrl: json["image_url"],
         notes: json["notes"],
       );
 
   Map<String, dynamic> toMap() => {
+        "id": id,
         "image_url": imageUrl,
         "notes": notes,
       };
 }
 
 class Frequency {
+  String id;
   String? type;
   Weekly? weekly;
   Monthly? monthly;
   Yearly? yearly;
 
   Frequency({
+    required this.id,
     this.type,
     this.weekly,
     this.monthly,
@@ -174,12 +182,14 @@ class Frequency {
   });
 
   Frequency copyWith({
+    String? id,
     String? type,
     Weekly? weekly,
     Monthly? monthly,
     Yearly? yearly,
   }) =>
       Frequency(
+        id: id ?? this.id,
         type: type ?? this.type,
         weekly: weekly ?? this.weekly,
         monthly: monthly ?? this.monthly,
@@ -191,6 +201,7 @@ class Frequency {
   String toJson() => json.encode(toMap());
 
   factory Frequency.fromMap(Map<String, dynamic> json) => Frequency(
+        id: json["id"],
         type: json["type"],
         weekly: json["weekly"] == null ? null : Weekly.fromMap(json["weekly"]),
         monthly:
@@ -199,6 +210,7 @@ class Frequency {
       );
 
   Map<String, dynamic> toMap() => {
+        "id": id,
         "type": type,
         "weekly": weekly?.toMap(),
         "monthly": monthly?.toMap(),

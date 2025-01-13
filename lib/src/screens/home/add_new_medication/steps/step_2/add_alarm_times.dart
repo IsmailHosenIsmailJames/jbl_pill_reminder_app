@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:jbl_pill_reminder_app/src/core/functions/genearate_random_id.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
 import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
@@ -20,8 +19,8 @@ class AddAlarmTimes extends StatefulWidget {
 }
 
 class _AddAlarmTimesState extends State<AddAlarmTimes> {
-  late TimeModel timeModel = widget.time ??
-      TimeModel(id: "${Random().nextInt(100000000) + 100000000}");
+  late TimeModel timeModel =
+      widget.time ?? TimeModel(id: getRandomGeneratedID());
 
   final medicationController = Get.put(AddNewMedicationController());
 
