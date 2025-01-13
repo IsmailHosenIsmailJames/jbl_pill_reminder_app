@@ -5,6 +5,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:jbl_pill_reminder_app/src/core/functions/genearate_random_id.dart';
 import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
 import 'package:jbl_pill_reminder_app/src/screens/camera/take_a_picture.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/controller/add_new_medication_controller.dart';
@@ -273,6 +274,7 @@ class _AddNewMedicineState extends State<AddNewMedicine> {
       setState(() {
         medicine.imageUrl = imagePath;
         medicationController.medications.value.prescription = Prescription(
+          id: medicine.id ?? getRandomGeneratedID(),
           imageUrl: medicine.imageUrl,
           notes: medicationController.medications.value.prescription?.notes,
         );

@@ -446,7 +446,25 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
                                           Icons.edit,
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    SizedBox(
+                                      height: 25,
+                                      child: IconButton(
+                                        style: IconButton.styleFrom(
+                                            padding: EdgeInsets.zero,
+                                            iconSize: 15),
+                                        onPressed: () {
+                                          setState(() {
+                                            scheduleModel.times
+                                                ?.removeAt(index);
+                                          });
+                                        },
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 if (scheduleModel.times?[index].notes != null ||
