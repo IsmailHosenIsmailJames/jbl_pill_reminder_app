@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
 import 'package:jbl_pill_reminder_app/src/resources/keys.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/add_alarm_times.dart';
 import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
+import 'package:intl/intl.dart' as intl;
 
 class MyForegroundTaskHandler extends TaskHandler {
   static const String incrementCountCommand = 'incrementCount';
@@ -34,13 +36,26 @@ class MyForegroundTaskHandler extends TaskHandler {
         return;
       }
 
+      String? medicineTokenTime =
+          SharedPrefs.prefs.getString(medicineTokenTimeKey);
+
       log("Going to loop");
+
+      Map<String, dynamic> medicineTokenTimeMap = <String, dynamic>{};
+      medicineTokenTimeMap = jsonDecode(medicineTokenTime ?? "{}");
 
       for (var medication in allMedication) {
         final medicationModel = MedicationModel.fromJson(medication);
         ScheduleModel? scheduleModel = medicationModel.schedule;
         String medicationTitle = medicationModel.title!;
-
+        if (medicineTokenTimeMap
+            .containsKey(intl.DateFormat("dd-mm-yy").format(DateTime.now()))) {
+          Map todayData = medicineTokenTimeMap[
+              intl.DateFormat("dd-mm-yy").format(DateTime.now())];
+          if (todayData.containsKey(medicationModel.id)) {
+            return;
+          }
+        }
         if (scheduleModel != null) {
           bool isTodayHaveMedication =
               checkIfTodayHaveMedication(scheduleModel);
