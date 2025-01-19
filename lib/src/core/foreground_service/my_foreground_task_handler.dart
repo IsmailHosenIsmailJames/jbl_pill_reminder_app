@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:jbl_pill_reminder_app/src/core/common.dart';
 import 'package:jbl_pill_reminder_app/src/core/notifications/initialize_notifications_service.dart';
 import 'package:jbl_pill_reminder_app/src/data/local_cache/shared_prefs.dart';
@@ -74,64 +75,42 @@ class MyForegroundTaskHandler extends TaskHandler {
               }
               log(minutesDifference.toString());
 
-              if (alarmTime.hour == now.hour &&
-                  (minutesDifference).abs() <= 100) {
-                int gap = 5;
+              if (minutesDifference.abs() <= 30) {
+                String notificationType = "reminder";
                 String notificationTitle =
                     "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
                 String subTitle =
-                    "You upcoming medicine at ${formatClockWithoutContext(clockFormat(time.clock!))}. Tap to see details.";
-                if (minutesDifference > 10) {
-                  gap = 5;
-                  notificationTitle = notificationTitle =
-                      "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
-                  subTitle =
-                      "You have $minutesDifference minutes left for next medication. Tap to see details.";
-                } else if (minutesDifference >= 5 && minutesDifference <= 10) {
-                  gap = 3;
-                  notificationTitle =
-                      "Your next medicine \"$medicationTitle\" is at ${formatClockWithoutContext(clockFormat(time.clock!))}";
-                  subTitle =
-                      "You have $minutesDifference minutes left for next medication. Tap to see details.";
-                } else if (minutesDifference.abs() >= 0 &&
-                    minutesDifference.abs() < 5) {
-                  gap = 1;
+                    "You have $minutesDifference minutes left for next medication. Tap to see details.";
+                if (minutesDifference < 0 && minutesDifference >= -5) {
+                  notificationType = "take_now";
                   notificationTitle =
                       "It's time to take \"$medicationTitle\" medicine.";
                   subTitle =
                       "Please take your medicine now. Tap to see details.";
-                } else if (minutesDifference <= -10) {
-                  gap = 5;
-                  notificationTitle =
-                      "You missed your \"$medicationTitle\" medicine.";
-                  subTitle =
-                      "Please take your medicine now that was need to take at ${formatClockWithoutContext(clockFormat(time.clock!))}. Tap to see details.";
-                } else {
-                  gap = 10;
-                  notificationTitle = notificationTitle =
-                      "You missed your \"$medicationTitle\" medicine.";
-                  subTitle =
-                      "Your missed \"$medicationTitle\" that was needed to take $minutesDifference minutes earlier. Tap to see details.";
                 }
+                String infoPath =
+                    "$notificationType${medicationModel.id}${time.id}";
+                String? isNotificationShown =
+                    SharedPrefs.prefs.getString(infoPath);
 
-                if (minutesDifference.abs() % gap == 0) {
-                  {
-                    LocalNotifications.flutterLocalNotificationsPlugin.show(
-                      idForMedication,
-                      notificationTitle,
-                      subTitle,
-                      const NotificationDetails(
-                        android: AndroidNotificationDetails(
-                          notificationChannelId,
-                          'JBL Pill Reminder',
-                          channelDescription:
-                              'Notification for JBL Pill Reminder App',
-                          priority: Priority.max,
-                        ),
+                if (isNotificationShown == null) {
+                  LocalNotifications.flutterLocalNotificationsPlugin.show(
+                    idForMedication,
+                    notificationTitle,
+                    subTitle,
+                    const NotificationDetails(
+                      android: AndroidNotificationDetails(
+                        notificationChannelId,
+                        'JBL Pill Reminder',
+                        channelDescription:
+                            'Notification for JBL Pill Reminder App',
+                        priority: Priority.max,
                       ),
-                      payload: "take_medicine",
-                    );
-                  }
+                    ),
+                    payload: "take_medicine",
+                  );
+
+                  SharedPrefs.prefs.setString(infoPath, "true");
                 }
 
                 if (minutesDifference >= 0) {
@@ -146,30 +125,30 @@ class MyForegroundTaskHandler extends TaskHandler {
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You missed your medicine that was needed to take $minutesDifference minutes earlier. Take it now.',
+                        'You missed your medicine that was needed to take ${minutesDifference.obs()} minutes earlier. Take it now.',
                   );
                 }
               } else {
-                int distanceInHour = now.difference(alarmTime).inHours;
-                log("distanceInHour: $distanceInHour");
+                int distanceMins = now.difference(alarmTime).inMinutes;
+                log("distanceMins: $distanceMins");
                 if (now.isAfter(alarmTime)) {
-                  distanceInHour = distanceInHour * -1;
+                  distanceMins = distanceMins * -1;
                 }
-                log("distanceInHour: $distanceInHour");
+                log("distanceMins: $distanceMins");
 
-                if (distanceInHour >= 0) {
+                if (distanceMins >= 0) {
                   FlutterForegroundTask.updateService(
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You have $distanceInHour hours left for $distanceInHour medication.',
+                        'You have ${formatDuration(Duration(minutes: distanceMins))} hours left.',
                   );
                 } else {
                   FlutterForegroundTask.updateService(
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You missed your medicine that was needed to take $distanceInHour hours earlier.',
+                        'Your missed medicine was at ${formatClockWithoutContext(clockFormat(time.clock!))}.',
                   );
                 }
               }
@@ -293,8 +272,12 @@ bool checkIfTodayHaveMedication(ScheduleModel schedule) {
 
 String formatClockWithoutContext(TimeOfDay time) {
   if (time.hour > 12) {
-    return "${time.hour - 12}:${time.minute} PM";
+    return "${(time.hour - 12).toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')} PM";
   } else {
     return "${time.hour}:${time.minute} AM";
   }
+}
+
+String formatDuration(Duration duration) {
+  return "${duration.inHours}:${duration.inMinutes % 60}:${duration.inSeconds % 60}";
 }
