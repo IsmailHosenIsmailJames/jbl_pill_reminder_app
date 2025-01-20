@@ -533,13 +533,13 @@ class _SetMedicationScheduleState extends State<SetMedicationSchedule> {
 }
 
 List<String> weekDaysList = [
-  "Saturday",
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday'
 ];
 
 List<String> frequencyTypeList = [

@@ -68,9 +68,10 @@ class MyForegroundTaskHandler extends TaskHandler {
               TimeOfDay alarmClock = clockFormat(time.clock!);
               DateTime alarmTime = DateTime(now.year, now.month, now.day,
                   alarmClock.hour, alarmClock.minute);
-              int minutesDifference = now.difference(alarmTime).inMinutes;
+              int minutesDifference = now.difference(alarmTime).inMinutes.abs();
               log('minutesDifference: $minutesDifference');
-              if (now.isAfter(alarmTime)) {
+              if (now.millisecondsSinceEpoch >
+                  alarmTime.millisecondsSinceEpoch) {
                 minutesDifference = minutesDifference * -1;
               }
               log(minutesDifference.toString());
@@ -129,9 +130,10 @@ class MyForegroundTaskHandler extends TaskHandler {
                   );
                 }
               } else {
-                int distanceMins = now.difference(alarmTime).inMinutes;
+                int distanceMins = now.difference(alarmTime).inMinutes.abs();
                 log("distanceMins: $distanceMins");
-                if (now.isAfter(alarmTime)) {
+                if (now.millisecondsSinceEpoch >
+                    alarmTime.millisecondsSinceEpoch) {
                   distanceMins = distanceMins * -1;
                 }
                 log("distanceMins: $distanceMins");
@@ -141,14 +143,14 @@ class MyForegroundTaskHandler extends TaskHandler {
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You have ${formatDuration(Duration(minutes: distanceMins))} hours left.',
+                        'Your next medicine have ${formatDuration(Duration(minutes: distanceMins))} time left.',
                   );
                 } else {
                   FlutterForegroundTask.updateService(
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'Your missed medicine was at ${formatClockWithoutContext(clockFormat(time.clock!))}.',
+                        'Your missed medicine was at ${formatClockWithoutContext(clockFormat(time.clock!))}, ${intl.DateFormat.yMMMd().format(alarmTime)}.',
                   );
                 }
               }
@@ -222,7 +224,9 @@ bool checkIfTodayHaveMedication(ScheduleModel schedule) {
   DateTime startDate = schedule.startDate;
   DateTime? endDate = schedule.endDate!;
 
-  if (DateTime.now().isAfter(startDate) && DateTime.now().isBefore(endDate)) {
+  if (DateTime.now().millisecondsSinceEpoch >=
+          startDate.millisecondsSinceEpoch &&
+      DateTime.now().millisecondsSinceEpoch <= endDate.millisecondsSinceEpoch) {
     log("Medication is active");
 
     if (schedule.frequency?.type == frequencyTypeList[0]) {
@@ -240,6 +244,10 @@ bool checkIfTodayHaveMedication(ScheduleModel schedule) {
       }
     } else if (schedule.frequency?.type == frequencyTypeList[2]) {
       List<String> listOfDay = (schedule.frequency?.weekly?.days) ?? [];
+      log(schedule.frequency?.weekly?.days.toString() ?? "",
+          name: "checkIfTodayHaveMedication");
+      log(weekDaysList[DateTime.now().weekday - 1].toString(),
+          name: "checkIfTodayHaveMedication");
       if (listOfDay.contains(weekDaysList[DateTime.now().weekday - 1])) {
         return true;
       } else {
