@@ -33,6 +33,8 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
 
   Map<String, int>? timeRangeOnSelectedDay;
 
+  String alarmOrNotification = "alarm";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +55,7 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
             const Divider(),
             const Gap(10),
             getTitlesForFields(
-              title: "Alarm Time",
+              title: "Time",
               isFieldRequired: true,
               icon: FluentIcons.clock_alarm_24_regular,
             ),
@@ -201,6 +203,56 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
                   decoration: const InputDecoration(hintText: "type here..."),
                 ),
               ),
+            const Gap(10),
+            getTitlesForFields(
+              title: "Type",
+            ),
+            DropdownButtonFormField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: MyAppColors.shadedMutedColor,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.only(left: 5, right: 5),
+              ),
+              borderRadius: BorderRadius.circular(7),
+              value: alarmOrNotification,
+              items: [
+                const DropdownMenuItem(
+                  value: "alarm",
+                  child: Row(
+                    children: [
+                      Icon(
+                        FluentIcons.clock_alarm_24_regular,
+                      ),
+                      Gap(10),
+                      Text(
+                        "Alarm",
+                      ),
+                    ],
+                  ),
+                ),
+                const DropdownMenuItem(
+                  value: "notification",
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.notifications_active_outlined,
+                      ),
+                      Gap(10),
+                      Text(
+                        "Notification",
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                alarmOrNotification = value!;
+                timeModel.notificationType = value;
+              },
+            ),
             const Gap(10),
             getTitlesForFields(
               title: "Note",

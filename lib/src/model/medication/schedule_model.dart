@@ -207,6 +207,7 @@ class TimeModel {
   String? clock;
   String? when;
   String? notes;
+  String? notificationType;
 
   TimeModel({
     required this.id,
@@ -214,6 +215,7 @@ class TimeModel {
     this.clock,
     this.when,
     this.notes,
+    this.notificationType,
   });
 
   TimeModel copyWith({
@@ -222,6 +224,7 @@ class TimeModel {
     String? clock,
     String? when,
     String? notes,
+    String? notificationType,
   }) =>
       TimeModel(
         id: id ?? this.id,
@@ -229,6 +232,7 @@ class TimeModel {
         clock: clock ?? this.clock,
         when: when ?? this.when,
         notes: notes ?? this.notes,
+        notificationType: notificationType ?? this.notificationType,
       );
 
   factory TimeModel.fromJson(String str) => TimeModel.fromMap(json.decode(str));
@@ -241,6 +245,7 @@ class TimeModel {
         clock: json["clock"],
         when: json["when"],
         notes: json["notes"],
+        notificationType: json["notificationType"],
       );
 
   Map<String, dynamic> toMap() => {
@@ -249,5 +254,6 @@ class TimeModel {
         "clock": clock,
         "when": when,
         "notes": notes,
+        "notificationType": notificationType,
       };
 }
