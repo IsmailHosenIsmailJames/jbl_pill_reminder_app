@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -76,6 +77,25 @@ class MyForegroundTaskHandler extends TaskHandler {
               }
               log(minutesDifference.toString());
 
+              String alarmOrNotification = time.notificationType ?? "alarm";
+              log("Going to tiger Alarm");
+              Alarm.set(
+                alarmSettings: AlarmSettings(
+                  id: alarmIDforMedicationReminder,
+                  dateTime: DateTime.now().add(const Duration(seconds: 5)),
+                  assetAudioPath: "assets/shaking-pill-bottle.mp3",
+                  loopAudio: true,
+                  vibrate: true,
+                  androidFullScreenIntent: true,
+                  notificationSettings: NotificationSettings(
+                    title:
+                        "$medicationTitle at ${formatClockWithoutContext(alarmClock)}",
+                    body:
+                        "It's time to take $medicationTitle's medicines. Please Take your medicine",
+                  ),
+                ),
+              );
+
               if (minutesDifference.abs() <= 30) {
                 String notificationType = "reminder";
                 String notificationTitle =
@@ -93,23 +113,49 @@ class MyForegroundTaskHandler extends TaskHandler {
                     "$notificationType${medicationModel.id}${time.id}";
                 String? isNotificationShown =
                     SharedPrefs.prefs.getString(infoPath);
+                FlutterForegroundTask.updateService(
+                  notificationTitle:
+                      "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
+                  notificationText: subTitle,
+                );
 
                 if (isNotificationShown == null) {
-                  LocalNotifications.flutterLocalNotificationsPlugin.show(
-                    idForMedication,
-                    notificationTitle,
-                    subTitle,
-                    const NotificationDetails(
-                      android: AndroidNotificationDetails(
-                        notificationChannelId,
-                        'JBL Pill Reminder',
-                        channelDescription:
-                            'Notification for JBL Pill Reminder App',
-                        priority: Priority.max,
+                  if (notificationType == "take_now" &&
+                      alarmOrNotification == "alarm") {
+                    Alarm.set(
+                      alarmSettings: AlarmSettings(
+                        id: alarmIDforMedicationReminder,
+                        dateTime:
+                            DateTime.now().add(const Duration(seconds: 5)),
+                        assetAudioPath: "assets/shaking-pill-bottle.mp3",
+                        loopAudio: true,
+                        vibrate: true,
+                        androidFullScreenIntent: true,
+                        notificationSettings: NotificationSettings(
+                          title:
+                              "$medicationTitle at ${formatClockWithoutContext(alarmClock)}",
+                          body:
+                              "It's time to take $medicationTitle's medicines. Please Take your medicine",
+                        ),
                       ),
-                    ),
-                    payload: "take_medicine",
-                  );
+                    );
+                  } else {
+                    LocalNotifications.flutterLocalNotificationsPlugin.show(
+                      idForMedication,
+                      notificationTitle,
+                      subTitle,
+                      const NotificationDetails(
+                        android: AndroidNotificationDetails(
+                          notificationChannelId,
+                          'JBL Pill Reminder',
+                          channelDescription:
+                              'Notification for JBL Pill Reminder App',
+                          priority: Priority.max,
+                        ),
+                      ),
+                      payload: "take_medicine",
+                    );
+                  }
 
                   SharedPrefs.prefs.setString(infoPath, "true");
                 }
@@ -119,17 +165,23 @@ class MyForegroundTaskHandler extends TaskHandler {
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You have $minutesDifference minutes left for next medication.',
+                        'You have ${minutesDifference.abs()} minutes left for next medication.',
                   );
                 } else {
                   FlutterForegroundTask.updateService(
                     notificationTitle:
                         "$medicationTitle at ${formatClockWithoutContext(clockFormat(time.clock!))}",
                     notificationText:
-                        'You missed your medicine that was needed to take ${minutesDifference.obs()} minutes earlier. Take it now.',
+                        'You missed your medicine that was needed to take ${minutesDifference.abs()} minutes earlier. Take it now.',
                   );
                 }
               } else {
+                SharedPrefs.prefs
+                    .remove("take_now${medicationModel.id}${time.id}");
+
+                SharedPrefs.prefs
+                    .remove("reminder${medicationModel.id}${time.id}");
+
                 int distanceMins = now.difference(alarmTime).inMinutes.abs();
                 log("distanceMins: $distanceMins");
                 if (now.millisecondsSinceEpoch >

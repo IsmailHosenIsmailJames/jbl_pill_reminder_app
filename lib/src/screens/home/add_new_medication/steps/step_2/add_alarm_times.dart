@@ -207,6 +207,7 @@ class _AddAlarmTimesState extends State<AddAlarmTimes> {
             getTitlesForFields(
               title: "Type",
             ),
+            const Gap(5),
             DropdownButtonFormField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(
