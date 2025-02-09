@@ -1,0 +1,10 @@
+{
+    "name": "user_name",
+    "age": 45,
+    "gender": "gender",
+    "division": "division",
+    "district": "district",
+    "thana": "thana",
+    "phone": "phone",
+    "password": "password"
+}

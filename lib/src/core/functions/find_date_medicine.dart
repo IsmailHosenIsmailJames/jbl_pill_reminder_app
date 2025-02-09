@@ -1,26 +1,31 @@
+import 'dart:developer';
+
 import 'package:intl/intl.dart';
-import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
-import 'package:jbl_pill_reminder_app/src/model/medication/schedule_model.dart';
-import 'package:jbl_pill_reminder_app/src/screens/home/add_new_medication/steps/step_2/set_medication_schedule.dart';
+import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
 
-List<MedicationModel> findDateMedicine(
-    List<MedicationModel> listOfMedications, DateTime date) {
-  List<MedicationModel> todaysMedication = [];
-  for (MedicationModel medicationModel in listOfMedications) {
-    String frequencyType = medicationModel.schedule?.frequency?.type ?? "";
+import '../../resources/frequency.dart';
+import '../../screens/add_reminder/model/schedule_model.dart';
+
+List<ReminderModel> findDateMedicine(
+    List<ReminderModel> listOfMedications, DateTime date) {
+  List<ReminderModel> todaysMedication = [];
+  for (ReminderModel medicationModel in listOfMedications) {
+    String frequencyType = medicationModel.schedule?.frequency?.type ?? '';
     List<TimeModel>? listOfTime = medicationModel.schedule?.times;
-
     if (listOfTime != null) {
       if (medicationModel.schedule?.startDate != null &&
           medicationModel.schedule?.endDate != null) {
         // is between start and end Date
-        if (!(date.isAfter(medicationModel.schedule!.startDate) &&
-            date.isBefore(medicationModel.schedule!.endDate!))) {
+        if (!(medicationModel.schedule!.startDate.millisecondsSinceEpoch <=
+                date.millisecondsSinceEpoch &&
+            medicationModel.schedule!.endDate!.millisecondsSinceEpoch >=
+                date.millisecondsSinceEpoch)) {
           continue;
         }
       }
       // everyday
       if (frequencyType == frequencyTypeList[0]) {
+        log('Frequency type: Every day');
         todaysMedication.add(medicationModel);
       }
       // every X days

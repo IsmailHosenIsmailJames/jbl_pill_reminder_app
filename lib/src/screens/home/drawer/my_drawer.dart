@@ -1,10 +1,19 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart';
+import 'package:jbl_pills_reminder_app/src/screens/history/history_page.dart';
+import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
+import 'package:jbl_pills_reminder_app/src/screens/my_pills/my_pills_page.dart';
+import 'package:jbl_pills_reminder_app/src/screens/profile_page/profile_page.dart';
+import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+  final String phone;
+  const MyDrawer({super.key, required this.phone});
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +26,26 @@ class MyDrawer extends StatelessWidget {
               color: MyAppColors.shadedMutedColor,
               image: const DecorationImage(
                 image: AssetImage(
-                  "assets/app_logo.png",
+                  'assets/app_logo.png',
                 ),
                 fit: BoxFit.fitHeight,
               ),
             ),
-            child: const Align(
+            child: Align(
               alignment: Alignment.bottomRight,
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text("v1.0.0-dev.2+2"),
+                padding: const EdgeInsets.all(8.0),
+                child: FutureBuilder(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                          '${snapshot.data!.version} (${snapshot.data!.buildNumber})');
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
+                ),
               ),
             ),
           ),
@@ -34,38 +53,98 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             minTileHeight: 40,
             leading: const Icon(FluentIcons.home_24_regular),
-            title: const Text("Home"),
-            onTap: () {},
+            title: const Text('Home'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(
+                () => const HomeScreen(),
+              );
+            },
           ),
           ListTile(
             minTileHeight: 40,
             leading: const Icon(FluentIcons.person_24_regular),
-            title: const Text("Profile"),
-            onTap: () {},
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(
+                () => const ProfilePage(),
+              );
+            },
           ),
           ListTile(
             minTileHeight: 40,
             leading: const Icon(FluentIcons.pill_24_regular),
-            title: const Text("My Pills"),
-            onTap: () {},
+            title: const Text('My Pills'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(
+                () => MyPillsPage(
+                  phone: phone,
+                ),
+              );
+            },
           ),
           ListTile(
             minTileHeight: 40,
-            leading: const Icon(FluentIcons.share_24_regular),
-            title: const Text("Share Dosecast"),
-            onTap: () {},
-          ),
-          ListTile(
-            minTileHeight: 40,
-            leading: const Icon(FluentIcons.settings_24_regular),
-            title: const Text("Settings"),
-            onTap: () {},
+            leading: const Icon(FluentIcons.history_24_regular),
+            title: const Text('My History'),
+            onTap: () {
+              Navigator.pop(context);
+
+              Get.to(
+                () => HistoryPage(
+                  phone: phone,
+                ),
+              );
+            },
           ),
           ListTile(
             minTileHeight: 40,
             leading: const Icon(FluentIcons.sign_out_24_regular),
-            title: const Text("Sign Out"),
-            onTap: () {},
+            title: const Text('Sign Out'),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    insetPadding: const EdgeInsets.all(10),
+                    title: const Text('Are you sure?'),
+                    content: const Text(
+                        'Once you sign out, your existing information will be deleted from the local device. Later you will get the data after signing in again.'),
+                    actions: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MyAppColors.primaryColor,
+                          iconColor: Colors.white,
+                          foregroundColor: Colors.white,
+                        ),
+                        label: const Text('Cancel'),
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          iconColor: Colors.white,
+                          foregroundColor: Colors.white,
+                        ),
+                        label: const Text('Sign Out'),
+                        icon: const Icon(Icons.logout_rounded),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          await Hive.box('user_db').clear();
+                          await Hive.box('reminder_db').clear();
+                          Get.offAll(() => const LoginPage());
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

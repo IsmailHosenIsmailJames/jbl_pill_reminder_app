@@ -1,0 +1,75 @@
+{
+    "user": {
+        "id": "user_id",
+        "name": "user_name",
+        "email": "user_email",
+        "mobile": "user_mobile",
+        "age": "user_age",
+        "gender": "user_gender",
+        "reminder_type": "reminder_type"
+    },
+    "reminders": [
+        {
+            "id": "155482168",
+            "phone_number": "01700000000",
+            "description": "My important Notes for my pills reminder.",
+            "quantity": "6",
+            "reminder_type": "alarm",
+            "medicine": {
+                "name": "Ace 500mg Tablet",
+                "brandName": "Ace",
+                "genericName": "Paracetamol",
+                "strength": "500mg"
+            },
+            "schedule": {
+                "start_date": "2025-02-06",
+                "end_date": "2025-02-28",
+                "when_to_take": "After food",
+                "how_many_minutes": 60,
+                "frequency": {
+                    "type": "Weekly",
+                    "weekly": {
+                        "days": [
+                            "Wednesday",
+                            "Friday"
+                        ]
+                    },
+                    "monthly": {
+                        "dates": [
+                            1,
+                            15,
+                            29
+                        ]
+                    },
+                    "yearly": {
+                        "dates": [
+                            "01-01-2025",
+                            "015-04-2025"
+                        ]
+                    },
+                    "every_x_days": 5
+                },
+                "times": [
+                    {
+                        "id": "57565",
+                        "name": "Morning",
+                        "hour": 9,
+                        "minute": 0
+                    },
+                    {
+                        "id": "8768",
+                        "name": "Night",
+                        "hour": 21,
+                        "minute": 0
+                    },
+                    {
+                        "id": "64339",
+                        "name": "Afternoon",
+                        "hour": 14,
+                        "minute": 0
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -14,7 +14,7 @@ Widget getTitlesForFields(
       ),
       if (isFieldRequired)
         const Text(
-          " *",
+          ' *',
           style: TextStyle(
             color: Colors.red,
             fontSize: 15,

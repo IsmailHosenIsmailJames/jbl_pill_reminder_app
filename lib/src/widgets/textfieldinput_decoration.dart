@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
-import 'package:jbl_pill_reminder_app/src/theme/const_values.dart';
+
+import '../theme/colors.dart';
+import '../theme/const_values.dart';
 
 InputDecoration textFieldInputDecoration({
   String? hint,
@@ -19,7 +20,7 @@ InputDecoration textFieldInputDecoration({
 }
 
 Widget customTextFieldDecoration({
-  required TextFormField textFormField,
+  required Widget textFormField,
 }) {
   return Container(
     padding: const EdgeInsets.only(left: 10, top: 2, bottom: 2),

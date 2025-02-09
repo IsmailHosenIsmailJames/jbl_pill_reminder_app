@@ -1,4 +1,4 @@
-# jbl_pill_reminder_app
+# jbl_pills_reminder_app
 
 A new Flutter project.
 

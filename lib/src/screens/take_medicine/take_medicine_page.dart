@@ -1,19 +1,27 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:jbl_pill_reminder_app/src/core/functions/functions.dart';
-import 'package:jbl_pill_reminder_app/src/model/medication/medication_card.dart';
-import 'package:jbl_pill_reminder_app/src/model/medication/medication_model.dart';
-import 'package:jbl_pill_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pill_reminder_app/src/theme/colors.dart';
+import 'package:hive/hive.dart';
+import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
+import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
+import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
+import 'package:jbl_pills_reminder_app/src/widgets/medication_card.dart';
+import 'package:toastification/toastification.dart';
+
+import '../../core/functions/safe_substring.dart';
 
 class TakeMedicinePage extends StatefulWidget {
   final String? title;
   final String? payload;
+  final ReminderModel currentMedicationToTake;
   const TakeMedicinePage({
     super.key,
     this.title,
     this.payload,
+    required this.currentMedicationToTake,
   });
 
   @override
@@ -22,10 +30,10 @@ class TakeMedicinePage extends StatefulWidget {
 
 class _TakeMedicinePageState extends State<TakeMedicinePage> {
   final homeController = Get.put(HomeController());
-  late MedicationModel currentMedicationToTake;
+  final ProfilePageController profilePageController =
+      Get.put(ProfilePageController());
   @override
   void initState() {
-    currentMedicationToTake = homeController.listOfAllMedications[0];
     super.initState();
   }
 
@@ -33,7 +41,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title ?? "Take Medicine"),
+        title: Text(widget.title ?? 'Take Medicine'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -51,10 +59,10 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                   ),
                 ),
                 const Gap(30),
-                if (currentMedicationToTake.title != null)
+                if (widget.currentMedicationToTake.medicine?.name != null)
                   Text(
                     substringSafe(
-                      currentMedicationToTake.title!,
+                      widget.currentMedicationToTake.medicine!.name ?? '',
                       30,
                     ),
                     style: const TextStyle(
@@ -64,56 +72,40 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                   ),
                 const Divider(),
                 const Text(
-                  "Details: ",
+                  'Details: ',
                   style: TextStyle(
                     fontSize: 14,
                   ),
                 ),
               ] +
-              List<Widget>.generate(
-                homeController.listOfAllMedications.length,
-                (index) {
-                  return cardOfMedicineForSummary(
-                    homeController.listOfAllMedications[index],
-                    context,
-                    showTitle: false,
-                  );
-                },
-              ) +
+              [
+                cardOfReminderForSummary(
+                  homeController.nextReminder.value!,
+                  context,
+                  showTitle: false,
+                )
+              ] +
               <Widget>[
-                Align(
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                    height: 35,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                          backgroundColor: MyAppColors.shadedGrey,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              side: BorderSide(
-                                color: MyAppColors.secondaryColor
-                                    .withValues(alpha: 0.5),
-                              ))),
-                      onPressed: () {},
-                      child: const Text("Notify me 5 minutes later"),
-                    ),
-                  ),
-                ),
                 const Gap(30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
-                      child: OutlinedButton(
+                      child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(100),
                           ),
                         ),
-                        onPressed: () {},
-                        child: const Text(
-                          "Already Taken",
+                        onPressed: () {
+                          Get.back();
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back,
+                        ),
+                        label: const Text(
+                          'Back',
                         ),
                       ),
                     ),
@@ -125,9 +117,31 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () async {
+                          final reminderDoneDB = Hive.box('reminder_done');
+                          Map<String, dynamic> reminderData =
+                              widget.currentMedicationToTake.toMap();
+                          reminderData['doneBackup'] = false;
+                          await reminderDoneDB.put(
+                            DateTime.now().millisecondsSinceEpoch.toString(),
+                            jsonEncode(reminderData),
+                          );
+                          try {
+                            HomeController.backupReminderHistory(
+                                profilePageController.userInfo.value!.phone);
+                          } catch (e) {
+                            log(e.toString());
+                          }
+                          toastification.show(
+                            context: context,
+                            title: const Text('Saved as done'),
+                            type: ToastificationType.success,
+                            autoCloseDuration: const Duration(seconds: 3),
+                          );
+                          Get.back();
+                        },
                         icon: const Icon(Icons.done),
-                        label: const Text("Done"),
+                        label: const Text('Done'),
                       ),
                     ),
                   ],
