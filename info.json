@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "result": {
+    "version": "1.0.1",
+    "buildNumber": "2",
+    "forceToUpdate": true,
+    "removeCacheOnUpdate": false,
+    "removeDataOnUpdate": false,
+    "removeCacheAndDataOnUpdate": false,
+    "downloadLink": "https://github.com/IsmailHosenIsmailJames/jbl_pill_reminder_app/releases/download/v1.0.1/jbl_pill_reminder_app-app-release-v1.0.1.apk",
+    "downloadLinkList": [
+      {
+        "architecture": "x86_64",
+        "link": "https://github.com/IsmailHosenIsmailJames/jbl_pill_reminder_app/releases/download/v1.0.1/jbl_pill_reminder_app-app-x86_64-release-v1.0.1.apk"
+      },
+      {
+        "architecture": "armeabi-v7a",
+        "link": "https://github.com/IsmailHosenIsmailJames/jbl_pill_reminder_app/releases/download/v1.0.1/jbl_pill_reminder_app-app-armeabi-v7a-release-v1.0.1.apk"
+      },
+      {
+        "architecture": "arm64-v8a",
+        "link": "https://github.com/IsmailHosenIsmailJames/jbl_pill_reminder_app/releases/download/v1.0.1/jbl_pill_reminder_app-app-arm64-v8a-release-v1.0.1.apk"
+      }
+    ]
+  }
+}

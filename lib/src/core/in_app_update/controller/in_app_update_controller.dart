@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/model/latest_app_info.dart';
+
+import '../model/latest_app_info.dart';
 
 class InAppUpdateController extends GetxController {
   RxList<LatestAppInfoAPIModel> latestAppInfoApiModel =

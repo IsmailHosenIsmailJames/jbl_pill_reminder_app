@@ -7,6 +7,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart';
 import 'package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart';
 import 'package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart';
 import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
@@ -109,6 +110,7 @@ class MyApp extends StatelessWidget {
           } else {
             Get.off(() => const LoginPage());
           }
+          inAppUpdateAndroid(context);
         },
         home: Scaffold(
           body: Center(

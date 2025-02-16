@@ -2,17 +2,17 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:jbl_pills_reminder_app/main.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/controller/in_app_update_controller.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/functions/get_device_info.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/functions/get_info_form_api.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/update_popup.dart';
-
+import '../../../../main.dart';
+import '../controller/in_app_update_controller.dart';
 import '../functions/compare_version.dart';
 import '../functions/get_app_info.dart';
+import '../functions/get_device_info.dart';
+import '../functions/get_info_form_api.dart';
 import '../model/latest_app_info.dart';
+import 'update_popup.dart';
 
 Future<void> inAppUpdateAndroid(BuildContext context) async {
+  log('inAppUpdateAndroid', name: 'fn');
   final inAppUpdateController = Get.put(InAppUpdateController());
   try {
     LatestAppInfoAPIModel latestAppInfo = await getInfoFormAPI();

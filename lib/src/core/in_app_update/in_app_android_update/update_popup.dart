@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:jbl_pills_reminder_app/main.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/popup_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../../../main.dart';
 import '../model/latest_app_info.dart';
+import 'popup_widget.dart';
 
 Future<void> showUpdatePopup(
   BuildContext context, {

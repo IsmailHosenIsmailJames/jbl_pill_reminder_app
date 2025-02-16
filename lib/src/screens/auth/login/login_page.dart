@@ -122,13 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text('Forgot Password?'),
-                    ),
-                  ),
+                  const Gap(10),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
