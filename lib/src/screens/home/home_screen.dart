@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart';
 import 'package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart';
 import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
 import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart';
@@ -60,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    inAppUpdateAndroid(context);
     loadUserData();
     super.initState();
     getAndSaveAllReminderFromServer();

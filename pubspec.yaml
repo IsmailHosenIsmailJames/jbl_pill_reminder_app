@@ -2,7 +2,7 @@ name: jbl_pills_reminder_app
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.1+2
+version: 1.0.2+2
 
 environment:
   sdk: ^3.6.1

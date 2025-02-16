@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -53,7 +54,7 @@ class _PopupWidgetState extends State<PopupWidget> {
         // height: 200,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.blue.shade900,
+          color: MyAppColors.primaryColor,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
