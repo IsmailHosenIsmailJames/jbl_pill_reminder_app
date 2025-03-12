@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:alarm/alarm.dart';
+import 'package:alarm/model/volume_settings.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart';
@@ -143,6 +144,9 @@ class MyTaskHandler extends TaskHandler {
                           title: title,
                           body: body,
                           stopButton: 'Stop',
+                        ),
+                        volumeSettings: VolumeSettings.fade(
+                          fadeDuration: const Duration(seconds: 5),
                         ),
                       );
                       log('alarm setting done');
