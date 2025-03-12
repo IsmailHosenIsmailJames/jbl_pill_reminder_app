@@ -84,7 +84,8 @@ Card cardOfReminderForSummary(
                   ),
                   const Gap(10),
                   Text(
-                    substringSafe(currentReminder.medicine?.name ?? '', 35),
+                    substringSafe(
+                        currentReminder.medicine?.brandName ?? '', 35),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,

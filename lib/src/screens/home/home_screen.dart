@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart';
@@ -67,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
     getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
 
-    requestPermissionsAwesomeNotifications();
     FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {

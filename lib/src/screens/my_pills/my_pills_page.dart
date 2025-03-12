@@ -26,7 +26,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
       for (var medicine in temAllMedicine) {
         if (medicine.brandName == currentMedicine.brandName &&
             medicine.genericName == currentMedicine.genericName &&
-            medicine.name == currentMedicine.name &&
+            medicine.brandName == currentMedicine.brandName &&
             medicine.strength == currentMedicine.strength) {
           isAlreadyExits = true;
         }
@@ -72,7 +72,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (medicine.name != null)
+                      if (medicine.brandName != null)
                         Row(
                           children: [
                             Text(
@@ -85,7 +85,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                             ),
                             const Gap(5),
                             Text(
-                              medicine.name!,
+                              medicine.brandName!,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),

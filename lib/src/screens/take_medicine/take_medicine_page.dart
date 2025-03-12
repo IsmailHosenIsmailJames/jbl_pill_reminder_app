@@ -59,10 +59,10 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                   ),
                 ),
                 const Gap(30),
-                if (widget.currentMedicationToTake.medicine?.name != null)
+                if (widget.currentMedicationToTake.medicine?.brandName != null)
                   Text(
                     substringSafe(
-                      widget.currentMedicationToTake.medicine!.name ?? '',
+                      widget.currentMedicationToTake.medicine?.brandName ?? '',
                       30,
                     ),
                     style: const TextStyle(

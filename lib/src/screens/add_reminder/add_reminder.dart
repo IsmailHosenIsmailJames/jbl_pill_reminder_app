@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -49,7 +50,7 @@ class _AddReminderState extends State<AddReminder> {
       reminderModel.schedule ?? ScheduleModel(startDate: DateTime.now());
 
   late TextEditingController textEditingControllerSearchMedicine =
-      TextEditingController(text: reminderModel.medicine?.name);
+      TextEditingController(text: reminderModel.medicine?.brandName);
   late TextEditingController textEditingControllerReminderDescription =
       TextEditingController(
     text: reminderModel.description,
@@ -68,6 +69,36 @@ class _AddReminderState extends State<AddReminder> {
   ProfilePageController profileController = Get.put(ProfilePageController());
 
   bool isAsyncLoading = false;
+
+  List<Map<String, dynamic>> medicineData = [];
+
+  @override
+  void initState() {
+    loadMedicineList();
+    super.initState();
+  }
+
+  Future<void> loadMedicineList() async {
+    String medicineJsonData =
+        await rootBundle.loadString('assets/resources/medicine_list.json');
+    dev.log('1');
+    List<Map> temMedicineData = List<Map>.from(jsonDecode(medicineJsonData));
+    dev.log('2');
+
+    for (int i = 0; i < temMedicineData.length; i++) {
+      Map<String, dynamic> element =
+          Map<String, dynamic>.from(temMedicineData[i]);
+      medicineData.add({
+        'brandName': element['BN'], // brandName = BN
+        'genericName': element['GN'], // genericName = GN
+        'strength': element['S'], // strength = S
+        'dosageDescription': element['DD'], // dosageDescription = DD
+      });
+    }
+    dev.log('3');
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +124,7 @@ class _AddReminderState extends State<AddReminder> {
                 textFormField: SearchField<MedicineModel>(
                   onSuggestionTap: (p0) {
                     textEditingControllerSearchMedicine.text =
-                        p0.item?.name ?? '';
+                        "${p0.item?.brandName ?? ''} (${p0.item?.genericName ?? ''}) - ${p0.item?.dosageDescription ?? ''}";
                   },
                   controller: textEditingControllerSearchMedicine,
                   validator: (value) {
@@ -116,12 +147,12 @@ class _AddReminderState extends State<AddReminder> {
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                                Text(item.name ?? ''),
+                                Text(item.brandName),
                                 const Gap(5),
                                 Text(
-                                  '(${item.genericName}) ${item.brandName}',
+                                  '(${item.genericName}) - ${item.dosageDescription}',
                                   style: const TextStyle(
-                                      fontSize: 10, color: Colors.grey),
+                                      fontSize: 12, color: Colors.grey),
                                 ),
                               ],
                             ),
@@ -790,11 +821,12 @@ class _AddReminderState extends State<AddReminder> {
                       description:
                           textEditingControllerReminderDescription.text,
                       medicine: MedicineModel(
-                        name: medicineModel?.name ??
+                        brandName: medicineModel?.brandName ??
                             textEditingControllerSearchMedicine.text,
-                        brandName: medicineModel?.brandName,
-                        genericName: medicineModel?.genericName,
-                        strength: medicineModel?.strength,
+                        genericName: medicineModel?.genericName ?? '',
+                        strength: medicineModel?.strength ?? '',
+                        dosageDescription:
+                            medicineModel?.dosageDescription ?? '',
                       ),
                       schedule: scheduleModel.copyWith(
                         howManyMinutes:
