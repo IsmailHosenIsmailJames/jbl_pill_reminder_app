@@ -26,9 +26,9 @@ class MyDrawer extends StatelessWidget {
               color: MyAppColors.shadedMutedColor,
               image: const DecorationImage(
                 image: AssetImage(
-                  'assets/app_logo.png',
+                  'assets/app_logo.jpeg',
                 ),
-                fit: BoxFit.fitHeight,
+                fit: BoxFit.cover,
               ),
             ),
             child: Align(

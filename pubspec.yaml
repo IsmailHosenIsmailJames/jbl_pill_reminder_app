@@ -2,7 +2,7 @@ name: jbl_pills_reminder_app
 description: "jbl pills reminder app"
 publish_to: 'none'
 
-version: 1.0.2+2
+version: 1.0.3+3
 
 environment:
   sdk: ^3.6.1
@@ -23,8 +23,11 @@ dependencies:
   gap: ^3.0.1
   get: ^5.0.0-release-candidate-9.3.2
   google_fonts: ^6.2.1
+  hive: ^2.2.3
   hive_flutter: ^1.1.0
+  http: ^1.3.0
   http_status_code: ^0.0.2
+  icons_launcher: ^3.0.1
   internet_connection_checker_plus: ^2.7.1
   intl: ^0.20.2
   open_file: ^3.5.10
@@ -61,3 +64,11 @@ flutter_native_splash:
   android_12:
     image: assets/app_splash.jpeg
     icon_background_color: 
+
+icons_launcher:
+  image_path: "assets/app_logo.jpeg"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
