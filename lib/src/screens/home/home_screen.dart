@@ -19,7 +19,6 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../core/background/background_setup.dart';
 import '../../core/functions/find_date_medicine.dart';
-import '../../core/notifications/requiest_permission.dart';
 import '../../theme/const_values.dart';
 import '../../widgets/medication_card.dart';
 import '../auth/signup/model/signup_models.dart';

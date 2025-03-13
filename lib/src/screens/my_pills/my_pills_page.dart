@@ -72,71 +72,67 @@ class _MyPillsPageState extends State<MyPillsPage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (medicine.brandName != null)
-                        Row(
-                          children: [
-                            Text(
-                              'Pill Name :',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.grey.shade600,
-                              ),
+                      Row(
+                        children: [
+                          Text(
+                            'Pill Name :',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
                             ),
-                            const Gap(5),
-                            Text(
-                              medicine.brandName!,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          ),
+                          const Gap(5),
+                          Text(
+                            medicine.brandName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
-                      if (medicine.genericName != null)
-                        Row(
-                          children: [
-                            Text(
-                              'Generic Name :',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.grey.shade600,
-                              ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Generic Name :',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
                             ),
-                            const Gap(5),
-                            Text(medicine.genericName!),
-                          ],
-                        ),
-                      if (medicine.brandName != null)
-                        Row(
-                          children: [
-                            Text(
-                              'Brand Name :',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.grey.shade600,
-                              ),
+                          ),
+                          const Gap(5),
+                          Text(medicine.genericName),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Brand Name :',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
                             ),
-                            const Gap(5),
-                            Text(medicine.brandName!),
-                          ],
-                        ),
-                      if (medicine.strength != null)
-                        Row(
-                          children: [
-                            Text(
-                              'Strength :',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: Colors.grey.shade600,
-                              ),
+                          ),
+                          const Gap(5),
+                          Text(medicine.brandName),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            'Strength :',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
                             ),
-                            const Gap(5),
-                            Text(medicine.strength!),
-                          ],
-                        ),
+                          ),
+                          const Gap(5),
+                          Text(medicine.strength),
+                        ],
+                      ),
                     ],
                   ),
                 ),
