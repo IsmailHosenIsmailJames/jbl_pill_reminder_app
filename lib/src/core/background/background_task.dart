@@ -250,7 +250,7 @@ class MyTaskHandler extends TaskHandler {
   }
 
   @override
-  Future<void> onDestroy(DateTime timestamp) async {
+  Future<void> onDestroy(DateTime timestamp, bool success) async {
     log('onDestroy');
   }
 
