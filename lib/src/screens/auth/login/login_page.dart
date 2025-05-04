@@ -172,7 +172,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> login(BuildContext context) async {
     String phone = textEditingControllerPhoneNumber.text;
-    if (!phone.startsWith('+88')) {
+    if (phone.startsWith('88')) {
+      phone = '+$phone';
+    } else if (phone.startsWith('0')) {
       phone = '+88$phone';
     }
     try {
