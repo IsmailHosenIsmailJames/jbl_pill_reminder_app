@@ -1,7 +1,5 @@
 import 'dart:developer';
 
-import 'package:alarm/alarm.dart';
-import 'package:alarm/model/volume_settings.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart';
@@ -86,6 +84,7 @@ class MyTaskHandler extends TaskHandler {
                   title: title,
                   body: body,
                   isPreReminder: true,
+                  isAlarm: false,
                 );
                 notificationShownMap.addAll({
                   fullTrackingID: {
@@ -113,6 +112,7 @@ class MyTaskHandler extends TaskHandler {
                     title: 'Pill Reminder',
                     body: 'Pill Reminder at ${time.name}',
                     isPreReminder: false,
+                    isAlarm: false,
                   );
                   alarmShown.addAll({
                     fullTrackingID: {
@@ -129,29 +129,14 @@ class MyTaskHandler extends TaskHandler {
                   if (status == true) {
                     try {
                       log('alarm settings');
-
-                      await Alarm.init();
-
-                      final alarmSettings = AlarmSettings(
+                      await pushNotifications(
                         id: int.parse(time.id),
-                        dateTime:
-                            DateTime.now().subtract(const Duration(seconds: 3)),
-                        assetAudioPath: 'assets/shaking-pill-bottle.mp3',
-                        loopAudio: true,
-                        vibrate: true,
-                        androidFullScreenIntent: true,
-                        notificationSettings: NotificationSettings(
-                          title: title,
-                          body: body,
-                          stopButton: 'Stop',
-                        ),
-                        volumeSettings: VolumeSettings.fade(
-                          fadeDuration: const Duration(seconds: 5),
-                        ),
+                        title: 'Pill Reminder',
+                        body: 'Pill Reminder at ${time.name}',
+                        isPreReminder: false,
+                        isAlarm: true,
                       );
-                      log('alarm setting done');
-                      await Alarm.set(alarmSettings: alarmSettings);
-                      log('Set alarm');
+
                       alarmShown.addAll({
                         fullTrackingID: {
                           'isShown': true,

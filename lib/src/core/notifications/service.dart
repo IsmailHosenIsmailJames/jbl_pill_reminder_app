@@ -22,6 +22,8 @@ class NotificationsService {
           locked: true,
           playSound: true,
           enableVibration: true,
+          soundSource: 'resource://raw/shaking_pill_bottle',
+          defaultRingtoneType: DefaultRingtoneType.Notification,
         ),
       ],
       debug: true,
