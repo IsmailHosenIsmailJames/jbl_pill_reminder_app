@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart';
-import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
+import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,7 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
-  final userDB = Hive.box('user_db');
+  final userDB = Hive.box("user_db");
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   loadUserData() {
-    String? userInfo = userDB.get('user_info', defaultValue: null);
+    String? userInfo = userDB.get("user_info", defaultValue: null);
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
   }
@@ -45,14 +45,14 @@ class _ProfilePageState extends State<ProfilePage> {
         phone: profilePageController.userInfo.value!.phone,
       ),
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text("Profile"),
       ),
       body: Obx(
         () {
           UserInfoModel? userInfo = profilePageController.userInfo.value;
           if (userInfo == null) {
             return const Center(
-              child: Text('No user found'),
+              child: Text("No user found"),
             );
           }
           String userName = userInfo.name;
@@ -84,10 +84,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('Phone', style: textStyle),
+                    child: Text("Phone", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.phone}',
+                    ": ${userInfo.phone}",
                   ),
                 ],
               ),
@@ -96,10 +96,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('Age', style: textStyle),
+                    child: Text("Age", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.age}',
+                    ": ${userInfo.age}",
                   ),
                 ],
               ),
@@ -108,10 +108,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('Gender', style: textStyle),
+                    child: Text("Gender", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.gender}',
+                    ": ${userInfo.gender}",
                   ),
                 ],
               ),
@@ -120,10 +120,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('Division', style: textStyle),
+                    child: Text("Division", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.division}',
+                    ": ${userInfo.division}",
                   ),
                 ],
               ),
@@ -132,10 +132,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('District', style: textStyle),
+                    child: Text("District", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.district}',
+                    ": ${userInfo.district}",
                   ),
                 ],
               ),
@@ -144,10 +144,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   SizedBox(
                     width: width * 0.2,
-                    child: Text('Thana', style: textStyle),
+                    child: Text("Thana", style: textStyle),
                   ),
                   Text(
-                    ': ${userInfo.thana}',
+                    ": ${userInfo.thana}",
                   ),
                 ],
               ),
@@ -163,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   loadUserData();
                 },
                 icon: const Icon(Icons.edit_rounded),
-                label: const Text('Edit Profile'),
+                label: const Text("Edit Profile"),
               ),
             ],
           );

@@ -1,13 +1,13 @@
-import 'dart:convert';
-import 'dart:developer';
+import "dart:convert";
+import "dart:developer";
 
-import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:toastification/toastification.dart';
+import "package:flutter/material.dart";
+import "package:hive/hive.dart";
+import "package:http/http.dart" as http;
+import "package:get/get.dart";
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:toastification/toastification.dart";
 
 class HomeController extends GetxController {
   Rx<DateTime> selectedDay = DateTime.now().obs;
@@ -18,7 +18,7 @@ class HomeController extends GetxController {
 
   static Future<List<Map<String, dynamic>>> getAllRemindersFromServer(
       String phoneNumber) async {
-    final url = Uri.parse('${baseAPI}reminders/$phoneNumber');
+    final url = Uri.parse("${baseAPI}reminders/$phoneNumber");
 
     try {
       final response = await http.get(url);
@@ -31,7 +31,7 @@ class HomeController extends GetxController {
       } else {
         toastification.show(
           context: Get.context!,
-          title: const Text('Failed to get reminders'),
+          title: const Text("Failed to get reminders"),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
         );
@@ -45,7 +45,7 @@ class HomeController extends GetxController {
 
   static Future<Map<String, dynamic>?> getSingleReminderFromServer(
       String phoneNumber, String id) async {
-    final url = Uri.parse('${baseAPI}reminders/$phoneNumber/$id');
+    final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id");
 
     final response = await http.get(url);
 
@@ -54,7 +54,7 @@ class HomeController extends GetxController {
     } else {
       toastification.show(
         context: Get.context!,
-        title: const Text('Failed to get reminders'),
+        title: const Text("Failed to get reminders"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
@@ -64,18 +64,18 @@ class HomeController extends GetxController {
 
   static Future<bool> updateReminder(
       String phoneNumber, String id, Map<String, dynamic> updatedData) async {
-    final url = Uri.parse('${baseAPI}reminders/$phoneNumber/$id/update/');
+    final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id/update/");
 
     final response = await http.put(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {"Content-Type": "application/json"},
       body: jsonEncode(updatedData),
     );
 
     if (response.statusCode == 200) {
       toastification.show(
         context: Get.context!,
-        title: const Text('Reminder updated successfully'),
+        title: const Text("Reminder updated successfully"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.success,
       );
@@ -83,7 +83,7 @@ class HomeController extends GetxController {
     } else {
       toastification.show(
         context: Get.context!,
-        title: const Text('Failed to update reminder'),
+        title: const Text("Failed to update reminder"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
@@ -92,14 +92,14 @@ class HomeController extends GetxController {
   }
 
   static Future<bool> deleteReminder(String phoneNumber, String id) async {
-    final url = Uri.parse('${baseAPI}reminders/$phoneNumber/$id/delete/');
+    final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id/delete/");
 
     final response = await http.delete(url);
 
     if (response.statusCode == 204) {
       toastification.show(
         context: Get.context!,
-        title: const Text('Reminder deleted successfully'),
+        title: const Text("Reminder deleted successfully"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.success,
       );
@@ -107,7 +107,7 @@ class HomeController extends GetxController {
     } else {
       toastification.show(
         context: Get.context!,
-        title: const Text('Failed to delete reminder'),
+        title: const Text("Failed to delete reminder"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
@@ -116,17 +116,17 @@ class HomeController extends GetxController {
   }
 
   static Future<void> backupReminderHistory(String phone) async {
-    log('backupReminderHistory');
-    final reminderDoneDB = await Hive.openBox('reminder_done');
+    log("backupReminderHistory");
+    final reminderDoneDB = await Hive.openBox("reminder_done");
 
     reminderDoneDB.toMap().forEach(
       (key, value) async {
         Map reminderData = jsonDecode(value);
-        final isDoneBackup = reminderData['doneBackup'];
+        final isDoneBackup = reminderData["doneBackup"];
         if (isDoneBackup == null || isDoneBackup == false) {
           if (await backupSingleHistory(
               Map<String, dynamic>.from(reminderData), phone)) {
-            reminderData['doneBackup'] = true;
+            reminderData["doneBackup"] = true;
             await reminderDoneDB.put(key, jsonEncode(reminderData));
           }
         }
@@ -136,19 +136,19 @@ class HomeController extends GetxController {
 
   static Future<bool> backupSingleHistory(
       Map<String, dynamic> historyData, String phone) async {
-    log('backupSingleHistory');
-    final url = Uri.parse('${baseAPI}history/backup/');
-    historyData.remove('doneBackup');
+    log("backupSingleHistory");
+    final url = Uri.parse("${baseAPI}history/backup/");
+    historyData.remove("doneBackup");
     final response = await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'phone_number': phone, 'data': historyData}),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"phone_number": phone, "data": historyData}),
     );
 
     if (response.statusCode == 201) {
       return true; // Successfully backed up
     } else {
-      print('Failed to backup history: ${response.body}');
+      print("Failed to backup history: ${response.body}");
       return false;
     }
   }

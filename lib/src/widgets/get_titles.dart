@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
 
 Widget getTitlesForFields(
     {required String title, IconData? icon, bool isFieldRequired = false}) {
@@ -14,7 +14,7 @@ Widget getTitlesForFields(
       ),
       if (isFieldRequired)
         const Text(
-          ' *',
+          " *",
           style: TextStyle(
             color: Colors.red,
             fontSize: 15,

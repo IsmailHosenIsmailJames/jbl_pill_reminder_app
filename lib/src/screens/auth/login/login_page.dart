@@ -1,23 +1,23 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
+import "dart:convert";
+import "dart:developer";
+import "dart:io";
 
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart';
-import 'package:http_status_code/http_status_code.dart';
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/get_titles.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:toastification/toastification.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:http/http.dart";
+import "package:http_status_code/http_status_code.dart";
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
+import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
+import "package:smooth_page_indicator/smooth_page_indicator.dart";
+import "package:toastification/toastification.dart";
 
-import '../../../theme/colors.dart';
-import '../../../widgets/intro_pages.dart';
+import "../../../theme/colors.dart";
+import "../../../widgets/intro_pages.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Gap(30),
                   getTitlesForFields(
-                    title: 'Phone Number',
+                    title: "Phone Number",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -82,14 +82,14 @@ class _LoginPageState extends State<LoginPage> {
                     textFormField: TextFormField(
                       keyboardType: TextInputType.phone,
                       decoration: textFieldInputDecoration(
-                        hint: '+8801xxxxxxxxx',
+                        hint: "+8801xxxxxxxxx",
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Please enter your phone number';
+                          return "Please enter your phone number";
                         }
                         if (value.length != 11 && value.length != 14) {
-                          return 'Please enter a valid phone number';
+                          return "Please enter a valid phone number";
                         }
                         return null;
                       },
@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Gap(10),
                   getTitlesForFields(
-                    title: 'Password',
+                    title: "Password",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -107,14 +107,14 @@ class _LoginPageState extends State<LoginPage> {
                     textFormField: TextFormField(
                       keyboardType: TextInputType.visiblePassword,
                       decoration: textFieldInputDecoration(
-                        hint: 'type your password...',
+                        hint: "type your password...",
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Please enter your password';
+                          return "Please enter your password";
                         }
                         if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
+                          return "Password must be at least 6 characters";
                         }
                         return null;
                       },
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       },
                       child: const Text(
-                        'Log in',
+                        "Log in",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1,
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                         child: const Text(
-                          'Sign Up',
+                          "Sign Up",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -172,34 +172,34 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> login(BuildContext context) async {
     String phone = textEditingControllerPhoneNumber.text;
-    if (phone.startsWith('88')) {
-      phone = '+$phone';
-    } else if (phone.startsWith('0')) {
-      phone = '+88$phone';
+    if (phone.startsWith("88")) {
+      phone = "+$phone";
+    } else if (phone.startsWith("0")) {
+      phone = "+88$phone";
     }
     try {
       final response = await post(
         Uri.parse(loginAPI),
         body: jsonEncode({
-          'phone': phone,
-          'password': textEditingControllerPassword.text,
+          "phone": phone,
+          "password": textEditingControllerPassword.text,
         }),
-        headers: {'Content-Type': 'application/json'},
+        headers: {"Content-Type": "application/json"},
       );
 
-      log('Hit : $loginAPI', name: 'HTTP');
-      log(response.statusCode.toString(), name: 'HTTP');
-      log(response.body, name: 'HTTP');
+      log("Hit : $loginAPI", name: "HTTP");
+      log(response.statusCode.toString(), name: "HTTP");
+      log(response.body, name: "HTTP");
       if (response.statusCode == StatusCode.OK) {
         final data = Map<String, dynamic>.from(jsonDecode(response.body));
-        data.addAll({'password': textEditingControllerPassword.text});
-        await Hive.box('user_db').put(
-          'user_info',
+        data.addAll({"password": textEditingControllerPassword.text});
+        await Hive.box("user_db").put(
+          "user_info",
           jsonEncode(data),
         );
         toastification.show(
           context: context,
-          title: const Text('Login Successful'),
+          title: const Text("Login Successful"),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.success,
         );
@@ -207,10 +207,10 @@ class _LoginPageState extends State<LoginPage> {
           () => const HomeScreen(),
         );
       } else {
-        String errorMsg = jsonDecode(response.body)['message'];
+        String errorMsg = jsonDecode(response.body)["message"];
         toastification.show(
           context: context,
-          title: const Text('Login Failed'),
+          title: const Text("Login Failed"),
           description: Text(errorMsg),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
       toastification.show(
         context: context,
-        title: const Text('Something went wrong'),
+        title: const Text("Something went wrong"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );

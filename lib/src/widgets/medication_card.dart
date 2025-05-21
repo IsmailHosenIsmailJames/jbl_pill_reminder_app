@@ -1,24 +1,24 @@
-import 'dart:math';
+import "dart:math";
 
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:intl/intl.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
-import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
-import 'package:toastification/toastification.dart';
+import "package:fluentui_system_icons/fluentui_system_icons.dart";
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:internet_connection_checker_plus/internet_connection_checker_plus.dart";
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:toastification/toastification.dart";
 
-import '../core/functions/safe_substring.dart';
-import '../resources/frequency.dart';
-import '../theme/colors.dart';
-import '../theme/const_values.dart';
+import "../core/functions/safe_substring.dart";
+import "../resources/frequency.dart";
+import "../theme/colors.dart";
+import "../theme/const_values.dart";
 
 Card cardOfReminderForSummary(
   ReminderModel currentReminder,
@@ -33,25 +33,25 @@ Card cardOfReminderForSummary(
 
   String? frequencyType = currentReminder.schedule?.frequency?.type;
 
-  String listOfFrequencyDay = '';
+  String listOfFrequencyDay = "";
   if (frequencyType == frequencyTypeList[1]) {
     int? distance = currentReminder.schedule?.frequency?.everyXDays;
-    listOfFrequencyDay += (distance ?? '').toString();
+    listOfFrequencyDay += (distance ?? "").toString();
   } else if (frequencyType == frequencyTypeList[2]) {
     List<String> listOfDay =
         (currentReminder.schedule?.frequency?.weekly?.days) ?? [];
     listOfFrequencyDay +=
-        listOfDay.toString().replaceAll('[', '').replaceAll(']', '');
+        listOfDay.toString().replaceAll("[", "").replaceAll("]", "");
   } else if (frequencyType == frequencyTypeList[3]) {
     List<int> listOfDay =
         (currentReminder.schedule?.frequency?.monthly?.dates) ?? [];
     listOfFrequencyDay +=
-        listOfDay.toString().replaceAll('[', '').replaceAll(']', '');
+        listOfDay.toString().replaceAll("[", "").replaceAll("]", "");
   } else if (frequencyType == frequencyTypeList[4]) {
     List<DateTime> listOfDay =
         (currentReminder.schedule?.frequency?.yearly?.dates) ?? [];
     for (var element in listOfDay) {
-      listOfFrequencyDay += '${DateFormat.yMMMd().format(element)},';
+      listOfFrequencyDay += "${DateFormat.yMMMd().format(element)},";
     }
   }
 
@@ -85,7 +85,7 @@ Card cardOfReminderForSummary(
                   const Gap(10),
                   Text(
                     substringSafe(
-                        currentReminder.medicine?.brandName ?? '', 35),
+                        currentReminder.medicine?.brandName ?? "", 35),
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -111,7 +111,7 @@ Card cardOfReminderForSummary(
               ),
               const Gap(10),
               Text(
-                frequencyType ?? '',
+                frequencyType ?? "",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -136,8 +136,8 @@ Card cardOfReminderForSummary(
                     ),
                     child: Text(
                       frequencyType == frequencyTypeList[1]
-                          ? 'every $listOfFrequencyDay days'
-                          : 'on $listOfFrequencyDay',
+                          ? "every $listOfFrequencyDay days"
+                          : "on $listOfFrequencyDay",
                     ),
                   ),
                 ),
@@ -152,10 +152,10 @@ Card cardOfReminderForSummary(
                 Row(
                   children: [
                     if (currentReminder.quantity != null)
-                      const Text('Quantity: '),
+                      const Text("Quantity: "),
                     if (currentReminder.quantity != null)
                       Text(
-                        '${currentReminder.quantity} ',
+                        "${currentReminder.quantity} ",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -205,8 +205,8 @@ Card cardOfReminderForSummary(
               ),
             ],
           ),
-          if ((currentReminder.description ?? '').isNotEmpty) const Gap(7),
-          if ((currentReminder.description ?? '').isNotEmpty)
+          if ((currentReminder.description ?? "").isNotEmpty) const Gap(7),
+          if ((currentReminder.description ?? "").isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +218,7 @@ Card cardOfReminderForSummary(
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: Text(
-                    currentReminder.description ?? '',
+                    currentReminder.description ?? "",
                   ),
                 ),
               ],
@@ -232,10 +232,10 @@ Card cardOfReminderForSummary(
               const Gap(10),
               Text(DateFormat.yMMMd().format(startDate)),
               const Gap(5),
-              const Text('to'),
+              const Text("to"),
               const Gap(5),
               endDate == null
-                  ? const Text('On going')
+                  ? const Text("On going")
                   : Text(DateFormat.yMMMd().format(endDate)),
             ],
           ),
@@ -284,7 +284,7 @@ Card cardOfReminderForSummary(
                         builder: (context) {
                           return AlertDialog(
                             insetPadding: const EdgeInsets.all(10),
-                            title: const Text('Are you sure?'),
+                            title: const Text("Are you sure?"),
                             content: const Text(
                                 "Once you delete, you can't recover it again."),
                             actions: [
@@ -296,7 +296,7 @@ Card cardOfReminderForSummary(
                                   Navigator.pop(context);
                                 },
                                 icon: const Icon(Icons.cancel),
-                                label: const Text('Cancel'),
+                                label: const Text("Cancel"),
                               ),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
@@ -308,7 +308,7 @@ Card cardOfReminderForSummary(
                                       false) {
                                     toastification.show(
                                       context: context,
-                                      title: const Text('No internet'),
+                                      title: const Text("No internet"),
                                       autoCloseDuration:
                                           const Duration(seconds: 2),
                                       type: ToastificationType.error,
@@ -322,7 +322,7 @@ Card cardOfReminderForSummary(
                                       await HomeController.deleteReminder(
                                           profile.userInfo.value!.phone, id);
                                   if (isDeleted) {
-                                    final reminderDB = Hive.box('reminder_db');
+                                    final reminderDB = Hive.box("reminder_db");
                                     await reminderDB.delete(id);
                                     final HomeController homeController =
                                         Get.find();
@@ -337,7 +337,7 @@ Card cardOfReminderForSummary(
 
                                     toastification.show(
                                       context: context,
-                                      title: const Text('Successfully deleted'),
+                                      title: const Text("Successfully deleted"),
                                       type: ToastificationType.success,
                                       autoCloseDuration:
                                           const Duration(seconds: 2),
@@ -345,7 +345,7 @@ Card cardOfReminderForSummary(
                                   } else {
                                     toastification.show(
                                       context: context,
-                                      title: const Text('Failed to delete'),
+                                      title: const Text("Failed to delete"),
                                       type: ToastificationType.error,
                                       autoCloseDuration:
                                           const Duration(seconds: 2),
@@ -353,7 +353,7 @@ Card cardOfReminderForSummary(
                                   }
                                 },
                                 icon: const Icon(Icons.delete),
-                                label: const Text('Delete'),
+                                label: const Text("Delete"),
                               )
                             ],
                           );

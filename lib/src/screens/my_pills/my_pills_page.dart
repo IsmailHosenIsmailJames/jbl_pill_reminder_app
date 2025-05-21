@@ -1,10 +1,10 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:jbl_pills_reminder_app/src/resources/medicine_list.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart';
+import "package:fluentui_system_icons/fluentui_system_icons.dart";
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 
 class MyPillsPage extends StatefulWidget {
   final String phone;
@@ -46,7 +46,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
         phone: widget.phone,
       ),
       appBar: AppBar(
-        title: const Text('My Pills'),
+        title: const Text("My Pills"),
       ),
       body: ListView.builder(
         itemCount: allMedicine.length,
@@ -75,7 +75,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                       Row(
                         children: [
                           Text(
-                            'Pill Name :',
+                            "Pill Name :",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -94,7 +94,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                       Row(
                         children: [
                           Text(
-                            'Generic Name :',
+                            "Generic Name :",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -108,7 +108,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                       Row(
                         children: [
                           Text(
-                            'Brand Name :',
+                            "Brand Name :",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
@@ -122,7 +122,7 @@ class _MyPillsPageState extends State<MyPillsPage> {
                       Row(
                         children: [
                           Text(
-                            'Strength :',
+                            "Strength :",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,

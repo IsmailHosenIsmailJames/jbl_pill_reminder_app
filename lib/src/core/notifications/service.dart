@@ -1,9 +1,9 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
+import "package:awesome_notifications/awesome_notifications.dart";
+import "package:flutter/material.dart";
+import "package:hive_flutter/hive_flutter.dart";
+import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 
 class NotificationsService {
   static Future<void> initNotifications() async {
@@ -11,10 +11,10 @@ class NotificationsService {
       null,
       [
         NotificationChannel(
-          channelKey: 'reminders',
-          channelName: 'Used for Reminders',
+          channelKey: "reminders",
+          channelName: "Used for Reminders",
           channelDescription:
-              'This channel is used for Reminders. When User add a Reminder, this channel will be used for remind the user',
+              "This channel is used for Reminders. When User add a Reminder, this channel will be used for remind the user",
           defaultColor: MyAppColors.primaryColor,
           ledColor: Colors.white,
           importance: NotificationImportance.Max,
@@ -22,7 +22,7 @@ class NotificationsService {
           locked: true,
           playSound: true,
           enableVibration: true,
-          soundSource: 'resource://raw/shaking_pill_bottle',
+          soundSource: "resource://raw/shaking_pill_bottle",
           defaultRingtoneType: DefaultRingtoneType.Notification,
         ),
       ],
@@ -45,25 +45,25 @@ class NotificationsService {
 
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    if (receivedAction.buttonKeyPressed == 'take_medicine') {
+    if (receivedAction.buttonKeyPressed == "take_medicine") {
       await Hive.initFlutter();
       await Hive.close();
-      final actionsBox = await Hive.openBox('actions');
-      await actionsBox.put('redirect', {DateTime.now().millisecondsSinceEpoch});
+      final actionsBox = await Hive.openBox("actions");
+      await actionsBox.put("redirect", {DateTime.now().millisecondsSinceEpoch});
     }
-    log('onActionReceivedMethod');
+    log("onActionReceivedMethod");
   }
 
   static Future<void> onNotificationCreatedMethod(receivedNotification) async {
-    log('onNotificationCreatedMethod');
+    log("onNotificationCreatedMethod");
   }
 
   static Future<void> onNotificationDisplayedMethod(
       receivedNotification) async {
-    log('onNotificationDisplayedMethod');
+    log("onNotificationDisplayedMethod");
   }
 
   static Future<void> onDismissActionReceivedMethod(receivedAction) async {
-    log('onDismissActionReceivedMethod');
+    log("onDismissActionReceivedMethod");
   }
 }

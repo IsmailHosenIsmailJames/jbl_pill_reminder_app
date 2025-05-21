@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_redundant_argument_values
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:flutter/foundation.dart";
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
-import 'background_task.dart';
+import "background_task.dart";
 
 Future<void> requestPermissions() async {
   // Android 13+, you need to allow notification permission to display foreground service notification.
@@ -19,15 +19,15 @@ Future<void> requestPermissions() async {
 
 Future<void> initService() async {
   final SharedPreferences info = await SharedPreferences.getInstance();
-  final timeInterval = info.getInt('time_interval');
+  final timeInterval = info.getInt("time_interval");
   // final minimumDistance = info.getInt("minimum_distance");
 
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
-      channelId: 'foreground_service',
-      channelName: 'Foreground Service Notification',
+      channelId: "foreground_service",
+      channelName: "Foreground Service Notification",
       channelDescription:
-          'This notification appears when the foreground location service is running.',
+          "This notification appears when the foreground location service is running.",
       channelImportance: NotificationChannelImportance.LOW,
       priority: NotificationPriority.LOW,
     ),
@@ -51,8 +51,8 @@ Future<ServiceRequestResult> startService() async {
   } else {
     return FlutterForegroundTask.startService(
       serviceId: 256,
-      notificationTitle: 'Foreground Service is running',
-      notificationText: 'Tap to return to the app',
+      notificationTitle: "Foreground Service is running",
+      notificationText: "Tap to return to the app",
       notificationIcon: null,
       callback: startCallback,
     );
@@ -66,7 +66,7 @@ Future<ServiceRequestResult> stopService() async {
 void onReceiveTaskData(Object data) {
   if (data is int) {
     if (kDebugMode) {
-      print('count: $data');
+      print("count: $data");
     }
   }
 }

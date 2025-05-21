@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
 
-import '../theme/colors.dart';
-import '../theme/const_values.dart';
+import "../theme/colors.dart";
+import "../theme/const_values.dart";
 
 class AppIntroPages extends StatelessWidget {
   final PageController pageController;
@@ -24,7 +24,7 @@ class AppIntroPages extends StatelessWidget {
               borderRadius: BorderRadius.circular(borderRadius),
               image: DecorationImage(
                 image: AssetImage(
-                  listOfPagesInfo[index]['img'],
+                  listOfPagesInfo[index]["img"],
                 ),
                 fit: BoxFit.fitHeight,
                 opacity: 0.3,
@@ -35,7 +35,7 @@ class AppIntroPages extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  listOfPagesInfo[index]['title'],
+                  listOfPagesInfo[index]["title"],
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class AppIntroPages extends StatelessWidget {
                 ),
                 const Gap(5),
                 Text(
-                  listOfPagesInfo[index]['text'],
+                  listOfPagesInfo[index]["text"],
                   style: const TextStyle(
                     fontSize: 12,
                   ),
@@ -59,21 +59,21 @@ class AppIntroPages extends StatelessWidget {
 
 List<Map<String, dynamic>> listOfPagesInfo = [
   {
-    'img': 'assets/img/vision.png',
-    'title': 'Welcome to JBL Pills Reminder App',
-    'text':
+    "img": "assets/img/vision.png",
+    "title": "Welcome to JBL Pills Reminder App",
+    "text":
         "We're so excited that you're joining our JBL Pills Reminder App. And like a family, we're here to support you, in sickness and in health.",
   },
   {
-    'img': 'assets/img/10767676_4538245.png',
-    'title': 'Take care of family',
-    'text':
-        'We are here to help you in taking care of a loved one, including medicine uptake, as well as be a source of inspiration when needed.',
+    "img": "assets/img/10767676_4538245.png",
+    "title": "Take care of family",
+    "text":
+        "We are here to help you in taking care of a loved one, including medicine uptake, as well as be a source of inspiration when needed.",
   },
   {
-    'img': 'assets/img/product-roadmap-services.png',
-    'title': 'Track Medication',
-    'text':
-        'Keeping track of medications can be overwhelming sometimes. So let us do the organizing for you - customized to your personal schedule and dosages.',
+    "img": "assets/img/product-roadmap-services.png",
+    "title": "Track Medication",
+    "text":
+        "Keeping track of medications can be overwhelming sometimes. So let us do the organizing for you - customized to your personal schedule and dosages.",
   }
 ];

@@ -1,4 +1,4 @@
-import 'dart:convert';
+import "dart:convert";
 
 class ScheduleModel {
   DateTime startDate = DateTime.now();
@@ -40,32 +40,32 @@ class ScheduleModel {
   String toJson() => json.encode(toMap());
 
   factory ScheduleModel.fromMap(Map<String, dynamic> json) => ScheduleModel(
-        startDate: json['start_date'] != null
-            ? DateTime.parse(json['start_date'])
+        startDate: json["start_date"] != null
+            ? DateTime.parse(json["start_date"])
             : DateTime.now(),
         endDate:
-            json['end_date'] == null ? null : DateTime.parse(json['end_date']),
-        whenToTake: json['when_to_take'],
-        howManyMinutes: json['how_many_minutes'],
-        frequency: json['frequency'] == null
+            json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
+        whenToTake: json["when_to_take"],
+        howManyMinutes: json["how_many_minutes"],
+        frequency: json["frequency"] == null
             ? null
-            : Frequency.fromMap(json['frequency']),
-        times: json['times'] == null
+            : Frequency.fromMap(json["frequency"]),
+        times: json["times"] == null
             ? []
             : List<TimeModel>.from(
-                json['times']!.map((x) => TimeModel.fromMap(x))),
+                json["times"]!.map((x) => TimeModel.fromMap(x))),
       );
 
   Map<String, dynamic> toMap() => {
-        'start_date':
+        "start_date":
             "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-        'end_date': endDate == null
+        "end_date": endDate == null
             ? null
             : "${endDate?.year.toString().padLeft(4, '0')}-${endDate?.month.toString().padLeft(2, '0')}-${endDate?.day.toString().padLeft(2, '0')}",
-        'when_to_take': whenToTake,
-        'how_many_minutes': howManyMinutes,
-        'frequency': frequency?.toMap(),
-        'times': times == null
+        "when_to_take": whenToTake,
+        "how_many_minutes": howManyMinutes,
+        "frequency": frequency?.toMap(),
+        "times": times == null
             ? []
             : List<dynamic>.from(times!.map((x) => x.toMap())),
       };
@@ -106,20 +106,20 @@ class Frequency {
   String toJson() => json.encode(toMap());
 
   factory Frequency.fromMap(Map<String, dynamic> json) => Frequency(
-        type: json['type'],
-        weekly: json['weekly'] == null ? null : Weekly.fromMap(json['weekly']),
+        type: json["type"],
+        weekly: json["weekly"] == null ? null : Weekly.fromMap(json["weekly"]),
         monthly:
-            json['monthly'] == null ? null : Monthly.fromMap(json['monthly']),
-        yearly: json['yearly'] == null ? null : Yearly.fromMap(json['yearly']),
-        everyXDays: json['every_x_days'],
+            json["monthly"] == null ? null : Monthly.fromMap(json["monthly"]),
+        yearly: json["yearly"] == null ? null : Yearly.fromMap(json["yearly"]),
+        everyXDays: json["every_x_days"],
       );
 
   Map<String, dynamic> toMap() => {
-        'type': type,
-        'weekly': weekly?.toMap(),
-        'monthly': monthly?.toMap(),
-        'yearly': yearly?.toMap(),
-        'every_x_days': everyXDays,
+        "type": type,
+        "weekly": weekly?.toMap(),
+        "monthly": monthly?.toMap(),
+        "yearly": yearly?.toMap(),
+        "every_x_days": everyXDays,
       };
 }
 
@@ -142,13 +142,13 @@ class Monthly {
   String toJson() => json.encode(toMap());
 
   factory Monthly.fromMap(Map<String, dynamic> json) => Monthly(
-        dates: json['dates'] == null
+        dates: json["dates"] == null
             ? []
-            : List<int>.from(json['dates']!.map((x) => x)),
+            : List<int>.from(json["dates"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        'dates': dates == null ? [] : List<dynamic>.from(dates!.map((x) => x)),
+        "dates": dates == null ? [] : List<dynamic>.from(dates!.map((x) => x)),
       };
 }
 
@@ -171,13 +171,13 @@ class Weekly {
   String toJson() => json.encode(toMap());
 
   factory Weekly.fromMap(Map<String, dynamic> json) => Weekly(
-        days: json['days'] == null
+        days: json["days"] == null
             ? []
-            : List<String>.from(json['days']!.map((x) => x)),
+            : List<String>.from(json["days"]!.map((x) => x)),
       );
 
   Map<String, dynamic> toMap() => {
-        'days': days == null ? [] : List<dynamic>.from(days!.map((x) => x)),
+        "days": days == null ? [] : List<dynamic>.from(days!.map((x) => x)),
       };
 }
 
@@ -200,13 +200,13 @@ class Yearly {
   String toJson() => json.encode(toMap());
 
   factory Yearly.fromMap(Map<String, dynamic> json) => Yearly(
-        dates: json['dates'] == null
+        dates: json["dates"] == null
             ? []
-            : List<DateTime>.from(json['dates']!.map((x) => DateTime.parse(x))),
+            : List<DateTime>.from(json["dates"]!.map((x) => DateTime.parse(x))),
       );
 
   Map<String, dynamic> toMap() => {
-        'dates': dates == null
+        "dates": dates == null
             ? []
             : List<dynamic>.from(dates!.map((x) =>
                 "${x.year.toString().padLeft(4, '0')}-${x.month.toString().padLeft(2, '0')}-${x.day.toString().padLeft(2, '0')}")),
@@ -244,16 +244,16 @@ class TimeModel {
   String toJson() => json.encode(toMap());
 
   factory TimeModel.fromMap(Map<String, dynamic> json) => TimeModel(
-        id: json['id'],
-        name: json['name'],
-        hour: json['hour'],
-        minute: json['minute'],
+        id: json["id"],
+        name: json["name"],
+        hour: json["hour"],
+        minute: json["minute"],
       );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'name': name,
-        'hour': hour,
-        'minute': minute,
+        "id": id,
+        "name": name,
+        "hour": hour,
+        "minute": minute,
       };
 }

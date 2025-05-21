@@ -1,14 +1,14 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:fluttertoast/fluttertoast.dart";
+import "package:path_provider/path_provider.dart";
+import "package:permission_handler/permission_handler.dart";
 
-import '../../../../main.dart';
-import '../model/latest_app_info.dart';
-import 'popup_widget.dart';
+import "../../../../main.dart";
+import "../model/latest_app_info.dart";
+import "popup_widget.dart";
 
 Future<void> showUpdatePopup(
   BuildContext context, {
@@ -18,7 +18,7 @@ Future<void> showUpdatePopup(
 }) async {
   Directory directory = await getApplicationCacheDirectory();
   String filePath =
-      '${directory.path}/apk-${latestAppInfoAPIModel.version}.apk';
+      "${directory.path}/apk-${latestAppInfoAPIModel.version}.apk";
 
   final isExitsSameVersionAPK = await File(filePath).exists();
 

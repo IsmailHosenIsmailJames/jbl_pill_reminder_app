@@ -1,7 +1,7 @@
-import 'dart:convert';
+import "dart:convert";
 
-import 'package:jbl_pills_reminder_app/src/resources/medicine_list.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart';
+import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 
 class ReminderModel {
   String id;
@@ -44,24 +44,24 @@ class ReminderModel {
   String toJson() => json.encode(toMap());
 
   factory ReminderModel.fromMap(Map<String, dynamic> json) => ReminderModel(
-        id: json['id'],
-        description: json['description'],
-        medicine: json['medicine'] == null
+        id: json["id"],
+        description: json["description"],
+        medicine: json["medicine"] == null
             ? null
-            : MedicineModel.fromMap(json['medicine']),
-        schedule: json['schedule'] == null
+            : MedicineModel.fromMap(json["medicine"]),
+        schedule: json["schedule"] == null
             ? null
-            : ScheduleModel.fromMap(json['schedule']),
-        quantity: json['quantity'],
-        reminderType: json['reminder_type'],
+            : ScheduleModel.fromMap(json["schedule"]),
+        quantity: json["quantity"],
+        reminderType: json["reminder_type"],
       );
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'description': description,
-        'medicine': medicine?.toMap(),
-        'schedule': schedule?.toMap(),
-        'quantity': quantity,
-        'reminder_type': reminderType,
+        "id": id,
+        "description": description,
+        "medicine": medicine?.toMap(),
+        "schedule": schedule?.toMap(),
+        "quantity": quantity,
+        "reminder_type": reminderType,
       };
 }

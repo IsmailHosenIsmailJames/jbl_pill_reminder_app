@@ -1,4 +1,4 @@
-import 'dart:convert';
+import "dart:convert";
 
 class UserInfoModel {
   final String name;
@@ -48,24 +48,24 @@ class UserInfoModel {
   String toJson() => json.encode(toMap());
 
   factory UserInfoModel.fromMap(Map<String, dynamic> json) => UserInfoModel(
-        name: json['name'],
-        age: json['age'],
-        gender: json['gender'],
-        division: json['division'],
-        district: json['district'],
-        thana: json['thana'],
-        phone: json['phone'],
-        password: json['password'],
+        name: json["name"],
+        age: json["age"],
+        gender: json["gender"],
+        division: json["division"],
+        district: json["district"],
+        thana: json["thana"],
+        phone: json["phone"],
+        password: json["password"],
       );
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'age': age,
-        'gender': gender,
-        'division': division,
-        'district': district,
-        'thana': thana,
-        'phone': phone,
-        'password': password,
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "division": division,
+        "district": district,
+        "thana": thana,
+        "phone": phone,
+        "password": password,
       };
 }

@@ -10,8 +10,8 @@
 /// integers.
 bool compareVersion(
     {required String currentVersion, required String latestVersion}) {
-  List<String> currentParts = currentVersion.split('.');
-  List<String> latestParts = latestVersion.split('.');
+  List<String> currentParts = currentVersion.split(".");
+  List<String> latestParts = latestVersion.split(".");
 
   for (int i = 0; i < currentParts.length; i++) {
     int currentPart = int.parse(currentParts[i]);

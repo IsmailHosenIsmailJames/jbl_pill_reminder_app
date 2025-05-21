@@ -1,23 +1,23 @@
-import 'dart:developer';
-import 'dart:io';
+import "dart:developer";
+import "dart:io";
 
-import 'package:clipboard/clipboard.dart';
-import 'package:dio/dio.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
-import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:clipboard/clipboard.dart";
+import "package:dio/dio.dart";
+import "package:fluentui_system_icons/fluentui_system_icons.dart";
+import "package:flutter/material.dart";
+import "package:fluttertoast/fluttertoast.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive_flutter/hive_flutter.dart";
+import "package:jbl_pills_reminder_app/src/theme/colors.dart";
+import "package:open_file/open_file.dart";
+import "package:path_provider/path_provider.dart";
+import "package:permission_handler/permission_handler.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
-import '../../../../main.dart';
-import '../controller/in_app_update_controller.dart';
-import '../model/latest_app_info.dart';
+import "../../../../main.dart";
+import "../controller/in_app_update_controller.dart";
+import "../model/latest_app_info.dart";
 
 class PopupWidget extends StatefulWidget {
   final LatestAppInfoAPIModel latestAppInfoAPIModel;
@@ -70,7 +70,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                   const Icon(Icons.download, color: Colors.white),
                   const Gap(10),
                   Text(
-                    'Update Available',
+                    "Update Available",
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -125,12 +125,12 @@ class _PopupWidgetState extends State<PopupWidget> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Current App version : ${widget.currentAppVersion}'),
+                  Text("Current App version : ${widget.currentAppVersion}"),
                   Text(
-                      'Latest App version : ${widget.latestAppInfoAPIModel.version}'),
+                      "Latest App version : ${widget.latestAppInfoAPIModel.version}"),
                   if (widget.latestAppInfoAPIModel.forceToUpdate == true)
                     const Text(
-                      'You have to update to latest version anyway',
+                      "You have to update to latest version anyway",
                       style: TextStyle(fontSize: 10, color: Colors.red),
                     ),
                   const Gap(10),
@@ -144,7 +144,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                     child: Row(
                       children: [
                         Text(
-                          'Having trouble with the update?',
+                          "Having trouble with the update?",
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey.shade600,
@@ -170,7 +170,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                       child: Column(
                         children: [
                           SelectableText(
-                            'Try a fresh install. Uninstall the current version, then download and install the latest one. Copy the link and download apk file.',
+                            "Try a fresh install. Uninstall the current version, then download and install the latest one. Copy the link and download apk file.",
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 11,
@@ -178,7 +178,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                           ),
                           const Gap(8),
                           SelectableText(
-                            'URL:  ${widget.apkDownloadLink}',
+                            "URL:  ${widget.apkDownloadLink}",
                             style: const TextStyle(
                               fontSize: 11,
                             ),
@@ -196,12 +196,12 @@ class _PopupWidgetState extends State<PopupWidget> {
                                 FlutterClipboard.copy(widget.apkDownloadLink)
                                     .then(
                                   (value) {
-                                    Fluttertoast.showToast(msg: 'Copied');
+                                    Fluttertoast.showToast(msg: "Copied");
                                   },
                                 );
                               },
                               label: const Text(
-                                'Copy',
+                                "Copy",
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.black,
@@ -229,7 +229,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                                     isUpdateChecked = true;
                                     Navigator.pop(context);
                                   },
-                        child: const Text('Not Now'),
+                        child: const Text("Not Now"),
                       ),
                       const Gap(10),
                       ElevatedButton(
@@ -241,7 +241,7 @@ class _PopupWidgetState extends State<PopupWidget> {
                             ? (widget.apkInstallPermission ==
                                         PermissionStatus.granted ||
                                     isGranted)
-                                ? const Text('Install Now')
+                                ? const Text("Install Now")
                                 : const Row(
                                     children: [
                                       Icon(
@@ -249,12 +249,12 @@ class _PopupWidgetState extends State<PopupWidget> {
                                         size: 20,
                                       ),
                                       Gap(6),
-                                      Text('Allow'),
+                                      Text("Allow"),
                                     ],
                                   )
                             : isDownloading
-                                ? const Text('Downloading...')
-                                : const Text('Download Now'),
+                                ? const Text("Downloading...")
+                                : const Text("Download Now"),
                       ),
                     ],
                   ),
@@ -270,7 +270,7 @@ class _PopupWidgetState extends State<PopupWidget> {
   Future<void> onProceedButtonClick() async {
     Directory directory = await getApplicationCacheDirectory();
     String filePath =
-        '${directory.path}/apk-${widget.latestAppInfoAPIModel.version}.apk';
+        "${directory.path}/apk-${widget.latestAppInfoAPIModel.version}.apk";
 
     if (widget.isExitsSameVersionAPK == false && isDownloaded == false) {
       setState(() {
@@ -306,25 +306,25 @@ class _PopupWidgetState extends State<PopupWidget> {
         if (widget.latestAppInfoAPIModel.removeCacheAndDataOnUpdate == true) {
           SharedPreferences info = await SharedPreferences.getInstance();
           await info.clear();
-          await Hive.box('info').clear();
+          await Hive.box("info").clear();
         } else {
           if (widget.latestAppInfoAPIModel.removeCacheOnUpdate == true) {
             SharedPreferences info = await SharedPreferences.getInstance();
             await info.clear();
           }
           if (widget.latestAppInfoAPIModel.removeDataOnUpdate == true) {
-            await Hive.box('info').clear();
+            await Hive.box("info").clear();
           }
         }
 
         final result = await OpenFile.open(filePath);
 
         if (result.type != ResultType.done) {
-          Fluttertoast.showToast(msg: 'Something went wrong');
+          Fluttertoast.showToast(msg: "Something went wrong");
         }
         log(result.message);
       } catch (e) {
-        log('Error clearing cache: $e');
+        log("Error clearing cache: $e");
       }
     }
   }

@@ -1,7 +1,7 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:jbl_pills_reminder_app/src/core/notifications/service.dart';
+import "package:awesome_notifications/awesome_notifications.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 
 Future<void> pushNotifications(
     {required int id,
@@ -13,12 +13,12 @@ Future<void> pushNotifications(
   AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: id, // Must be unique for each notification
-      channelKey: 'reminders', // The channel key you created
+      channelKey: "reminders", // The channel key you created
       title: title,
       body: body,
       locked: isPreReminder ? false : true,
       actionType: ActionType.KeepOnTop,
-      customSound: 'resource://raw/shaking_pill_bottle',
+      customSound: "resource://raw/shaking_pill_bottle",
       category:
           isAlarm ? NotificationCategory.Alarm : NotificationCategory.Reminder,
     ),
@@ -34,16 +34,16 @@ Future<void> pushNotifications(
         ? null
         : [
             NotificationActionButton(
-              key: 'dismiss',
-              label: 'Dismiss',
+              key: "dismiss",
+              label: "Dismiss",
               actionType: ActionType.DismissAction,
             ),
             NotificationActionButton(
-              key: 'take_medicine',
-              label: 'Take Medicine',
+              key: "take_medicine",
+              label: "Take Medicine",
               actionType: ActionType.Default,
             ),
           ],
   );
-  log('Notification Shown');
+  log("Notification Shown");
 }

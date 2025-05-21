@@ -1,19 +1,19 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:flutter/material.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
-import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
-import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
-import 'package:toastification/toastification.dart';
+import "package:flutter/material.dart";
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
+import "package:flutter_native_splash/flutter_native_splash.dart";
+import "package:get/get.dart";
+import "package:google_fonts/google_fonts.dart";
+import "package:hive_flutter/hive_flutter.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/theme/colors.dart";
+import "package:toastification/toastification.dart";
 
-import 'src/theme/const_values.dart';
+import "src/theme/const_values.dart";
 
 bool isUpdateChecked = false;
 
@@ -23,10 +23,10 @@ void main() async {
   FlutterForegroundTask.initCommunicationPort();
 
   await Hive.initFlutter();
-  await Hive.openBox('user_db');
-  await Hive.openBox('reminder_db');
-  await Hive.openBox('actions');
-  await Hive.openBox('reminder_done');
+  await Hive.openBox("user_db");
+  await Hive.openBox("reminder_db");
+  await Hive.openBox("actions");
+  await Hive.openBox("reminder_done");
 
   runApp(const MyApp());
 }
@@ -92,13 +92,13 @@ class MyApp extends StatelessWidget {
 
           final userInfoController = Get.put(ProfilePageController());
           final userInfo =
-              Hive.box('user_db').get('user_info', defaultValue: null);
+              Hive.box("user_db").get("user_info", defaultValue: null);
           if (userInfo != null && userInfo.isNotEmpty) {
             try {
               userInfoController.userInfo.value =
                   UserInfoModel.fromJson(userInfo);
             } catch (e) {
-              log(e.toString(), name: 'UserInfoModel Error');
+              log(e.toString(), name: "UserInfoModel Error");
             }
           }
 

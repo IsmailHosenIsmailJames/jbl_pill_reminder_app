@@ -1,16 +1,16 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:intl/intl.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 
-import '../../resources/frequency.dart';
-import '../../screens/add_reminder/model/schedule_model.dart';
+import "../../resources/frequency.dart";
+import "../../screens/add_reminder/model/schedule_model.dart";
 
 List<ReminderModel> findDateMedicine(
     List<ReminderModel> listOfMedications, DateTime date) {
   List<ReminderModel> todaysMedication = [];
   for (ReminderModel medicationModel in listOfMedications) {
-    String frequencyType = medicationModel.schedule?.frequency?.type ?? '';
+    String frequencyType = medicationModel.schedule?.frequency?.type ?? "";
     List<TimeModel>? listOfTime = medicationModel.schedule?.times;
     if (listOfTime != null) {
       if (medicationModel.schedule?.startDate != null &&
@@ -25,7 +25,7 @@ List<ReminderModel> findDateMedicine(
       }
       // everyday
       if (frequencyType == frequencyTypeList[0]) {
-        log('Frequency type: Every day');
+        log("Frequency type: Every day");
         todaysMedication.add(medicationModel);
       }
       // every X days
@@ -44,7 +44,7 @@ List<ReminderModel> findDateMedicine(
       }
       // weekly
       else if (frequencyType == frequencyTypeList[2]) {
-        DateFormat formatter = DateFormat('EEEE');
+        DateFormat formatter = DateFormat("EEEE");
         String weekday = formatter.format(date);
         List<String>? listOfDay =
             medicationModel.schedule?.frequency?.weekly?.days;
@@ -56,7 +56,7 @@ List<ReminderModel> findDateMedicine(
       }
       // monthly
       else if (frequencyType == frequencyTypeList[3]) {
-        DateFormat formatter = DateFormat('d');
+        DateFormat formatter = DateFormat("d");
         String day = formatter.format(date);
         List<int>? listOfDay =
             medicationModel.schedule?.frequency?.monthly?.dates;

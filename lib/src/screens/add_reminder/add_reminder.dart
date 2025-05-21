@@ -1,32 +1,32 @@
-import 'dart:convert';
-import 'dart:developer' as dev;
-import 'dart:math';
+import "dart:convert";
+import "dart:developer" as dev;
+import "dart:math";
 
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:http_status_code/http_status_code.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:intl/intl.dart';
-import 'package:jbl_pills_reminder_app/src/resources/medicine_list.dart';
-import 'package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/get_titles.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart';
-import 'package:searchfield/searchfield.dart';
-import 'package:toastification/toastification.dart';
+import "package:fluentui_system_icons/fluentui_system_icons.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:http_status_code/http_status_code.dart";
+import "package:internet_connection_checker_plus/internet_connection_checker_plus.dart";
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
+import "package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
+import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
+import "package:searchfield/searchfield.dart";
+import "package:toastification/toastification.dart";
 
-import '../../resources/frequency.dart';
-import '../../resources/week_days.dart';
-import '../../theme/colors.dart';
-import '../../theme/const_values.dart';
+import "../../resources/frequency.dart";
+import "../../resources/week_days.dart";
+import "../../theme/colors.dart";
+import "../../theme/const_values.dart";
 
 class AddReminder extends StatefulWidget {
   final bool? editMode;
@@ -80,22 +80,22 @@ class _AddReminderState extends State<AddReminder> {
 
   Future<void> loadMedicineList() async {
     String medicineJsonData =
-        await rootBundle.loadString('assets/resources/medicine_list.json');
-    dev.log('1');
+        await rootBundle.loadString("assets/resources/medicine_list.json");
+    dev.log("1");
     List<Map> temMedicineData = List<Map>.from(jsonDecode(medicineJsonData));
-    dev.log('2');
+    dev.log("2");
 
     for (int i = 0; i < temMedicineData.length; i++) {
       Map<String, dynamic> element =
           Map<String, dynamic>.from(temMedicineData[i]);
       medicineData.add({
-        'brandName': element['BN'], // brandName = BN
-        'genericName': element['GN'], // genericName = GN
-        'strength': element['S'], // strength = S
-        'dosageDescription': element['DD'], // dosageDescription = DD
+        "brandName": element["BN"], // brandName = BN
+        "genericName": element["GN"], // genericName = GN
+        "strength": element["S"], // strength = S
+        "dosageDescription": element["DD"], // dosageDescription = DD
       });
     }
-    dev.log('3');
+    dev.log("3");
 
     setState(() {});
   }
@@ -104,7 +104,7 @@ class _AddReminderState extends State<AddReminder> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Reminder'),
+        title: const Text("Add Reminder"),
       ),
       body: SafeArea(
         child: Form(
@@ -118,7 +118,7 @@ class _AddReminderState extends State<AddReminder> {
             ),
             children: [
               const Gap(10),
-              getTitlesForFields(title: 'Medicine name', isFieldRequired: true),
+              getTitlesForFields(title: "Medicine name", isFieldRequired: true),
               const Gap(5),
               customTextFieldDecoration(
                 textFormField: SearchField<MedicineModel>(
@@ -129,7 +129,7 @@ class _AddReminderState extends State<AddReminder> {
                   controller: textEditingControllerSearchMedicine,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please type a medicine name';
+                      return "Please type a medicine name";
                     } else {
                       return null;
                     }
@@ -150,7 +150,7 @@ class _AddReminderState extends State<AddReminder> {
                                 Text(item.brandName),
                                 const Gap(5),
                                 Text(
-                                  '(${item.genericName}) - ${item.dosageDescription}',
+                                  "(${item.genericName}) - ${item.dosageDescription}",
                                   style: const TextStyle(
                                       fontSize: 12, color: Colors.grey),
                                 ),
@@ -165,7 +165,7 @@ class _AddReminderState extends State<AddReminder> {
               ),
               const Gap(10),
               getTitlesForFields(
-                title: 'Frequency',
+                title: "Frequency",
                 isFieldRequired: true,
               ),
               const Gap(5),
@@ -224,22 +224,22 @@ class _AddReminderState extends State<AddReminder> {
                   textFormField: TextFormField(
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return "Please enter some text";
                       }
                       if (int.tryParse(value) == null) {
-                        return 'Please enter a valid number';
+                        return "Please enter a valid number";
                       }
                       return null;
                     },
                     controller: TextEditingController(
                         text: scheduleModel.frequency?.everyXDays?.toString() ??
-                            ''),
+                            ""),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     onChanged: (value) {
                       scheduleModel.frequency?.everyXDays = int.tryParse(value);
                     },
                     decoration: const InputDecoration(
-                      hintText: 'type how many days the gap is...',
+                      hintText: "type how many days the gap is...",
                     ),
                     onTapOutside: (event) {
                       FocusManager.instance.primaryFocus?.unfocus();
@@ -248,17 +248,17 @@ class _AddReminderState extends State<AddReminder> {
                 ),
               if (scheduleModel.frequency?.type == frequencyTypeList[2])
                 getTitlesForFields(
-                  title: 'Select Week Days',
+                  title: "Select Week Days",
                   icon: FluentIcons.select_all_on_24_regular,
                 ),
               if (scheduleModel.frequency?.type == frequencyTypeList[3])
                 getTitlesForFields(
-                  title: 'Select Days in a Month',
+                  title: "Select Days in a Month",
                   icon: FluentIcons.select_all_on_24_regular,
                 ),
               if (scheduleModel.frequency?.type == frequencyTypeList[4])
                 getTitlesForFields(
-                  title: 'Add Dates of a Year',
+                  title: "Add Dates of a Year",
                   icon: FluentIcons.calendar_24_regular,
                 ),
               const Gap(5),
@@ -391,7 +391,7 @@ class _AddReminderState extends State<AddReminder> {
                                 ),
                                 Gap(10),
                                 Text(
-                                  'No dates selected',
+                                  "No dates selected",
                                 ),
                               ],
                             ),
@@ -440,7 +440,7 @@ class _AddReminderState extends State<AddReminder> {
                                   });
                                 });
                               },
-                              label: const Text('Add Date'),
+                              label: const Text("Add Date"),
                               icon: const Icon(
                                 FluentIcons.add_24_regular,
                                 size: 18,
@@ -454,7 +454,7 @@ class _AddReminderState extends State<AddReminder> {
               // Quantity
               const Gap(10),
               getTitlesForFields(
-                title: 'Quantity',
+                title: "Quantity",
                 isFieldRequired: true,
               ),
               const Gap(5),
@@ -462,11 +462,11 @@ class _AddReminderState extends State<AddReminder> {
                 textFormField: TextFormField(
                   controller: textEditingControllerQuantity,
                   decoration: textFieldInputDecoration(
-                    hint: 'type quantity here...',
+                    hint: "type quantity here...",
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return "Please enter some text";
                     }
                     return null;
                   },
@@ -481,7 +481,7 @@ class _AddReminderState extends State<AddReminder> {
 
               const Gap(10),
               getTitlesForFields(
-                title: 'When to take',
+                title: "When to take",
                 isFieldRequired: true,
               ),
               const Gap(5),
@@ -546,13 +546,13 @@ class _AddReminderState extends State<AddReminder> {
                   textFormField: TextFormField(
                     controller: textEditingControllerMinutes,
                     decoration: textFieldInputDecoration(
-                      hint: 'type minutes here...',
+                      hint: "type minutes here...",
                     ),
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty ||
                           int.tryParse(value) == null) {
-                        return 'Please enter valid minutes';
+                        return "Please enter valid minutes";
                       } else {
                         return null;
                       }
@@ -565,7 +565,7 @@ class _AddReminderState extends State<AddReminder> {
                 ),
               const Gap(10),
               getTitlesForFields(
-                title: 'Time',
+                title: "Time",
                 isFieldRequired: true,
               ),
               const Gap(5),
@@ -606,8 +606,8 @@ class _AddReminderState extends State<AddReminder> {
                           ),
                           onPressed: () {
                             TimeOfDay avg = TimeOfDay(
-                              hour: ((value['start_time'] ?? 0) +
-                                      (value['end_time'] ?? 0)) ~/
+                              hour: ((value["start_time"] ?? 0) +
+                                      (value["end_time"] ?? 0)) ~/
                                   2,
                               minute: 0,
                             );
@@ -653,7 +653,7 @@ class _AddReminderState extends State<AddReminder> {
                         hour: currentTime.hour, minute: currentTime.minute);
                     return Row(
                       children: [
-                        Text('${currentTime.name}: '),
+                        Text("${currentTime.name}: "),
                         const Gap(5),
                         Text(
                           timeOfDay.format(context),
@@ -691,7 +691,7 @@ class _AddReminderState extends State<AddReminder> {
                               );
                             },
                             child: const Text(
-                              'Change',
+                              "Change",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 12),
                             ),
@@ -704,7 +704,7 @@ class _AddReminderState extends State<AddReminder> {
               ),
               const Gap(10),
               getTitlesForFields(
-                title: 'Ending date of reminder',
+                title: "Ending date of reminder",
               ),
               const Gap(5),
               SizedBox(
@@ -727,21 +727,21 @@ class _AddReminderState extends State<AddReminder> {
                   ),
                   label: Text(
                     scheduleModel.endDate == null
-                        ? 'Pick a Date'
+                        ? "Pick a Date"
                         : DateFormat.yMMMEd().format(scheduleModel.endDate!),
                   ),
                 ),
               ),
               const Gap(10),
               getTitlesForFields(
-                title: 'Notes',
+                title: "Notes",
               ),
               const Gap(5),
               customTextFieldDecoration(
                 textFormField: TextFormField(
                   controller: textEditingControllerReminderDescription,
                   decoration: textFieldInputDecoration(
-                    hint: 'type reminder description here...',
+                    hint: "type reminder description here...",
                   ),
                   maxLines: 15,
                   minLines: 1,
@@ -752,45 +752,45 @@ class _AddReminderState extends State<AddReminder> {
               ),
               const Gap(10),
               getTitlesForFields(
-                title: 'Reminder type',
+                title: "Reminder type",
                 isFieldRequired: true,
               ),
               const Gap(5),
               customTextFieldDecoration(
                 textFormField: DropdownButtonFormField(
                   decoration: textFieldInputDecoration(
-                    hint: 'Select reminder type',
+                    hint: "Select reminder type",
                   ),
                   value: reminderModel.reminderType,
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select reminder type';
+                      return "Please select reminder type";
                     }
                     return null;
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   items: [
                     const DropdownMenuItem(
-                      value: 'notification',
+                      value: "notification",
                       child: Row(
                         children: [
                           Icon(
                             Icons.notifications,
                           ),
                           Gap(10),
-                          Text('Notification'),
+                          Text("Notification"),
                         ],
                       ),
                     ),
                     const DropdownMenuItem(
-                      value: 'alarm',
+                      value: "alarm",
                       child: Row(
                         children: [
                           Icon(
                             Icons.alarm,
                           ),
                           Gap(10),
-                          Text('Alarm'),
+                          Text("Alarm"),
                         ],
                       ),
                     ),
@@ -808,7 +808,7 @@ class _AddReminderState extends State<AddReminder> {
                   if (formKey.currentState!.validate()) {
                     Map<String, dynamic>? selectedMedicine;
                     for (var element in medicineData) {
-                      if (element['name'] ==
+                      if (element["name"] ==
                           textEditingControllerSearchMedicine.text) {
                         selectedMedicine = element;
                       }
@@ -823,10 +823,10 @@ class _AddReminderState extends State<AddReminder> {
                       medicine: MedicineModel(
                         brandName: medicineModel?.brandName ??
                             textEditingControllerSearchMedicine.text,
-                        genericName: medicineModel?.genericName ?? '',
-                        strength: medicineModel?.strength ?? '',
+                        genericName: medicineModel?.genericName ?? "",
+                        strength: medicineModel?.strength ?? "",
                         dosageDescription:
-                            medicineModel?.dosageDescription ?? '',
+                            medicineModel?.dosageDescription ?? "",
                       ),
                       schedule: scheduleModel.copyWith(
                         howManyMinutes:
@@ -841,7 +841,7 @@ class _AddReminderState extends State<AddReminder> {
                       });
                       if (await InternetConnection().hasInternetAccess) {
                         Map<String, dynamic> data = reminderModel.toMap();
-                        data['phone_number'] =
+                        data["phone_number"] =
                             profileController.userInfo.value!.phone;
                         if (widget.editMode == true) {
                           final bool isSuccessful =
@@ -851,12 +851,12 @@ class _AddReminderState extends State<AddReminder> {
                             data,
                           );
                           if (isSuccessful) {
-                            await Hive.box('reminder_db')
+                            await Hive.box("reminder_db")
                                 .put(reminderModel.id, jsonEncode(data));
 
                             toastification.show(
                               context: context,
-                              title: const Text('Saved changes successfully'),
+                              title: const Text("Saved changes successfully"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.success,
                             );
@@ -867,7 +867,7 @@ class _AddReminderState extends State<AddReminder> {
                           } else {
                             toastification.show(
                               context: context,
-                              title: const Text('Something went wrong'),
+                              title: const Text("Something went wrong"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.error,
                             );
@@ -877,12 +877,12 @@ class _AddReminderState extends State<AddReminder> {
                               .createReminder(data);
                           if (response != null &&
                               response.statusCode == StatusCode.CREATED) {
-                            await Hive.box('reminder_db')
+                            await Hive.box("reminder_db")
                                 .put(reminderModel.id, jsonEncode(data));
 
                             toastification.show(
                               context: context,
-                              title: const Text('Saved Successfully'),
+                              title: const Text("Saved Successfully"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.success,
                             );
@@ -891,7 +891,7 @@ class _AddReminderState extends State<AddReminder> {
                           } else {
                             toastification.show(
                               context: context,
-                              title: const Text('Something went wrong'),
+                              title: const Text("Something went wrong"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.error,
                             );
@@ -900,7 +900,7 @@ class _AddReminderState extends State<AddReminder> {
                       } else {
                         toastification.show(
                           context: context,
-                          title: const Text('No Internet Connection'),
+                          title: const Text("No Internet Connection"),
                           autoCloseDuration: const Duration(seconds: 2),
                           type: ToastificationType.error,
                         );
@@ -928,8 +928,8 @@ class _AddReminderState extends State<AddReminder> {
                       )
                     : const Icon(Icons.done),
                 label: Text((widget.editMode ?? false)
-                    ? 'Save Changes'
-                    : 'Add Reminder'),
+                    ? "Save Changes"
+                    : "Add Reminder"),
               ),
             ],
           ),
@@ -941,7 +941,7 @@ class _AddReminderState extends State<AddReminder> {
   String? checkValidityOfReminder(ReminderModel reminderModel) {
     // check frequency of medicine
     if (textEditingControllerSearchMedicine.text.trim().isEmpty) {
-      return 'Please enter medicine name';
+      return "Please enter medicine name";
     }
     final frequency = reminderModel.schedule?.frequency;
     if (frequency != null &&
@@ -955,17 +955,17 @@ class _AddReminderState extends State<AddReminder> {
                 frequency.monthly != null) ||
             (frequency.type == frequencyTypeList[4] &&
                 frequency.yearly != null))) {
-      dev.log('Pass frequency:${frequency.toJson()}');
+      dev.log("Pass frequency:${frequency.toJson()}");
     } else {
-      return 'Please add frequency of medicine';
+      return "Please add frequency of medicine";
     }
 
     // check alarms
 
     if (reminderModel.schedule?.times?.isNotEmpty == true) {
-      dev.log('Added ${reminderModel.schedule?.times?.length}');
+      dev.log("Added ${reminderModel.schedule?.times?.length}");
     } else {
-      return 'Please add Alarm Time';
+      return "Please add Alarm Time";
     }
 
     return null;

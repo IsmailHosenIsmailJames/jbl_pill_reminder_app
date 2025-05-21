@@ -1,26 +1,26 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:io';
+import "dart:convert";
+import "dart:developer";
+import "dart:io";
 
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart';
-import 'package:jbl_pills_reminder_app/src/screens/auth/signup/controller/signip_page_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/home_screen.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/get_titles.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:http_status_code/http_status_code.dart';
-import 'package:toastification/toastification.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:http/http.dart" as http;
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/signup/controller/signip_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
+import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
+import "package:smooth_page_indicator/smooth_page_indicator.dart";
+import "package:http_status_code/http_status_code.dart";
+import "package:toastification/toastification.dart";
 
-import '../../../resources/division_district_thana.dart';
-import '../../../theme/colors.dart';
-import '../../../widgets/intro_pages.dart';
-import 'model/signup_models.dart';
+import "../../../resources/division_district_thana.dart";
+import "../../../theme/colors.dart";
+import "../../../widgets/intro_pages.dart";
+import "model/signup_models.dart";
 
 class SignupPage extends StatefulWidget {
   final UserInfoModel? userInfoModel;
@@ -112,7 +112,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const Gap(30),
                   Text(
-                    widget.userInfoModel == null ? 'Sign In' : 'Update Profile',
+                    widget.userInfoModel == null ? "Sign In" : "Update Profile",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
@@ -121,13 +121,13 @@ class _SignupPageState extends State<SignupPage> {
                   const Gap(5),
                   Text(
                     widget.userInfoModel == null
-                        ? 'Please fill the information to sign in'
-                        : 'Please change information to update your profile',
+                        ? "Please fill the information to sign in"
+                        : "Please change information to update your profile",
                     style: const TextStyle(color: Colors.grey),
                   ),
                   const Gap(10),
                   getTitlesForFields(
-                    title: 'Name',
+                    title: "Name",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -135,7 +135,7 @@ class _SignupPageState extends State<SignupPage> {
                     textFormField: TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
+                          return "Please enter your name";
                         }
                         return null;
                       },
@@ -143,13 +143,13 @@ class _SignupPageState extends State<SignupPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       controller: textEditingControllerName,
                       decoration: textFieldInputDecoration(
-                        hint: 'type your name here...',
+                        hint: "type your name here...",
                       ),
                     ),
                   ),
                   const Gap(10),
                   getTitlesForFields(
-                    title: 'Age',
+                    title: "Age",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -157,11 +157,11 @@ class _SignupPageState extends State<SignupPage> {
                     textFormField: TextFormField(
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your age';
+                          return "Please enter your age";
                         }
                         if (int.tryParse(value) == null ||
                             int.parse(value) < 0) {
-                          return 'Please enter a valid age';
+                          return "Please enter a valid age";
                         }
                         return null;
                       },
@@ -169,13 +169,13 @@ class _SignupPageState extends State<SignupPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       controller: textEditingControllerAge,
                       decoration: textFieldInputDecoration(
-                        hint: 'type your age here...',
+                        hint: "type your age here...",
                       ),
                     ),
                   ),
                   const Gap(10),
                   getTitlesForFields(
-                    title: 'Gender',
+                    title: "Gender",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -183,16 +183,16 @@ class _SignupPageState extends State<SignupPage> {
                     textFormField: DropdownButtonFormField(
                       value: signupPageController.gender.value,
                       decoration: textFieldInputDecoration(
-                        hint: 'type your gender here...',
+                        hint: "type your gender here...",
                       ),
                       items: [
                         const DropdownMenuItem(
-                          value: 'Male',
-                          child: Text('Male'),
+                          value: "Male",
+                          child: Text("Male"),
                         ),
                         const DropdownMenuItem(
-                          value: 'Female',
-                          child: Text('Female'),
+                          value: "Female",
+                          child: Text("Female"),
                         ),
                       ],
                       onChanged: (value) {
@@ -200,7 +200,7 @@ class _SignupPageState extends State<SignupPage> {
                       },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please select your gender';
+                          return "Please select your gender";
                         }
                         return null;
                       },
@@ -209,7 +209,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const Gap(10),
                   getTitlesForFields(
-                    title: 'Address',
+                    title: "Address",
                     isFieldRequired: true,
                   ),
                   const Gap(5),
@@ -231,7 +231,7 @@ class _SignupPageState extends State<SignupPage> {
                           textFormField: DropdownButtonFormField(
                             value: choosenDivision,
                             decoration: textFieldInputDecoration(
-                                hint: 'Select Division'),
+                                hint: "Select Division"),
                             items: dvision
                                 .map((e) =>
                                     DropdownMenuItem(value: e, child: Text(e)))
@@ -244,7 +244,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please select your division';
+                                return "Please select your division";
                               }
                               return null;
                             },
@@ -257,7 +257,7 @@ class _SignupPageState extends State<SignupPage> {
                           textFormField: DropdownButtonFormField(
                             value: choosenDistrict,
                             decoration: textFieldInputDecoration(
-                                hint: 'Select District'),
+                                hint: "Select District"),
                             items: district
                                 .map((e) =>
                                     DropdownMenuItem(value: e, child: Text(e)))
@@ -269,7 +269,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please select your district';
+                                return "Please select your district";
                               }
                               return null;
                             },
@@ -282,7 +282,7 @@ class _SignupPageState extends State<SignupPage> {
                           textFormField: DropdownButtonFormField(
                             value: signupPageController.choosenThana.value,
                             decoration:
-                                textFieldInputDecoration(hint: 'Select Thana'),
+                                textFieldInputDecoration(hint: "Select Thana"),
                             items: thana
                                 .map((e) =>
                                     DropdownMenuItem(value: e, child: Text(e)))
@@ -292,7 +292,7 @@ class _SignupPageState extends State<SignupPage> {
                             },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please select your thana';
+                                return "Please select your thana";
                               }
                               return null;
                             },
@@ -306,7 +306,7 @@ class _SignupPageState extends State<SignupPage> {
                   const Gap(10),
                   if (widget.userInfoModel == null)
                     getTitlesForFields(
-                      title: 'Phone Number',
+                      title: "Phone Number",
                       isFieldRequired: true,
                     ),
                   if (widget.userInfoModel == null) const Gap(5),
@@ -315,14 +315,14 @@ class _SignupPageState extends State<SignupPage> {
                       textFormField: TextFormField(
                         controller: textEditingControllerPhoneNumber,
                         decoration: textFieldInputDecoration(
-                          hint: '+8801xxxxxxxxx',
+                          hint: "+8801xxxxxxxxx",
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your phone number';
+                            return "Please enter your phone number";
                           }
                           if (value.length != 11 && value.length != 14) {
-                            return 'Please enter a valid phone number';
+                            return "Please enter a valid phone number";
                           }
                           return null;
                         },
@@ -333,7 +333,7 @@ class _SignupPageState extends State<SignupPage> {
                   const Gap(10),
                   if (widget.userInfoModel == null)
                     getTitlesForFields(
-                      title: 'Password',
+                      title: "Password",
                       isFieldRequired: true,
                     ),
                   if (widget.userInfoModel == null) const Gap(5),
@@ -342,14 +342,14 @@ class _SignupPageState extends State<SignupPage> {
                       textFormField: TextFormField(
                         controller: textEditingControllerPassword,
                         decoration: textFieldInputDecoration(
-                          hint: 'type your password here...',
+                          hint: "type your password here...",
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return "Please enter your password";
                           }
                           if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
+                            return "Password must be at least 6 characters";
                           }
                           return null;
                         },
@@ -361,7 +361,7 @@ class _SignupPageState extends State<SignupPage> {
                   if (widget.userInfoModel == null) const Gap(10),
                   if (widget.userInfoModel == null)
                     getTitlesForFields(
-                      title: 'Confirm Password',
+                      title: "Confirm Password",
                       isFieldRequired: true,
                     ),
                   if (widget.userInfoModel == null) const Gap(5),
@@ -370,14 +370,14 @@ class _SignupPageState extends State<SignupPage> {
                       textFormField: TextFormField(
                         controller: textEditingControllerConfirmPassword,
                         decoration: textFieldInputDecoration(
-                          hint: 'type your confirm password here...',
+                          hint: "type your confirm password here...",
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your confirm password';
+                            return "Please enter your confirm password";
                           }
                           if (value != textEditingControllerPassword.text) {
-                            return 'Password does not match';
+                            return "Password does not match";
                           }
                           return null;
                         },
@@ -401,8 +401,8 @@ class _SignupPageState extends State<SignupPage> {
                         },
                         child: Text(
                           widget.userInfoModel == null
-                              ? 'Sign up'
-                              : 'Save changes',
+                              ? "Sign up"
+                              : "Save changes",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1,
@@ -418,7 +418,7 @@ class _SignupPageState extends State<SignupPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Center(
-                          child: Text('Already have an account?',
+                          child: Text("Already have an account?",
                               style: TextStyle(color: Colors.black),
                               textAlign: TextAlign.center),
                         ),
@@ -429,7 +429,7 @@ class _SignupPageState extends State<SignupPage> {
                             );
                           },
                           child: const Text(
-                            'Log in',
+                            "Log in",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -449,8 +449,8 @@ class _SignupPageState extends State<SignupPage> {
 
   Future<void> signupOrUpdate(BuildContext context) async {
     String phone = textEditingControllerPhoneNumber.text;
-    if (!phone.startsWith('+88')) {
-      phone = '+88$phone';
+    if (!phone.startsWith("+88")) {
+      phone = "+88$phone";
     }
 
     try {
@@ -469,14 +469,14 @@ class _SignupPageState extends State<SignupPage> {
       if (widget.userInfoModel == null) {
         response = await http.post(Uri.parse(signUpAPI),
             body: userInfoModel.toJson(),
-            headers: {'Content-Type': 'application/json'});
+            headers: {"Content-Type": "application/json"});
       } else {
         Map<String, dynamic> data = userInfoModel.toMap();
-        data.remove('password');
+        data.remove("password");
         response = await http.put(
           Uri.parse(updateUserInfoAPI),
           body: jsonEncode(data),
-          headers: {'Content-Type': 'application/json'},
+          headers: {"Content-Type": "application/json"},
         );
       }
 
@@ -485,13 +485,13 @@ class _SignupPageState extends State<SignupPage> {
         log(response.body);
 
         if (widget.userInfoModel == null) {
-          await Hive.box('user_db').put(
-            'user_info',
+          await Hive.box("user_db").put(
+            "user_info",
             userInfoModel.toJson(),
           );
           toastification.show(
             context: context,
-            title: const Text('Signup Success'),
+            title: const Text("Signup Success"),
             autoCloseDuration: const Duration(seconds: 2),
             type: ToastificationType.success,
           );
@@ -499,14 +499,14 @@ class _SignupPageState extends State<SignupPage> {
             () => const HomeScreen(),
           );
         } else {
-          await Hive.box('user_db').put(
-            'user_info',
+          await Hive.box("user_db").put(
+            "user_info",
             userInfoModel.toJson(),
           );
 
           toastification.show(
             context: context,
-            title: const Text('Update Success'),
+            title: const Text("Update Success"),
             autoCloseDuration: const Duration(seconds: 2),
             type: ToastificationType.success,
           );
@@ -515,7 +515,7 @@ class _SignupPageState extends State<SignupPage> {
       } else if (response.statusCode == StatusCode.BAD_REQUEST) {
         toastification.show(
           context: context,
-          title: const Text('Information is not valid'),
+          title: const Text("Information is not valid"),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
         );
@@ -524,7 +524,7 @@ class _SignupPageState extends State<SignupPage> {
         log(response.statusCode.toString());
         toastification.show(
           context: context,
-          title: const Text('Signup Failed'),
+          title: const Text("Signup Failed"),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
         );
@@ -547,7 +547,7 @@ class _SignupPageState extends State<SignupPage> {
       log(e.toString());
       toastification.show(
         context: context,
-        title: const Text('Something went wrong'),
+        title: const Text("Something went wrong"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );

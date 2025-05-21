@@ -1,18 +1,18 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
-import '../../../../main.dart';
-import '../controller/in_app_update_controller.dart';
-import '../functions/compare_version.dart';
-import '../functions/get_app_info.dart';
-import '../functions/get_device_info.dart';
-import '../functions/get_info_form_api.dart';
-import '../model/latest_app_info.dart';
-import 'update_popup.dart';
+import "package:flutter/cupertino.dart";
+import "package:get/get.dart";
+import "../../../../main.dart";
+import "../controller/in_app_update_controller.dart";
+import "../functions/compare_version.dart";
+import "../functions/get_app_info.dart";
+import "../functions/get_device_info.dart";
+import "../functions/get_info_form_api.dart";
+import "../model/latest_app_info.dart";
+import "update_popup.dart";
 
 Future<void> inAppUpdateAndroid(BuildContext context) async {
-  log('inAppUpdateAndroid', name: 'fn');
+  log("inAppUpdateAndroid", name: "fn");
   final inAppUpdateController = Get.put(InAppUpdateController());
   try {
     LatestAppInfoAPIModel latestAppInfo = await getInfoFormAPI();
@@ -49,7 +49,7 @@ Future<void> inAppUpdateAndroid(BuildContext context) async {
           }
         }
         if (apkDownloadLink != null) {
-          log('Update Available on $apkDownloadLink');
+          log("Update Available on $apkDownloadLink");
           await showUpdatePopup(
             context,
             latestAppInfoAPIModel: latestAppInfo,
@@ -58,12 +58,12 @@ Future<void> inAppUpdateAndroid(BuildContext context) async {
           );
         } else {
           // ignore
-          log('No Update');
+          log("No Update");
         }
       } else {
         // ignore
         isUpdateChecked = true;
-        log('No Update');
+        log("No Update");
       }
     }
   } catch (e) {

@@ -1,17 +1,17 @@
-import 'dart:convert';
-import 'dart:developer';
+import "dart:convert";
+import "dart:developer";
 
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/medication_card.dart';
-import 'package:toastification/toastification.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive/hive.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
+import "package:toastification/toastification.dart";
 
-import '../../core/functions/safe_substring.dart';
+import "../../core/functions/safe_substring.dart";
 
 class TakeMedicinePage extends StatefulWidget {
   final String? title;
@@ -41,7 +41,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title ?? 'Take Medicine'),
+        title: Text(widget.title ?? "Take Medicine"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -62,7 +62,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                 if (widget.currentMedicationToTake.medicine?.brandName != null)
                   Text(
                     substringSafe(
-                      widget.currentMedicationToTake.medicine?.brandName ?? '',
+                      widget.currentMedicationToTake.medicine?.brandName ?? "",
                       30,
                     ),
                     style: const TextStyle(
@@ -72,7 +72,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                   ),
                 const Divider(),
                 const Text(
-                  'Details: ',
+                  "Details: ",
                   style: TextStyle(
                     fontSize: 14,
                   ),
@@ -105,7 +105,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           Icons.arrow_back,
                         ),
                         label: const Text(
-                          'Back',
+                          "Back",
                         ),
                       ),
                     ),
@@ -118,10 +118,10 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           ),
                         ),
                         onPressed: () async {
-                          final reminderDoneDB = Hive.box('reminder_done');
+                          final reminderDoneDB = Hive.box("reminder_done");
                           Map<String, dynamic> reminderData =
                               widget.currentMedicationToTake.toMap();
-                          reminderData['doneBackup'] = false;
+                          reminderData["doneBackup"] = false;
                           await reminderDoneDB.put(
                             DateTime.now().millisecondsSinceEpoch.toString(),
                             jsonEncode(reminderData),
@@ -134,14 +134,14 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           }
                           toastification.show(
                             context: context,
-                            title: const Text('Saved as done'),
+                            title: const Text("Saved as done"),
                             type: ToastificationType.success,
                             autoCloseDuration: const Duration(seconds: 3),
                           );
                           Get.back();
                         },
                         icon: const Icon(Icons.done),
-                        label: const Text('Done'),
+                        label: const Text("Done"),
                       ),
                     ),
                   ],

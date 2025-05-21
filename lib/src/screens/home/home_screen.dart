@@ -1,29 +1,29 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:flutter/material.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:gap/gap.dart';
-import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:intl/intl.dart';
-import 'package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart';
-import 'package:jbl_pills_reminder_app/src/theme/colors.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:table_calendar/table_calendar.dart';
+import "package:flutter/material.dart";
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
+import "package:gap/gap.dart";
+import "package:get/get.dart";
+import "package:hive_flutter/hive_flutter.dart";
+import "package:internet_connection_checker_plus/internet_connection_checker_plus.dart";
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
+import "package:jbl_pills_reminder_app/src/theme/colors.dart";
+import "package:permission_handler/permission_handler.dart";
+import "package:table_calendar/table_calendar.dart";
 
-import '../../core/background/background_setup.dart';
-import '../../core/functions/find_date_medicine.dart';
-import '../../theme/const_values.dart';
-import '../../widgets/medication_card.dart';
-import '../auth/signup/model/signup_models.dart';
-import '../profile_page/controller/profile_page_controller.dart';
-import '../take_medicine/take_medicine_page.dart';
+import "../../core/background/background_setup.dart";
+import "../../core/functions/find_date_medicine.dart";
+import "../../theme/const_values.dart";
+import "../../widgets/medication_card.dart";
+import "../auth/signup/model/signup_models.dart";
+import "../profile_page/controller/profile_page_controller.dart";
+import "../take_medicine/take_medicine_page.dart";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,7 +34,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final homeController = Get.put(HomeController());
-  final reminderDB = Hive.box('reminder_db');
+  final reminderDB = Hive.box("reminder_db");
 
   bool isLoading = false;
 
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
     every1Stream().listen(
       (event) async {
         final lastDateOfReg =
-            Hive.box('actions').get('redirect', defaultValue: null);
+            Hive.box("actions").get("redirect", defaultValue: null);
         if (lastDateOfReg != null) {
           DateTime? dateTime = DateTime.tryParse(lastDateOfReg);
 
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ));
             }
           }
-          await Hive.box('actions').delete('redirect');
+          await Hive.box("actions").delete("redirect");
         }
       },
     );
@@ -120,12 +120,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  final userDB = Hive.box('user_db');
+  final userDB = Hive.box("user_db");
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
   loadUserData() {
-    String? userInfo = userDB.get('user_info', defaultValue: null);
+    String? userInfo = userDB.get("user_info", defaultValue: null);
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
   }
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pill Reminder'),
+        title: const Text("Pill Reminder"),
         actions: [
           if (isLoading)
             const Padding(
@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.add,
               ),
               label: const Text(
-                'Add New Reminder',
+                "Add New Reminder",
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const Gap(10),
           const Text(
-            'Next Reminder',
+            "Next Reminder",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(10),
                     child: const Text(
-                      'No next reminder for today.',
+                      "No next reminder for today.",
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
               isSameDay(homeController.selectedDay.value, DateTime.now()) ==
                       true
                   ? "Today's Reminder"
-                  : 'Reminder on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}',
+                  : "Reminder on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -289,14 +289,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(borderRadius),
                       image: const DecorationImage(
                         image: AssetImage(
-                          'assets/img/pills.png',
+                          "assets/img/pills.png",
                         ),
                         opacity: 0.1,
                       ),
                     ),
                     child: const Center(
                       child: Text(
-                        'No reminder for this day',
+                        "No reminder for this day",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -310,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const Gap(15),
           const Text(
-            'All Reminders',
+            "All Reminders",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -340,14 +340,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               right: 5, bottom: 5, top: 5),
                           decoration: BoxDecoration(
                             image: const DecorationImage(
-                              image: AssetImage('assets/img/box_empty.png'),
+                              image: AssetImage("assets/img/box_empty.png"),
                               opacity: 0.1,
                             ),
                             color: MyAppColors.shadedMutedColor,
                             borderRadius: BorderRadius.circular(borderRadius),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('Empty'),
+                          child: const Text("Empty"),
                         ),
                     ],
               );
@@ -377,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
       rowHeight: 40,
       calendarFormat: CalendarFormat.week,
       availableCalendarFormats: {
-        CalendarFormat.week: 'Week',
+        CalendarFormat.week: "Week",
       },
       startingDayOfWeek: StartingDayOfWeek.saturday,
       headerStyle: const HeaderStyle(
@@ -414,7 +414,7 @@ List<ReminderModel> findMedicineForSelectedDay(
 }
 
 ReminderModel? getNextReminder(List<ReminderModel> reminderList) {
-  log('nextMedicine');
+  log("nextMedicine");
 
   DateTime now = DateTime.now().subtract(const Duration(minutes: 5));
   List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
@@ -446,7 +446,7 @@ TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
 }
 
 void reloadAllReminderList(HomeController homeController) {
-  final reminderDB = Hive.box('reminder_db');
+  final reminderDB = Hive.box("reminder_db");
 
   List<ReminderModel> tem = [];
   for (var element in reminderDB.values) {
@@ -459,7 +459,7 @@ void reloadAllReminderList(HomeController homeController) {
     sortRemindersBasedOnCreatedDate(homeController.listOfTodaysReminder.value),
   );
 
-  log(homeController.nextReminder.value?.toJson() ?? 'Empty');
+  log(homeController.nextReminder.value?.toJson() ?? "Empty");
 }
 
 List<ReminderModel> sortRemindersBasedOnCreatedDate(
@@ -472,9 +472,9 @@ List<ReminderModel> sortRemindersBasedOnCreatedDate(
 
 Future<void> requestAndroidScheduleExactAlarmPermission() async {
   final status = await Permission.scheduleExactAlarm.status;
-  log('Schedule exact alarm permission: $status.');
+  log("Schedule exact alarm permission: $status.");
   if (status.isDenied) {
-    log('Requesting schedule exact alarm permission...');
+    log("Requesting schedule exact alarm permission...");
     final res = await Permission.scheduleExactAlarm.request();
     log('Schedule exact alarm permission ${res.isGranted ? '' : 'not'} granted.');
   }

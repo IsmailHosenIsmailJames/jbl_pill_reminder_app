@@ -1,25 +1,25 @@
-import 'dart:developer';
+import "dart:developer";
 
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart';
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
+import "package:hive_flutter/hive_flutter.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 
-import '../../screens/add_reminder/model/reminder_model.dart';
-import '../../screens/home/home_screen.dart';
-import '../functions/find_date_medicine.dart';
+import "../../screens/add_reminder/model/reminder_model.dart";
+import "../../screens/home/home_screen.dart";
+import "../functions/find_date_medicine.dart";
 
-@pragma('vm:entry-point')
+@pragma("vm:entry-point")
 void startCallback() {
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
 
 class MyTaskHandler extends TaskHandler {
   void handleTask() async {
-    log('onRepeatEvent');
+    log("onRepeatEvent");
     await Hive.initFlutter();
     await Hive.close();
-    final reminderDB = await Hive.openBox('reminder_db');
+    final reminderDB = await Hive.openBox("reminder_db");
 
     List<ReminderModel> allReminder = [];
     for (var element in reminderDB.values) {
@@ -32,7 +32,7 @@ class MyTaskHandler extends TaskHandler {
     List<ReminderModel> nextAllReminder = [];
 
     for (int i = 0; i < todaysReminder.length; i++) {
-      log('loop:  $i');
+      log("loop:  $i");
       ReminderModel? nextReminder = getNextReminder(
           todaysReminder, DateTime.now().subtract(const Duration(minutes: 5)));
       if (nextReminder != null) {
@@ -43,11 +43,11 @@ class MyTaskHandler extends TaskHandler {
       todaysReminder.removeWhere((element) => element.id == nextReminder.id);
     }
 
-    log('Next Reminder : ${nextAllReminder.length}');
+    log("Next Reminder : ${nextAllReminder.length}");
 
     if (nextAllReminder.isNotEmpty) {
       for (int i = 0; i < nextAllReminder.length; i++) {
-        log('$i -> ${nextAllReminder[i].id}');
+        log("$i -> ${nextAllReminder[i].id}");
       }
       for (ReminderModel nextReminder in nextAllReminder) {
         List<TimeModel>? times = nextReminder.schedule?.times;
@@ -62,16 +62,16 @@ class MyTaskHandler extends TaskHandler {
             String timeFormatted =
                 "${time.name}, ${"${time.hour > 12 ? time.hour % 12 : time.hour}".padLeft(2, '0')}:${"${time.minute}".padLeft(2, '0')} ${time.hour < 12 ? 'AM' : 'PM'}";
             String fullTrackingID =
-                '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}-${time.id}';
+                "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}-${time.id}";
 
-            final actionBox = await Hive.openBox('actions');
-            String body = 'Your next pill at $timeFormatted';
-            String title = 'Reminder for ${time.name} medicine';
-            log('Difference: $difference');
+            final actionBox = await Hive.openBox("actions");
+            String body = "Your next pill at $timeFormatted";
+            String title = "Reminder for ${time.name} medicine";
+            log("Difference: $difference");
             if (difference < 30 && difference > 0) {
               Map<String, dynamic> notificationShownMap =
                   Map<String, dynamic>.from(
-                      actionBox.get('reminder_shown', defaultValue: {}));
+                      actionBox.get("reminder_shown", defaultValue: {}));
               bool alreadyShown = false;
               log(notificationShownMap.toString());
               if (notificationShownMap.containsKey(fullTrackingID)) {
@@ -88,97 +88,97 @@ class MyTaskHandler extends TaskHandler {
                 );
                 notificationShownMap.addAll({
                   fullTrackingID: {
-                    'isShown': true,
-                    'title': title,
-                    'body': 'Your next pill at $timeFormatted'
+                    "isShown": true,
+                    "title": title,
+                    "body": "Your next pill at $timeFormatted"
                   }
                 });
-                await actionBox.put('reminder_shown', notificationShownMap);
+                await actionBox.put("reminder_shown", notificationShownMap);
               } else {
-                log('Already shown ${time.id}');
+                log("Already shown ${time.id}");
                 FlutterForegroundTask.updateService(
-                  notificationTitle: 'Pills Reminder',
-                  notificationText: 'Your next pill at $timeFormatted',
+                  notificationTitle: "Pills Reminder",
+                  notificationText: "Your next pill at $timeFormatted",
                 );
               }
             } else if (difference <= 0 || difference > -5) {
-              log('Alarm Time: $difference');
+              log("Alarm Time: $difference");
               Map<String, dynamic> alarmShown = Map<String, dynamic>.from(
-                  actionBox.get('alarm_shown', defaultValue: {}));
+                  actionBox.get("alarm_shown", defaultValue: {}));
               if (!alarmShown.containsKey(fullTrackingID)) {
-                if (nextReminder.reminderType == 'notification') {
+                if (nextReminder.reminderType == "notification") {
                   await pushNotifications(
                     id: int.parse(time.id),
-                    title: 'Pill Reminder',
-                    body: 'Pill Reminder at ${time.name}',
+                    title: "Pill Reminder",
+                    body: "Pill Reminder at ${time.name}",
                     isPreReminder: false,
                     isAlarm: false,
                   );
                   alarmShown.addAll({
                     fullTrackingID: {
-                      'isShown': true,
-                      'title': title,
-                      'body': 'Your next pill at $timeFormatted'
+                      "isShown": true,
+                      "title": title,
+                      "body": "Your next pill at $timeFormatted"
                     }
                   });
-                  await actionBox.put('alarm_shown', alarmShown);
+                  await actionBox.put("alarm_shown", alarmShown);
                 } else {
                   bool status =
                       await checkAndroidScheduleExactAlarmPermission();
-                  log('status: $status');
+                  log("status: $status");
                   if (status == true) {
                     try {
-                      log('alarm settings');
+                      log("alarm settings");
                       await pushNotifications(
                         id: int.parse(time.id),
-                        title: 'Pill Reminder',
-                        body: 'Pill Reminder at ${time.name}',
+                        title: "Pill Reminder",
+                        body: "Pill Reminder at ${time.name}",
                         isPreReminder: false,
                         isAlarm: true,
                       );
 
                       alarmShown.addAll({
                         fullTrackingID: {
-                          'isShown': true,
-                          'title': title,
-                          'body': 'Your next pill at $timeFormatted'
+                          "isShown": true,
+                          "title": title,
+                          "body": "Your next pill at $timeFormatted"
                         }
                       });
-                      await actionBox.put('alarm_shown', alarmShown);
+                      await actionBox.put("alarm_shown", alarmShown);
                     } catch (e) {
-                      log('Error : \n${e.toString()}');
+                      log("Error : \n${e.toString()}");
                     }
                   }
                 }
               } else {
-                log('Already shown ${time.toJson()}');
+                log("Already shown ${time.toJson()}");
                 FlutterForegroundTask.updateService(
-                  notificationTitle: 'Pills Reminder',
-                  notificationText: 'Your next pill at $timeFormatted',
+                  notificationTitle: "Pills Reminder",
+                  notificationText: "Your next pill at $timeFormatted",
                 );
               }
             }
             FlutterForegroundTask.updateService(
-              notificationTitle: 'Pills Reminder',
-              notificationText: 'Your next pill at $timeFormatted',
+              notificationTitle: "Pills Reminder",
+              notificationText: "Your next pill at $timeFormatted",
             );
           } else {
             FlutterForegroundTask.updateService(
-              notificationTitle: 'Foreground Service is running',
-              notificationText: 'Tap to return to the app',
+              notificationTitle: "Foreground Service is running",
+              notificationText: "Tap to return to the app",
             );
           }
         } else {
           FlutterForegroundTask.updateService(
-            notificationTitle: 'Foreground Service is running',
-            notificationText: 'Tap to return to the app',
+            notificationTitle: "Foreground Service is running",
+            notificationText: "Tap to return to the app",
           );
         }
       }
     } else {
       FlutterForegroundTask.updateService(
-        notificationTitle: 'Foreground Service is running',
-        notificationText: 'Tap to return to the app',
+        notificationTitle: "Foreground Service is running",
+        notificationText: "Tap to return to the app",
       );
     }
   }
@@ -196,7 +196,7 @@ class MyTaskHandler extends TaskHandler {
 
   ReminderModel? getNextReminder(
       List<ReminderModel> reminderList, DateTime now) {
-    log('nextMedicine');
+    log("nextMedicine");
 
     List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
 
@@ -236,28 +236,28 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   Future<void> onDestroy(DateTime timestamp, bool success) async {
-    log('onDestroy');
+    log("onDestroy");
   }
 
   @override
   void onReceiveData(Object data) {
-    log('onReceiveData: $data');
+    log("onReceiveData: $data");
   }
 
   @override
   void onNotificationButtonPressed(String id) {
-    log('onNotificationButtonPressed: $id');
+    log("onNotificationButtonPressed: $id");
   }
 
   @override
   void onNotificationPressed() {
-    FlutterForegroundTask.launchApp('/');
+    FlutterForegroundTask.launchApp("/");
 
-    log('onNotificationPressed');
+    log("onNotificationPressed");
   }
 
   @override
   void onNotificationDismissed() {
-    log('onNotificationDismissed');
+    log("onNotificationDismissed");
   }
 }

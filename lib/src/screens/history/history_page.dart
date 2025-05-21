@@ -1,13 +1,13 @@
-import 'dart:convert';
-import 'dart:developer';
+import "dart:convert";
+import "dart:developer";
 
-import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:http/http.dart';
-import 'package:intl/intl.dart';
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/widgets/medication_card.dart';
+import "package:flutter/material.dart";
+import "package:gap/gap.dart";
+import "package:http/http.dart";
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 
 class HistoryPage extends StatefulWidget {
   final String phone;
@@ -22,10 +22,10 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My History'),
+        title: const Text("My History"),
       ),
       body: FutureBuilder(
-        future: get(Uri.parse('${baseAPI}history/${widget.phone}')),
+        future: get(Uri.parse("${baseAPI}history/${widget.phone}")),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -48,7 +48,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         Row(
                           children: [
                             Text(
-                              '${index + 1}.',
+                              "${index + 1}.",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -57,7 +57,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             ),
                             const Gap(10),
                             Text(
-                              '${TimeOfDay(hour: data.keys.elementAt(index).hour, minute: data.keys.elementAt(index).minute).format(context)},',
+                              "${TimeOfDay(hour: data.keys.elementAt(index).hour, minute: data.keys.elementAt(index).minute).format(context)},",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -85,11 +85,11 @@ class _HistoryPageState extends State<HistoryPage> {
                 );
               } else {
                 log(response.statusCode.toString());
-                return const Text('Unable to load: 404');
+                return const Text("Unable to load: 404");
               }
             } else {
               return const Center(
-                child: Text('Unable to load'),
+                child: Text("Unable to load"),
               );
             }
           }
@@ -102,9 +102,9 @@ class _HistoryPageState extends State<HistoryPage> {
     Map<DateTime, ReminderModel> sortedData = {};
 
     for (int i = 0; i < rawData.length; i++) {
-      String date = rawData[i]['created_at'];
+      String date = rawData[i]["created_at"];
       DateTime dateTime = DateTime.parse(date);
-      Map<String, dynamic> data = Map<String, dynamic>.from(rawData[i]['data']);
+      Map<String, dynamic> data = Map<String, dynamic>.from(rawData[i]["data"]);
       sortedData.addAll({dateTime: ReminderModel.fromMap(data)});
     }
     return sortedData;

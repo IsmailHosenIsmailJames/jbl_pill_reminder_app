@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import "package:get/get.dart";
 
 class SignupPageController extends GetxController {
   Rx<String?> gender = Rx<String?>(null);

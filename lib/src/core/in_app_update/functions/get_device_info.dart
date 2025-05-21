@@ -1,4 +1,4 @@
-import 'package:device_info_plus/device_info_plus.dart';
+import "package:device_info_plus/device_info_plus.dart";
 
 Future<List<String>> getDeviceSupportedAbisInfo() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();

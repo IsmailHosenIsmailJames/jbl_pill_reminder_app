@@ -1,12 +1,12 @@
-import 'dart:math';
-import 'dart:developer' as dev;
-import 'dart:convert';
+import "dart:math";
+import "dart:developer" as dev;
+import "dart:convert";
 
-import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
+import "package:http/http.dart" as http;
+import "package:get/get.dart";
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
 
-import '../model/reminder_model.dart';
+import "../model/reminder_model.dart";
 
 class AddNewReminderModelController extends GetxController {
   Rx<ReminderModel> reminders =
@@ -17,9 +17,9 @@ class AddNewReminderModelController extends GetxController {
   Future<http.Response?> createReminder(
       Map<String, dynamic> reminderData) async {
     try {
-      final url = Uri.parse('${baseAPI}reminders/create/');
+      final url = Uri.parse("${baseAPI}reminders/create/");
       final headers = {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       };
 
       final body = jsonEncode(reminderData); // Convert reminderData to JSON
@@ -31,7 +31,7 @@ class AddNewReminderModelController extends GetxController {
         dev.log(response.statusCode.toString());
         return response;
       } catch (e) {
-        print('Error creating reminder: $e');
+        print("Error creating reminder: $e");
         rethrow; // Re-throw the error so the caller can handle it
       }
     } catch (e) {
