@@ -8,6 +8,7 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
+  alarm: ^5.1.4
   awesome_notifications: ^0.10.1
   clipboard: ^0.1.3
   device_info_plus: ^11.3.3
@@ -27,7 +28,7 @@ dependencies:
   http: ^1.3.0
   http_status_code: ^0.0.2
   icons_launcher: ^3.0.1
-  internet_connection_checker_plus: ^2.7.1
+  internet_connection_checker: ^3.0.1
   intl: ^0.20.2
   open_file: ^3.5.10
   package_info_plus: ^8.3.0
@@ -44,7 +45,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.14
   hive_generator: ^2.0.1
 
@@ -64,7 +65,7 @@ flutter_native_splash:
   image: assets/app_logo.jpeg
   android_12:
     image: assets/app_logo.jpeg
-    icon_background_color: 
+    icon_background_color:
 
 icons_launcher:
   image_path: "assets/app_logo.jpeg"

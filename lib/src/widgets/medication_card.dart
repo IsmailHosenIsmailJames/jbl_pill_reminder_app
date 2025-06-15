@@ -5,7 +5,7 @@ import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive/hive.dart";
-import "package:internet_connection_checker_plus/internet_connection_checker_plus.dart";
+import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -303,8 +303,8 @@ Card cardOfReminderForSummary(
                                   backgroundColor: Colors.red,
                                 ),
                                 onPressed: () async {
-                                  if (await InternetConnection()
-                                          .hasInternetAccess ==
+                                  if (await InternetConnectionChecker
+                                          .instance.hasConnection ==
                                       false) {
                                     toastification.show(
                                       context: context,
