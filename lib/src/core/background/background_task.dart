@@ -2,6 +2,8 @@ import "dart:developer";
 
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
+import "package:jbl_pills_reminder_app/src/core/alarm/alarm_config.dart";
+import "package:jbl_pills_reminder_app/src/core/alarm/set_alarm.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 
@@ -84,7 +86,6 @@ class MyTaskHandler extends TaskHandler {
                   title: title,
                   body: body,
                   isPreReminder: true,
-                  isAlarm: false,
                 );
                 notificationShownMap.addAll({
                   fullTrackingID: {
@@ -109,10 +110,10 @@ class MyTaskHandler extends TaskHandler {
                 if (nextReminder.reminderType == "notification") {
                   await pushNotifications(
                     id: int.parse(time.id),
-                    title: "Pill Reminder",
-                    body: "Pill Reminder at ${time.name}",
+                    title: "Time for your medicine!",
+                    body:
+                        "It's time to take your ${nextReminder.medicine?.genericName ?? nextReminder.medicine?.brandName ?? "medicine"} (${time.name}).",
                     isPreReminder: false,
-                    isAlarm: false,
                   );
                   alarmShown.addAll({
                     fullTrackingID: {
@@ -129,21 +130,29 @@ class MyTaskHandler extends TaskHandler {
                   if (status == true) {
                     try {
                       log("alarm settings");
-                      await pushNotifications(
-                        id: int.parse(time.id),
-                        title: "Pill Reminder",
-                        body: "Pill Reminder at ${time.name}",
-                        isPreReminder: false,
-                        isAlarm: true,
+                      bool isSuccess = await setAlarm(
+                        getAlarmConfig(
+                          id: int.parse(time.id),
+                          title:
+                              "Reminder for ${nextReminder.medicine?.genericName ?? nextReminder.medicine?.brandName ?? "your pills"}",
+                          body:
+                              "It's time to take your ${time.name} dose.\nMedicine: ${nextReminder.medicine?.genericName ?? nextReminder.medicine?.brandName ?? "your pills"}\nDosage: ${nextReminder.medicine?.strength ?? ""} ${nextReminder.medicine?.strength ?? ""}\nTake it now!.",
+                          timeOfAlarm: DateTime.now().copyWith(
+                            hour: time.hour,
+                            minute: time.minute,
+                          ),
+                        ),
                       );
 
-                      alarmShown.addAll({
-                        fullTrackingID: {
-                          "isShown": true,
-                          "title": title,
-                          "body": "Your next pill at $timeFormatted"
-                        }
-                      });
+                      if (isSuccess) {
+                        alarmShown.addAll({
+                          fullTrackingID: {
+                            "isShown": true,
+                            "title": title,
+                            "body": "Your next pill at $timeFormatted"
+                          }
+                        });
+                      }
                       await actionBox.put("alarm_shown", alarmShown);
                     } catch (e) {
                       log("Error : \n${e.toString()}");
