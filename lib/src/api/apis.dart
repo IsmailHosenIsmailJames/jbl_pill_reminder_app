@@ -1,4 +1,4 @@
-String baseAPI = "http://128.199.87.251:2025/api/";
+String baseAPI = "http://103.168.140.134:5003/api/";
 String signUpAPI = "${baseAPI}user/signup/";
 String loginAPI = "${baseAPI}user/login/";
 String updateUserInfoAPI = "${baseAPI}user/update_user/";

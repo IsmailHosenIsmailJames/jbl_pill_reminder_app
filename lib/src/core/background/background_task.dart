@@ -144,6 +144,8 @@ class MyTaskHandler extends TaskHandler {
                         ),
                       );
 
+                      log("setAlarm -> $isSuccess", name: "Set Alarm");
+
                       if (isSuccess) {
                         alarmShown.addAll({
                           fullTrackingID: {

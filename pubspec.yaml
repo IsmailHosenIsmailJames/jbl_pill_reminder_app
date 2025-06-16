@@ -58,6 +58,7 @@ flutter:
     - assets/
     - assets/img/
     - assets/resources/
+    - assets/sound/
 
 
 flutter_native_splash:
