@@ -11,6 +11,7 @@ import "package:hive/hive.dart";
 import "package:http_status_code/http_status_code.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/background/work_manager/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -22,7 +23,6 @@ import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:searchfield/searchfield.dart";
 import "package:toastification/toastification.dart";
-import "package:workmanager/workmanager.dart";
 
 import "../../resources/frequency.dart";
 import "../../resources/week_days.dart";
@@ -921,10 +921,7 @@ class _AddReminderState extends State<AddReminder> {
                     }
                   }
                   try {
-                    Workmanager().registerOneOffTask(
-                      "reminder_process",
-                      "reminder_processor_onetime",
-                    );
+                    await analyzeDatabase();
                   } catch (e) {
                     dev.log(e.toString());
                   }

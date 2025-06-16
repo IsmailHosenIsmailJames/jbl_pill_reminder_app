@@ -26,7 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
   }
 
-  loadUserData() {
+  void loadUserData() {
     String? userInfo = userDB.get("user_info", defaultValue: null);
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;

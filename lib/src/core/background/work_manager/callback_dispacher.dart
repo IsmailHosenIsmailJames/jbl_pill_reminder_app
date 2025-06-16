@@ -1,3 +1,5 @@
+import "dart:developer";
+
 import "package:alarm/alarm.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:workmanager/workmanager.dart";
@@ -19,6 +21,7 @@ void callbackDispatcher() {
 }
 
 Future<void> analyzeDatabase() async {
+  await Alarm.init();
   await Hive.initFlutter();
   await Hive.close();
   final reminderDB = await Hive.openBox("reminder_db");
@@ -62,7 +65,6 @@ Future<void> analyzeDatabase() async {
         String body =
             "Time for ${reminderModel.medicine?.genericName ?? reminderModel.medicine?.brandName ?? "take medicine"}";
         if (reminderModel.reminderType == ReminderType.alarm) {
-          await Alarm.init();
           AlarmSettings? previousConfig = await Alarm.getAlarm(idAsInt);
           if (previousConfig == null) {
             await setAlarm(getAlarmConfig(
@@ -88,4 +90,5 @@ Future<void> analyzeDatabase() async {
       }
     }
   }
+  log("Finished Task");
 }

@@ -4,12 +4,13 @@ import "dart:developer";
 import "package:alarm/alarm.dart";
 import "package:alarm/utils/alarm_set.dart";
 import "package:flutter/material.dart";
-// import "package:flutter_foreground_task/flutter_foreground_task.dart";
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/background/work_manager/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
@@ -19,7 +20,6 @@ import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:table_calendar/table_calendar.dart";
-import "package:workmanager/workmanager.dart";
 
 import "../../core/background/background_setup.dart";
 import "../../core/functions/find_date_medicine.dart";
@@ -61,10 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
     try {
-      Workmanager().registerOneOffTask(
-        "reminder_process",
-        "reminder_processor_onetime",
-      );
+      await analyzeDatabase();
     } catch (e) {
       dev.log(e.toString());
     }
@@ -79,13 +76,13 @@ class _HomeScreenState extends State<HomeScreen> {
     getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
 
-    // FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
+    FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await requestPermissions().then((value) {
-        // initService().then((value) {
-        //   startService();
-        // });
+        initService().then((value) {
+          startService();
+        });
       });
 
       requestAndroidScheduleExactAlarmPermission();
