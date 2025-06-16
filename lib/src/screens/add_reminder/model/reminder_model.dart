@@ -9,7 +9,7 @@ class ReminderModel {
   MedicineModel? medicine;
   ScheduleModel? schedule;
   String? quantity;
-  String? reminderType;
+  ReminderType? reminderType;
 
   ReminderModel({
     required this.id,
@@ -27,7 +27,7 @@ class ReminderModel {
     MedicineModel? medicine,
     ScheduleModel? schedule,
     String? quantity,
-    String? reminderType,
+    ReminderType? reminderType,
   }) =>
       ReminderModel(
         id: id ?? this.id,
@@ -53,7 +53,9 @@ class ReminderModel {
             ? null
             : ScheduleModel.fromMap(json["schedule"]),
         quantity: json["quantity"],
-        reminderType: json["reminder_type"],
+        reminderType: ReminderType.values.firstWhere(
+          (element) => element.name == json["reminder_type"],
+        ),
       );
 
   Map<String, dynamic> toMap() => {
@@ -62,6 +64,8 @@ class ReminderModel {
         "medicine": medicine?.toMap(),
         "schedule": schedule?.toMap(),
         "quantity": quantity,
-        "reminder_type": reminderType,
+        "reminder_type": reminderType?.name,
       };
 }
+
+enum ReminderType { alarm, notification }

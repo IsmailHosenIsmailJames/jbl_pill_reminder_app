@@ -2,7 +2,6 @@ import "dart:developer";
 
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
-import "package:hive_flutter/hive_flutter.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 
 class NotificationsService {
@@ -45,12 +44,7 @@ class NotificationsService {
 
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    if (receivedAction.buttonKeyPressed == "take_medicine") {
-      await Hive.initFlutter();
-      await Hive.close();
-      final actionsBox = await Hive.openBox("actions");
-      await actionsBox.put("redirect", {DateTime.now().millisecondsSinceEpoch});
-    }
+    if (receivedAction.buttonKeyPressed == "take_medicine") {}
     log("onActionReceivedMethod");
   }
 

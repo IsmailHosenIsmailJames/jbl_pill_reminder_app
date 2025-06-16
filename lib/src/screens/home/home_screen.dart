@@ -1,7 +1,10 @@
+import "dart:developer" as dev;
 import "dart:developer";
 
+import "package:alarm/alarm.dart";
+import "package:alarm/utils/alarm_set.dart";
 import "package:flutter/material.dart";
-import "package:flutter_foreground_task/flutter_foreground_task.dart";
+// import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_flutter/hive_flutter.dart";
@@ -16,6 +19,7 @@ import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:table_calendar/table_calendar.dart";
+import "package:workmanager/workmanager.dart";
 
 import "../../core/background/background_setup.dart";
 import "../../core/functions/find_date_medicine.dart";
@@ -56,23 +60,32 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     }
+    try {
+      Workmanager().registerOneOffTask(
+        "reminder_process",
+        "reminder_processor_onetime",
+      );
+    } catch (e) {
+      dev.log(e.toString());
+    }
   }
 
   @override
   void initState() {
     inAppUpdateAndroid(context);
     loadUserData();
-    super.initState();
+    checkNotificationsAction();
+
     getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
 
-    FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
+    // FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await requestPermissions().then((value) {
-        initService().then((value) {
-          startService();
-        });
+        // initService().then((value) {
+        //   startService();
+        // });
       });
 
       requestAndroidScheduleExactAlarmPermission();
@@ -83,28 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
             homeController.listOfTodaysReminder.value),
       );
     });
-    every1Stream().listen(
-      (event) async {
-        final lastDateOfReg =
-            Hive.box("actions").get("redirect", defaultValue: null);
-        if (lastDateOfReg != null) {
-          DateTime? dateTime = DateTime.tryParse(lastDateOfReg);
-
-          if (dateTime != null &&
-              DateTime.now().difference(dateTime).inSeconds < 30) {
-            if (homeController.nextReminder.value != null) {
-              Get.to(() => TakeMedicinePage(
-                    currentMedicationToTake: homeController.nextReminder.value!,
-                  ));
-            }
-          }
-          await Hive.box("actions").delete("redirect");
-        }
-      },
-    );
 
     HomeController.backupReminderHistory(
         profilePageController.userInfo.value!.phone);
+
+    super.initState();
   }
 
   Stream<int> every30Stream() {
@@ -114,20 +110,30 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Stream<int> every1Stream() {
-    return Stream<int>.periodic(const Duration(seconds: 1), (computationCount) {
-      return computationCount;
-    });
-  }
-
   final userDB = Hive.box("user_db");
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
-  loadUserData() {
+  void loadUserData() {
     String? userInfo = userDB.get("user_info", defaultValue: null);
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
+  }
+
+  void checkNotificationsAction() async {
+    await Alarm.checkAlarm();
+    if (await Alarm.isRinging()) {
+      AlarmSet? alarmSet = await Alarm.ringing.first;
+      String? payload = alarmSet.alarms.first.payload;
+      if (payload != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          Get.to(
+            () => TakeMedicinePage(
+                currentMedicationToTake: ReminderModel.fromJson(payload)),
+          );
+        });
+      }
+    }
   }
 
   @override

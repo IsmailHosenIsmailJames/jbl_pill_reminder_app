@@ -22,6 +22,7 @@ import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:searchfield/searchfield.dart";
 import "package:toastification/toastification.dart";
+import "package:workmanager/workmanager.dart";
 
 import "../../resources/frequency.dart";
 import "../../resources/week_days.dart";
@@ -771,27 +772,27 @@ class _AddReminderState extends State<AddReminder> {
                   },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   items: [
-                    const DropdownMenuItem(
-                      value: "notification",
+                    DropdownMenuItem(
+                      value: ReminderType.notification,
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.notifications,
                           ),
-                          Gap(10),
-                          Text("Notification"),
+                          const Gap(10),
+                          Text(ReminderType.notification.name.capitalize),
                         ],
                       ),
                     ),
-                    const DropdownMenuItem(
-                      value: "alarm",
+                    DropdownMenuItem(
+                      value: ReminderType.alarm,
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.alarm,
                           ),
-                          Gap(10),
-                          Text("Alarm"),
+                          const Gap(10),
+                          Text(ReminderType.alarm.name.capitalize),
                         ],
                       ),
                     ),
@@ -918,6 +919,14 @@ class _AddReminderState extends State<AddReminder> {
                         type: ToastificationType.error,
                       );
                     }
+                  }
+                  try {
+                    Workmanager().registerOneOffTask(
+                      "reminder_process",
+                      "reminder_processor_onetime",
+                    );
+                  } catch (e) {
+                    dev.log(e.toString());
                   }
                 },
                 icon: isAsyncLoading

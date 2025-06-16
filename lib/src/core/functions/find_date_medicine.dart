@@ -2,6 +2,7 @@ import "dart:developer";
 
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 
 import "../../resources/frequency.dart";
 import "../../screens/add_reminder/model/schedule_model.dart";
@@ -81,4 +82,13 @@ List<ReminderModel> findDateMedicine(
     }
   }
   return todaysMedication;
+}
+
+List<ReminderModel> findMedicineForSelectedDay(
+    List<ReminderModel> listOfAllReminder, DateTime selectedDay) {
+  List<ReminderModel> todaysMedication =
+      findDateMedicine(listOfAllReminder, selectedDay);
+  List<ReminderModel> listOfTodaysReminder =
+      sortRemindersBasedOnCreatedDate(todaysMedication);
+  return listOfTodaysReminder;
 }
