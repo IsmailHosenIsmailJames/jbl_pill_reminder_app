@@ -10,7 +10,6 @@ import "package:get/get.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/core/background/work_manager/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
@@ -20,6 +19,7 @@ import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:table_calendar/table_calendar.dart";
+import "package:workmanager/workmanager.dart";
 
 import "../../core/background/background_setup.dart";
 import "../../core/functions/find_date_medicine.dart";
@@ -61,7 +61,10 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
     try {
-      await analyzeDatabase();
+      Workmanager().registerOneOffTask(
+        "reminder_processor",
+        "reminder_processor_onetime",
+      );
     } catch (e) {
       dev.log(e.toString());
     }
@@ -126,7 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           Get.to(
             () => TakeMedicinePage(
-                currentMedicationToTake: ReminderModel.fromJson(payload)),
+              currentMedicationToTake: ReminderModel.fromJson(payload),
+              alarmID: alarmSet.alarms.first.id,
+            ),
           );
         });
       }

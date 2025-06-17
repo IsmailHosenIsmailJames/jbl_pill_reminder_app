@@ -1,6 +1,7 @@
 import "dart:developer";
 
 import "package:alarm/alarm.dart";
+import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:workmanager/workmanager.dart";
 
@@ -32,7 +33,10 @@ Future<void> analyzeDatabase() async {
   allReminder = sortRemindersBasedOnCreatedDate(allReminder);
   List<ReminderModel> todaysReminder = findMedicineForSelectedDay(
       allReminder, DateTime.now().subtract(const Duration(minutes: 5)));
+  List<ReminderModel> upcomingRemindersInNext15Min = [];
   DateTime now = DateTime.now();
+  DateTime fifteenMinutesFromNow = now.add(const Duration(minutes: 15));
+
   for (ReminderModel reminderModel in todaysReminder) {
     for (TimeModel timeModel in reminderModel.schedule?.times ?? []) {
       int idAsInt = int.parse(timeModel.id);
@@ -45,25 +49,33 @@ Future<void> analyzeDatabase() async {
 
       DateTime preReminderTime =
           exactMedicationTime.subtract(const Duration(minutes: 15));
-
       if (preReminderTime.isAfter(now)) {
         await pushNotifications(
           id: idAsInt,
           title:
-              "Pre-Reminder: ${reminderModel.medicine?.genericName ?? reminderModel.medicine?.brandName ?? "Take medicine"}",
+              "Pre-Reminder: ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"}",
           body:
-              "You have a dose of ${reminderModel.medicine?.genericName ?? reminderModel.medicine?.brandName ?? "Take medicine"} scheduled in 15 minutes.",
+              "You have a dose of ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"} scheduled in 15 minutes.",
           time: preReminderTime,
           isPreReminder: true,
           data: reminderModel,
         );
       }
 
+      if (exactMedicationTime.isAfter(now) &&
+          exactMedicationTime.isBefore(fifteenMinutesFromNow)) {
+        // To avoid adding the same reminder multiple times if it has multiple schedules in the next 15 mins
+        if (!upcomingRemindersInNext15Min
+            .any((r) => r.id == reminderModel.id)) {
+          upcomingRemindersInNext15Min.add(reminderModel);
+        }
+      }
+
       if (exactMedicationTime.isAfter(now)) {
         String title =
-            "It's time for take ${reminderModel.medicine?.genericName ?? reminderModel.medicine?.brandName ?? "medicine"}";
+            "It's time for take ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "medicine"}";
         String body =
-            "Time for ${reminderModel.medicine?.genericName ?? reminderModel.medicine?.brandName ?? "take medicine"}";
+            "Time for ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "take medicine"}";
         if (reminderModel.reminderType == ReminderType.alarm) {
           AlarmSettings? previousConfig = await Alarm.getAlarm(idAsInt);
           if (previousConfig == null) {
@@ -90,5 +102,26 @@ Future<void> analyzeDatabase() async {
       }
     }
   }
+
+  if (upcomingRemindersInNext15Min.isNotEmpty) {
+    for (var reminderModel in upcomingRemindersInNext15Min) {
+      try {
+        FlutterForegroundTask.updateService(
+          notificationTitle:
+              "Pre-Reminder: ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"}",
+          notificationText:
+              "You have a dose of ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"} scheduled in 15 minutes.",
+        );
+      } catch (e) {
+        log(e.toString(), name: "upcomingRemindersInNext15Min");
+      }
+    }
+  } else {
+    FlutterForegroundTask.updateService(
+      notificationTitle: "Foreground Service is running",
+      notificationText: "Tap to return to the app",
+    );
+  }
+
   log("Finished Task");
 }

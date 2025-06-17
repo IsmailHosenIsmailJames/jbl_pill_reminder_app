@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:developer";
 
+import "package:alarm/alarm.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
@@ -17,11 +18,13 @@ class TakeMedicinePage extends StatefulWidget {
   final String? title;
   final String? payload;
   final ReminderModel currentMedicationToTake;
+  final int? alarmID;
   const TakeMedicinePage({
     super.key,
     this.title,
     this.payload,
     required this.currentMedicationToTake,
+    this.alarmID,
   });
 
   @override
@@ -138,6 +141,15 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             type: ToastificationType.success,
                             autoCloseDuration: const Duration(seconds: 3),
                           );
+
+                          try {
+                            if (widget.alarmID != null) {
+                              await Alarm.stop(widget.alarmID!);
+                            }
+                          } catch (e) {
+                            log(e.toString(), name: "alarm");
+                          }
+
                           Get.back();
                         },
                         icon: const Icon(Icons.done),

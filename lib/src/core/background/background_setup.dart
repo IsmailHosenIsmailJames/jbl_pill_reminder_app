@@ -1,18 +1,31 @@
-// ignore_for_file: avoid_redundant_argument_values
+import "dart:io";
 
 import "package:flutter/foundation.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:jbl_pills_reminder_app/src/core/background/background_task.dart";
+import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 Future<void> requestPermissions() async {
-  // Android 13+, you need to allow notification permission to display foreground service notification.
-  //
-  // iOS: If you need notification, ask for permission.
-  final notificationPermissionStatus =
+  final NotificationPermission notificationPermission =
       await FlutterForegroundTask.checkNotificationPermission();
-  if (notificationPermissionStatus != NotificationPermission.granted) {
+  if (notificationPermission != NotificationPermission.granted) {
     await FlutterForegroundTask.requestNotificationPermission();
+  }
+
+  var ignoreBatteryOpt = await Permission.ignoreBatteryOptimizations.status;
+  if (ignoreBatteryOpt != PermissionStatus.granted) {
+    ignoreBatteryOpt = await Permission.ignoreBatteryOptimizations.request();
+  }
+
+  if (Platform.isAndroid) {
+    if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
+      await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+    }
+
+    if (!await FlutterForegroundTask.canScheduleExactAlarms) {
+      await FlutterForegroundTask.openAlarmsAndRemindersSettings();
+    }
   }
 }
 
@@ -39,7 +52,7 @@ Future<void> initService() async {
       autoRunOnMyPackageReplaced: true,
       allowWakeLock: true,
       allowWifiLock: true,
-      eventAction: ForegroundTaskEventAction.repeat(timeInterval ?? 10000),
+      eventAction: ForegroundTaskEventAction.repeat(timeInterval ?? 30000),
     ),
   );
 }
