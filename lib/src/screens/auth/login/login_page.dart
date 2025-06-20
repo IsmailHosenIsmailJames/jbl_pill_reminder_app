@@ -3,6 +3,7 @@ import "dart:developer";
 import "dart:io";
 
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive/hive.dart";
@@ -51,117 +52,125 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.all(10),
             child: Form(
               key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppIntroPages(pageController: pageController),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
-                    child: Center(
-                      child: SmoothPageIndicator(
-                        controller: pageController,
-                        count: listOfPagesInfo.length,
-                        effect: ExpandingDotsEffect(
-                          activeDotColor: MyAppColors.primaryColor,
-                          dotHeight: 5,
-                          dotWidth: MediaQuery.of(context).size.width / 10,
-                          expansionFactor: 7,
-                          spacing: 5,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Gap(30),
-                  getTitlesForFields(
-                    title: "Phone Number",
-                    isFieldRequired: true,
-                  ),
-                  const Gap(5),
-                  customTextFieldDecoration(
-                    textFormField: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      decoration: textFieldInputDecoration(
-                        hint: "+8801xxxxxxxxx",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Please enter your phone number";
-                        }
-                        if (value.length != 11 && value.length != 14) {
-                          return "Please enter a valid phone number";
-                        }
-                        return null;
-                      },
-                      controller: textEditingControllerPhoneNumber,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    ),
-                  ),
-                  const Gap(10),
-                  getTitlesForFields(
-                    title: "Password",
-                    isFieldRequired: true,
-                  ),
-                  const Gap(5),
-                  customTextFieldDecoration(
-                    textFormField: TextFormField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: textFieldInputDecoration(
-                        hint: "type your password...",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Please enter your password";
-                        }
-                        if (value.length < 6) {
-                          return "Password must be at least 6 characters";
-                        }
-                        return null;
-                      },
-                      controller: textEditingControllerPassword,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    ),
-                  ),
-                  const Gap(10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          await login(context);
-                        }
-                      },
-                      child: const Text(
-                        "Log in",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Gap(10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text("Haven't signed up yet?"),
-                      TextButton(
-                        onPressed: () {
-                          Get.off(
-                            () => const SignupPage(),
-                          );
-                        },
-                        child: const Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
+              child: AutofillGroup(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppIntroPages(pageController: pageController),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
+                      child: Center(
+                        child: SmoothPageIndicator(
+                          controller: pageController,
+                          count: listOfPagesInfo.length,
+                          effect: ExpandingDotsEffect(
+                            activeDotColor: MyAppColors.primaryColor,
+                            dotHeight: 5,
+                            dotWidth: MediaQuery.of(context).size.width / 10,
+                            expansionFactor: 7,
+                            spacing: 5,
                           ),
                         ),
                       ),
-                    ],
-                  )
-                ],
+                    ),
+                    const Gap(30),
+                    getTitlesForFields(
+                      title: "Phone Number",
+                      isFieldRequired: true,
+                    ),
+                    const Gap(5),
+                    customTextFieldDecoration(
+                      textFormField: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        autofillHints: const [AutofillHints.telephoneNumber],
+                        decoration: textFieldInputDecoration(
+                          hint: "+8801xxxxxxxxx",
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Please enter your phone number";
+                          }
+                          if (value.length != 11 && value.length != 14) {
+                            return "Please enter a valid phone number";
+                          }
+                          return null;
+                        },
+                        controller: textEditingControllerPhoneNumber,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                      ),
+                    ),
+                    const Gap(10),
+                    getTitlesForFields(
+                      title: "Password",
+                      isFieldRequired: true,
+                    ),
+                    const Gap(5),
+                    customTextFieldDecoration(
+                      textFormField: TextFormField(
+                        keyboardType: TextInputType.visiblePassword,
+                        autofillHints: const [AutofillHints.password],
+                        obscureText: true,
+                        onEditingComplete: () =>
+                            TextInput.finishAutofillContext(),
+                        decoration: textFieldInputDecoration(
+                          hint: "type your password...",
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Please enter your password";
+                          }
+                          if (value.length < 6) {
+                            return "Password must be at least 6 characters";
+                          }
+                          return null;
+                        },
+                        controller: textEditingControllerPassword,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                      ),
+                    ),
+                    const Gap(10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            TextInput.finishAutofillContext(shouldSave: true);
+                            await login(context);
+                          }
+                        },
+                        child: const Text(
+                          "Log in",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Gap(10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text("Haven't signed up yet?"),
+                        TextButton(
+                          onPressed: () {
+                            Get.off(
+                              () => const SignupPage(),
+                            );
+                          },
+                          child: const Text(
+                            "Sign Up",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -191,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
       log(response.statusCode.toString(), name: "HTTP");
       log(response.body, name: "HTTP");
       if (response.statusCode == StatusCode.OK) {
+        TextInput.finishAutofillContext(shouldSave: true);
         final data = Map<String, dynamic>.from(jsonDecode(response.body));
         data.addAll({"password": textEditingControllerPassword.text});
         await Hive.box("user_db").put(
