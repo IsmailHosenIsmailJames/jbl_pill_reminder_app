@@ -1,8 +1,8 @@
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
+import "package:jbl_pills_reminder_app/app.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
-
-import "../../../main.dart";
 
 class NotificationsService {
   static Future<void> initNotifications() async {
@@ -73,10 +73,10 @@ class NotificationsService {
     // Your code goes here
 
     // Navigate into pages, avoiding to open the notification details page over another details page already opened
-    MyApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        "/notification-page",
+    App.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        Routes.notificationRoute,
         (route) =>
-            (route.settings.name != "/notification-page") || route.isFirst,
+            (route.settings.name != Routes.notificationRoute) || route.isFirst,
         arguments: receivedAction);
   }
 }

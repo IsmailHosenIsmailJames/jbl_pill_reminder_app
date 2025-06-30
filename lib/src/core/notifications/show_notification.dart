@@ -38,7 +38,7 @@ Future<void> pushNotifications({
       actionType: ActionType.KeepOnTop,
       customSound: "resource://raw/shaking_pill_bottle",
       category: NotificationCategory.Reminder,
-      payload: {"data": data.toJson()},
+      payload: Map<String, String?>.from(data.toMap()),
     ),
     schedule: NotificationCalendar.fromDate(
       date: time,
