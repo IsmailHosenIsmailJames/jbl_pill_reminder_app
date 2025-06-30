@@ -1,7 +1,6 @@
 import "dart:convert";
 import "dart:developer";
 
-import "package:alarm/alarm.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
@@ -144,7 +143,8 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
 
                           try {
                             if (widget.alarmID != null) {
-                              await Alarm.stop(widget.alarmID!);
+                              // await Alarm.stop(widget.alarmID!);
+                              // TODO: replace Alarm Package functionality
                             }
                           } catch (e) {
                             log(e.toString(), name: "alarm");

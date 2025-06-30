@@ -1,7 +1,5 @@
 import "dart:developer";
 
-import "package:alarm/alarm.dart";
-import "package:alarm/utils/alarm_set.dart";
 import "package:flutter/material.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:gap/gap.dart";
@@ -66,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     inAppUpdateAndroid(context);
     loadUserData();
-    checkNotificationsAction();
+    // checkNotificationsAction();
 
     getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
@@ -112,23 +110,24 @@ class _HomeScreenState extends State<HomeScreen> {
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
   }
 
-  void checkNotificationsAction() async {
-    await Alarm.checkAlarm();
-    if (await Alarm.isRinging()) {
-      AlarmSet? alarmSet = await Alarm.ringing.first;
-      String? payload = alarmSet.alarms.first.payload;
-      if (payload != null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          Get.to(
-            () => TakeMedicinePage(
-              currentMedicationToTake: ReminderModel.fromJson(payload),
-              alarmID: alarmSet.alarms.first.id,
-            ),
-          );
-        });
-      }
-    }
-  }
+  // void checkNotificationsAction() async {
+  //   await Alarm.checkAlarm();
+  //   if (await Alarm.isRinging()) {
+  //     AlarmSet? alarmSet = await Alarm.ringing.first;
+  //     String? payload = alarmSet.alarms.first.payload;
+  //     if (payload != null) {
+  //       WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //         Get.to(
+  //           () => TakeMedicinePage(
+  //             currentMedicationToTake: ReminderModel.fromJson(payload),
+  //             alarmID: alarmSet.alarms.first.id,
+  //           ),
+  //         );
+  //       });
+  //     }
+  //   }
+  // }
+  // TODO : Relecae alarm package notification
 
   @override
   Widget build(BuildContext context) {

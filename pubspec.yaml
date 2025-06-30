@@ -8,7 +8,6 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
-  alarm: ^5.1.4
   app_settings: ^6.1.1
   awesome_notifications: ^0.10.1
   clipboard: ^0.1.3

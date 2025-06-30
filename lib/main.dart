@@ -1,6 +1,5 @@
 import "dart:developer";
 
-import "package:alarm/alarm.dart";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
@@ -26,7 +25,6 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   FlutterForegroundTask.initCommunicationPort();
-  await Alarm.init();
 
   await Hive.initFlutter();
   await Hive.openBox("user_db");

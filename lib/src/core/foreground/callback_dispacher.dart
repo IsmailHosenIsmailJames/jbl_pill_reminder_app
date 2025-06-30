@@ -1,11 +1,8 @@
 import "dart:developer";
 
-import "package:alarm/alarm.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
 
-import "/src/core/alarm/alarm_config.dart";
-import "/src/core/alarm/set_alarm.dart";
 import "/src/core/functions/find_date_medicine.dart";
 import "/src/core/notifications/show_notification.dart";
 import "/src/screens/add_reminder/model/reminder_model.dart";
@@ -13,7 +10,6 @@ import "/src/screens/add_reminder/model/schedule_model.dart";
 import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
 Future<void> analyzeDatabaseForeground() async {
-  await Alarm.init();
   await Hive.initFlutter();
   await Hive.close();
   final reminderDB = await Hive.openBox("reminder_db");
@@ -68,18 +64,19 @@ Future<void> analyzeDatabaseForeground() async {
         String body =
             "Time for ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "take medicine"}";
         if (reminderModel.reminderType == ReminderType.alarm) {
-          AlarmSettings? previousConfig = await Alarm.getAlarm(idAsInt);
-          if (previousConfig == null) {
-            await setAlarm(getAlarmConfig(
-              id: idAsInt,
-              timeOfAlarm: exactMedicationTime,
-              title: title,
-              body: body,
-              data: reminderModel,
-            ));
-          } else {
-            print("Already alarm set");
-          }
+          // AlarmSettings? previousConfig = await Alarm.getAlarm(idAsInt);
+          // if (previousConfig == null) {
+          //   await setAlarm(getAlarmConfig(
+          //     id: idAsInt,
+          //     timeOfAlarm: exactMedicationTime,
+          //     title: title,
+          //     body: body,
+          //     data: reminderModel,
+          //   ));
+          // } else {
+          //   print("Already alarm set");
+          // }
+          // TODO : repleace Alrm package functionality
         } else {
           await pushNotifications(
             id: idAsInt,
