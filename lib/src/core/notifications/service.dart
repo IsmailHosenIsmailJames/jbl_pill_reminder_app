@@ -21,11 +21,14 @@ class NotificationsService {
           locked: true,
           playSound: true,
           enableVibration: true,
+          defaultPrivacy: NotificationPrivacy.Public,
+          enableLights: true,
+          ledOffMs: 500,
+          ledOnMs: 500,
           soundSource: "resource://raw/shaking_pill_bottle",
           defaultRingtoneType: DefaultRingtoneType.Notification,
         ),
       ],
-      debug: true,
     );
 
     await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {

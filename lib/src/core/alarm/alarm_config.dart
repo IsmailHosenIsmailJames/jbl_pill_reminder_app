@@ -21,10 +21,9 @@ AlarmSettings getAlarmConfig({
     vibrate: true,
     warningNotificationOnKill: Platform.isIOS,
     androidFullScreenIntent: true,
-    volumeSettings: VolumeSettings.fade(
-      volume: 0.8,
-      fadeDuration: const Duration(seconds: 5),
-      volumeEnforced: false,
+    volumeSettings: const VolumeSettings.fixed(
+      volume: 1.0,
+      volumeEnforced: true,
     ),
     payload: data.toJson(),
     notificationSettings: NotificationSettings(

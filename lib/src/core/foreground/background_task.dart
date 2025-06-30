@@ -1,7 +1,7 @@
 import "dart:developer";
 
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
-import "package:jbl_pills_reminder_app/src/core/background/work_manager/callback_dispacher.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 
 import "../../screens/add_reminder/model/reminder_model.dart";
@@ -47,12 +47,12 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
-    analyzeDatabase();
+    analyzeDatabaseForeground();
   }
 
   @override
   Future<void> onRepeatEvent(DateTime timestamp) async {
-    analyzeDatabase();
+    analyzeDatabaseForeground();
   }
 
   @override

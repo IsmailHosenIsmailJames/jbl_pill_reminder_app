@@ -3,7 +3,6 @@ import "dart:developer";
 import "package:alarm/alarm.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
-import "package:workmanager/workmanager.dart";
 
 import "/src/core/alarm/alarm_config.dart";
 import "/src/core/alarm/set_alarm.dart";
@@ -13,15 +12,7 @@ import "/src/screens/add_reminder/model/reminder_model.dart";
 import "/src/screens/add_reminder/model/schedule_model.dart";
 import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
-@pragma("vm:entry-point")
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    await analyzeDatabase();
-    return Future.value(true);
-  });
-}
-
-Future<void> analyzeDatabase() async {
+Future<void> analyzeDatabaseForeground() async {
   await Alarm.init();
   await Hive.initFlutter();
   await Hive.close();

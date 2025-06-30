@@ -8,7 +8,6 @@ import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:get/get.dart";
 import "package:google_fonts/google_fonts.dart";
 import "package:hive_flutter/hive_flutter.dart";
-import "package:jbl_pills_reminder_app/src/core/background/work_manager/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
@@ -19,20 +18,12 @@ import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_p
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
 import "package:toastification/toastification.dart";
-import "package:workmanager/workmanager.dart";
 
 bool isUpdateChecked = false;
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
-  Workmanager().registerPeriodicTask(
-    "reminder_process",
-    "reminder_processor",
-    frequency: const Duration(minutes: 15),
-  );
 
   FlutterForegroundTask.initCommunicationPort();
   await Alarm.init();

@@ -2,7 +2,7 @@ import "dart:io";
 
 import "package:flutter/foundation.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
-import "package:jbl_pills_reminder_app/src/core/background/background_task.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -52,7 +52,7 @@ Future<void> initService() async {
       autoRunOnMyPackageReplaced: true,
       allowWakeLock: true,
       allowWifiLock: true,
-      eventAction: ForegroundTaskEventAction.repeat(timeInterval ?? 30000),
+      eventAction: ForegroundTaskEventAction.repeat(timeInterval ?? 60000),
     ),
   );
 }
