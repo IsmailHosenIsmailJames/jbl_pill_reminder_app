@@ -1,3 +1,4 @@
+import "dart:convert";
 import "dart:developer";
 
 import "package:awesome_notifications/awesome_notifications.dart";
@@ -108,7 +109,8 @@ class _AppState extends State<App> {
             final ReceivedAction receivedAction =
                 settings.arguments as ReceivedAction;
             final Map<String, String?>? data = receivedAction.payload != null
-                ? Map<String, String?>.from(receivedAction.payload!)
+                ? Map<String, String?>.from(
+                    jsonDecode(receivedAction.payload!["payloadString"]!))
                 : null;
             if (data != null) {
               return TakeMedicinePage(
