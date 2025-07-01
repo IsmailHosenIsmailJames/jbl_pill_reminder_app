@@ -25,6 +25,7 @@ Future<void> analyzeDatabaseForeground() async {
   List<ReminderModel> upcomingRemindersInNext15Min = [];
   DateTime now = DateTime.now();
   DateTime fifteenMinutesFromNow = now.add(const Duration(minutes: 15));
+  log("analyzeDatabaseForeground -> ${todaysReminder.length}");
 
   for (ReminderModel reminderModel in todaysReminder) {
     for (TimeModel timeModel in reminderModel.schedule?.times ?? []) {
@@ -38,10 +39,10 @@ Future<void> analyzeDatabaseForeground() async {
 
       DateTime preReminderTime =
           exactMedicationTime.subtract(const Duration(minutes: 15));
+      log(exactMedicationTime.difference(now).inSeconds.abs().toString());
       // check time difference less then 1 minute
-      if (preReminderTime.isAfter(now) &&
-          preReminderTime.difference(now).inSeconds.abs() <= 60) {
-        if (MyForegroundTaskHandler.reminderNotificationShown
+      if (preReminderTime.difference(now).inSeconds.abs() <= 60) {
+        if (!MyForegroundTaskHandler.reminderNotificationShown
             .contains(idAsInt)) {
           MyForegroundTaskHandler.reminderNotificationShown.add(idAsInt);
           await AwesomeNotifications().dismiss(idAsInt);
@@ -60,8 +61,7 @@ Future<void> analyzeDatabaseForeground() async {
         }
       }
 
-      if (exactMedicationTime.isAfter(now) &&
-          exactMedicationTime.isBefore(fifteenMinutesFromNow)) {
+      if (exactMedicationTime.isBefore(fifteenMinutesFromNow)) {
         // To avoid adding the same reminder multiple times if it has multiple schedules in the next 15 mins
         if (!upcomingRemindersInNext15Min
             .any((r) => r.id == reminderModel.id)) {
@@ -69,8 +69,7 @@ Future<void> analyzeDatabaseForeground() async {
         }
       }
 
-      if (exactMedicationTime.isAfter(now) &&
-          exactMedicationTime.difference(now).inSeconds.abs() <= 60) {
+      if (exactMedicationTime.difference(now).inSeconds.abs() <= 60) {
         String title =
             "It's time for take ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "medicine"}";
         String body =
@@ -79,7 +78,7 @@ Future<void> analyzeDatabaseForeground() async {
         // check if the time difference is less then 1 minute
 
         if (reminderModel.reminderType == ReminderType.alarm) {
-          if (MyForegroundTaskHandler.alarmShown.contains(idAsInt)) {
+          if (!MyForegroundTaskHandler.alarmShown.contains(idAsInt)) {
             MyForegroundTaskHandler.alarmShown.add(idAsInt);
             await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
@@ -94,7 +93,7 @@ Future<void> analyzeDatabaseForeground() async {
             log("Already Shown $idAsInt", name: "alarm");
           }
         } else {
-          if (MyForegroundTaskHandler.notificationShown.contains(idAsInt)) {
+          if (!MyForegroundTaskHandler.notificationShown.contains(idAsInt)) {
             MyForegroundTaskHandler.notificationShown.add(idAsInt);
             await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(

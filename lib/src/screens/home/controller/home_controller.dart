@@ -17,7 +17,7 @@ class HomeController extends GetxController {
   RxList<ReminderModel> listOfAllReminder = RxList<ReminderModel>([]);
 
   static Future<List<Map<String, dynamic>>> getAllRemindersFromServer(
-      String phoneNumber) async {
+      BuildContext context, String phoneNumber) async {
     final url = Uri.parse("${baseAPI}reminders/$phoneNumber");
 
     try {
@@ -30,7 +30,7 @@ class HomeController extends GetxController {
             .toList();
       } else {
         toastification.show(
-          context: Get.context!,
+          context: context,
           title: const Text("Failed to get reminders"),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
@@ -44,7 +44,7 @@ class HomeController extends GetxController {
   }
 
   static Future<Map<String, dynamic>?> getSingleReminderFromServer(
-      String phoneNumber, String id) async {
+      BuildContext context, String phoneNumber, String id) async {
     final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id");
 
     final response = await http.get(url);
@@ -53,7 +53,7 @@ class HomeController extends GetxController {
       return jsonDecode(response.body);
     } else {
       toastification.show(
-        context: Get.context!,
+        context: context,
         title: const Text("Failed to get reminders"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
@@ -62,8 +62,8 @@ class HomeController extends GetxController {
     }
   }
 
-  static Future<bool> updateReminder(
-      String phoneNumber, String id, Map<String, dynamic> updatedData) async {
+  static Future<bool> updateReminder(BuildContext context, String phoneNumber,
+      String id, Map<String, dynamic> updatedData) async {
     final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id/update/");
 
     final response = await http.put(
@@ -74,7 +74,7 @@ class HomeController extends GetxController {
 
     if (response.statusCode == 200) {
       toastification.show(
-        context: Get.context!,
+        context: context,
         title: const Text("Reminder updated successfully"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.success,
@@ -82,7 +82,7 @@ class HomeController extends GetxController {
       return true; // Updated successfully
     } else {
       toastification.show(
-        context: Get.context!,
+        context: context,
         title: const Text("Failed to update reminder"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
@@ -91,14 +91,15 @@ class HomeController extends GetxController {
     }
   }
 
-  static Future<bool> deleteReminder(String phoneNumber, String id) async {
+  static Future<bool> deleteReminder(
+      BuildContext context, String phoneNumber, String id) async {
     final url = Uri.parse("${baseAPI}reminders/$phoneNumber/$id/delete/");
 
     final response = await http.delete(url);
 
     if (response.statusCode == 204) {
       toastification.show(
-        context: Get.context!,
+        context: context,
         title: const Text("Reminder deleted successfully"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.success,
@@ -106,7 +107,7 @@ class HomeController extends GetxController {
       return true;
     } else {
       toastification.show(
-        context: Get.context!,
+        context: context,
         title: const Text("Failed to delete reminder"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,

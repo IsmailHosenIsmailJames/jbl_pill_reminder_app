@@ -20,6 +20,7 @@ class MyForegroundTaskHandler extends TaskHandler {
 
   @override
   Future<void> onRepeatEvent(DateTime timestamp) async {
+    log([reminderNotificationShown, notificationShown, alarmShown].toString());
     analyzeDatabaseForeground();
   }
 

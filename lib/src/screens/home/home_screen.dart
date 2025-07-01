@@ -11,6 +11,7 @@ import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
@@ -48,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       final List<Map<String, dynamic>> reminderData =
           await HomeController.getAllRemindersFromServer(
+        context,
         profilePageController.userInfo.value!.phone,
       );
       for (var reminder in reminderData) {
@@ -150,20 +152,20 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("Pill Reminder"),
         actions: [
-          // IconButton(
-          //   onPressed: () {
-          //     pushNotifications(
-          //       id: int.parse(
-          //           homeController.listOfTodaysReminder.value.first.id),
-          //       title: "title",
-          //       body: "body",
-          //       isPreReminder: false,
-          //       data: homeController.listOfTodaysReminder.value.first,
-          //       isAlarm: true,
-          //     );
-          //   },
-          //   icon: const Icon(Icons.notification_add),
-          // ),
+          IconButton(
+            onPressed: () {
+              pushNotifications(
+                id: int.parse(
+                    homeController.listOfTodaysReminder.value.first.id),
+                title: "title",
+                body: "body",
+                isPreReminder: false,
+                data: homeController.listOfTodaysReminder.value.first,
+                isAlarm: true,
+              );
+            },
+            icon: const Icon(Icons.notification_add),
+          ),
           if (isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),

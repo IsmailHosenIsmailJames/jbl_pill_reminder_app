@@ -849,6 +849,7 @@ class _AddReminderState extends State<AddReminder> {
                         if (widget.editMode == true) {
                           final bool isSuccessful =
                               await HomeController.updateReminder(
+                            context,
                             profileController.userInfo.value!.phone,
                             reminderModel.id,
                             data,

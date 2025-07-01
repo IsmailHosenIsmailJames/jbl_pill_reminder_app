@@ -322,7 +322,9 @@ Card cardOfReminderForSummary(
                                   ProfilePageController profile = Get.find();
                                   final bool isDeleted =
                                       await HomeController.deleteReminder(
-                                          profile.userInfo.value!.phone, id);
+                                          context,
+                                          profile.userInfo.value!.phone,
+                                          id);
                                   if (isDeleted) {
                                     final reminderDB = Hive.box("reminder_db");
                                     await reminderDB.delete(id);
