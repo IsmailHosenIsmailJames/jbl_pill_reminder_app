@@ -15,7 +15,6 @@ import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_m
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
-import "package:permission_handler/permission_handler.dart";
 import "package:table_calendar/table_calendar.dart";
 
 import "../../core/foreground/background_setup.dart";
@@ -77,9 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
           startService();
         });
       });
-
-      requestAndroidScheduleExactAlarmPermission();
     });
+
     every30Stream().listen((event) async {
       homeController.nextReminder.value = getNextReminder(
         sortRemindersBasedOnCreatedDate(
@@ -117,10 +115,13 @@ class _HomeScreenState extends State<HomeScreen> {
   //     String? payload = alarmSet.alarms.first.payload;
   //     if (payload != null) {
   //       WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //         Get.to(
-  //           () => TakeMedicinePage(
-  //             currentMedicationToTake: ReminderModel.fromJson(payload),
-  //             alarmID: alarmSet.alarms.first.id,
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => TakeMedicinePage(
+  //               currentMedicationToTake: ReminderModel.fromJson(payload),
+  //               alarmID: alarmSet.alarms.first.id,
+  //             ),
   //           ),
   //         );
   //       });
@@ -174,8 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.zero,
               ),
               onPressed: () async {
-                await Get.to(
-                  () => const AddReminder(),
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddReminder(),
+                  ),
                 );
                 reloadAllReminderList(homeController);
               },
@@ -204,12 +208,14 @@ class _HomeScreenState extends State<HomeScreen> {
               if (homeController.nextReminder.value != null) {
                 return GestureDetector(
                   onTap: () {
-                    Get.to(
-                      () => TakeMedicinePage(
-                        currentMedicationToTake:
-                            homeController.nextReminder.value!,
-                      ),
-                    );
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TakeMedicinePage(
+                            currentMedicationToTake:
+                                homeController.nextReminder.value!,
+                          ),
+                        ));
                   },
                   child: cardOfReminderForSummary(
                     homeController.nextReminder.value!,
@@ -467,14 +473,4 @@ List<ReminderModel> sortRemindersBasedOnCreatedDate(
     (a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate),
   );
   return listOfReminders;
-}
-
-Future<void> requestAndroidScheduleExactAlarmPermission() async {
-  final status = await Permission.scheduleExactAlarm.status;
-  log("Schedule exact alarm permission: $status.");
-  if (status.isDenied) {
-    log("Requesting schedule exact alarm permission...");
-    final res = await Permission.scheduleExactAlarm.request();
-    log('Schedule exact alarm permission ${res.isGranted ? '' : 'not'} granted.');
-  }
 }

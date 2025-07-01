@@ -155,11 +155,13 @@ class _ProfilePageState extends State<ProfilePage> {
               const Gap(30),
               OutlinedButton.icon(
                 onPressed: () async {
-                  await Get.to(
-                    () => SignupPage(
-                      userInfoModel: userInfo,
-                    ),
-                  );
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignupPage(
+                          userInfoModel: userInfo,
+                        ),
+                      ));
                   loadUserData();
                 },
                 icon: const Icon(Icons.edit_rounded),

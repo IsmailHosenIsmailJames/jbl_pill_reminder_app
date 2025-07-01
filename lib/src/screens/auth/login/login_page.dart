@@ -5,7 +5,6 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
 import "package:hive/hive.dart";
 import "package:http/http.dart";
 import "package:http_status_code/http_status_code.dart";
@@ -156,8 +155,12 @@ class _LoginPageState extends State<LoginPage> {
                         const Text("Haven't signed up yet?"),
                         TextButton(
                           onPressed: () {
-                            Get.off(
-                              () => const SignupPage(),
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SignupPage(),
+                              ),
+                              (route) => false,
                             );
                           },
                           child: const Text(
@@ -213,8 +216,12 @@ class _LoginPageState extends State<LoginPage> {
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.success,
         );
-        Get.off(
-          () => const HomeScreen(),
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+          (route) => false,
         );
       } else {
         String errorMsg = jsonDecode(response.body)["message"];

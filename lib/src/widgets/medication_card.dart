@@ -256,11 +256,13 @@ Card cardOfReminderForSummary(
                           Get.put(AddNewReminderModelController());
                       addMedicationController.reminders.value = currentReminder;
 
-                      await Get.to(
-                        () => const AddReminder(
-                          editMode: true,
-                        ),
-                      );
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddReminder(
+                              editMode: true,
+                            ),
+                          ));
                       addMedicationController.reminders.value = ReminderModel(
                           id: (Random().nextInt(100000000) + 100000000)
                               .toString());

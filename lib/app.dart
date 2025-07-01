@@ -5,17 +5,16 @@ import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:get/get.dart";
 import "package:google_fonts/google_fonts.dart";
-import "package:hive/hive.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_page.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
+import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
 
 class App extends StatefulWidget {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -47,7 +46,8 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    FlutterNativeSplash.remove();
+    return MaterialApp(
       navigatorKey: App.navigatorKey,
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
@@ -92,8 +92,6 @@ class _AppState extends State<App> {
           ),
         ),
       ),
-      defaultTransition: Transition.leftToRight,
-      initialRoute: Routes.rootRoute,
       onGenerateRoute: (settings) {
         log(settings.name.toString(), name: "settings");
         log(settings.arguments.toString(), name: "settings");
@@ -121,23 +119,13 @@ class _AppState extends State<App> {
           });
         }
         if (settings.name == Routes.alarmRoute) {}
-        return null;
-      },
-      onInit: () async {
-        FlutterNativeSplash.remove();
-        await Future.delayed(const Duration(seconds: 1));
 
-        final userInfo =
-            Hive.box("user_db").get("user_info", defaultValue: null);
-        if (userInfo != null && userInfo.isNotEmpty) {
-          try {
-            userInfoController.userInfo.value =
-                UserInfoModel.fromJson(userInfo);
-          } catch (e) {
-            log(e.toString(), name: "UserInfoModel Error");
-          }
-        }
+        return MaterialPageRoute(
+          builder: (context) =>
+              RoutesNotFound(routeName: settings.name ?? "'Empty'"),
+        );
       },
+      initialRoute: Routes.rootRoute,
     );
   }
 }

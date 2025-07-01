@@ -1,7 +1,6 @@
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
 import "package:hive/hive.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
@@ -56,9 +55,11 @@ class MyDrawer extends StatelessWidget {
             title: const Text("Home"),
             onTap: () {
               Navigator.pop(context);
-              Get.to(
-                () => const HomeScreen(),
-              );
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ));
             },
           ),
           ListTile(
@@ -67,9 +68,11 @@ class MyDrawer extends StatelessWidget {
             title: const Text("Profile"),
             onTap: () {
               Navigator.pop(context);
-              Get.to(
-                () => const ProfilePage(),
-              );
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ));
             },
           ),
           ListTile(
@@ -78,11 +81,13 @@ class MyDrawer extends StatelessWidget {
             title: const Text("My Pills"),
             onTap: () {
               Navigator.pop(context);
-              Get.to(
-                () => MyPillsPage(
-                  phone: phone,
-                ),
-              );
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyPillsPage(
+                      phone: phone,
+                    ),
+                  ));
             },
           ),
           ListTile(
@@ -92,11 +97,13 @@ class MyDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
 
-              Get.to(
-                () => HistoryPage(
-                  phone: phone,
-                ),
-              );
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryPage(
+                      phone: phone,
+                    ),
+                  ));
             },
           ),
           ListTile(
@@ -137,7 +144,14 @@ class MyDrawer extends StatelessWidget {
                           Navigator.pop(context);
                           await Hive.box("user_db").clear();
                           await Hive.box("reminder_db").clear();
-                          Get.offAll(() => const LoginPage());
+                          // Get.offAll(() => const LoginPage());
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                            (route) => true,
+                          );
                         },
                       ),
                     ],

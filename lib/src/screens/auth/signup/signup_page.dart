@@ -441,8 +441,12 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Get.off(
-                                () => const LoginPage(),
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginPage(),
+                                ),
+                                (route) => false,
                               );
                             },
                             child: const Text(
@@ -514,9 +518,12 @@ class _SignupPageState extends State<SignupPage> {
             autoCloseDuration: const Duration(seconds: 2),
             type: ToastificationType.success,
           );
-          Get.off(
-            () => const HomeScreen(),
-          );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+              (route) => false);
         } else {
           await Hive.box("user_db").put(
             "user_info",
