@@ -1,8 +1,13 @@
+import "dart:convert";
+import "dart:developer";
+
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:jbl_pills_reminder_app/app.dart";
-import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_page.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class NotificationsService {
   static Future<void> initNotifications() async {
@@ -70,13 +75,29 @@ class NotificationsService {
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    // Your code goes here
+    final actionNavigationDB = await SharedPreferences.getInstance();
+    await actionNavigationDB.setString(
+        "actionData", jsonEncode(receivedAction.toMap()));
+    await actionNavigationDB.setInt(
+        "actionDataTime", DateTime.now().millisecondsSinceEpoch);
+    log("Data saved on actionData shared_pref", name: "onActionReceivedMethod");
+  }
+}
 
-    // Navigate into pages, avoiding to open the notification details page over another details page already opened
-    App.navigatorKey.currentState?.pushNamedAndRemoveUntil(
-        Routes.notificationRoute,
-        (route) =>
-            (route.settings.name != Routes.notificationRoute) || route.isFirst,
-        arguments: receivedAction);
+void customNavigation(Map? actionData) async {
+  if (actionData != null) {
+    log(actionData.toString(), name: "actionData");
+    ReceivedAction receivedAction =
+        ReceivedAction().fromMap(Map<String, dynamic>.from(actionData));
+    String? reminderRawData = receivedAction.payload?["payloadString"];
+    if (reminderRawData != null) {
+      App.navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (context) => TakeMedicinePage(
+            currentMedicationToTake: ReminderModel.fromJson(reminderRawData),
+          ),
+        ),
+      );
+    }
   }
 }

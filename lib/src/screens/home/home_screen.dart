@@ -1,3 +1,4 @@
+import "dart:convert";
 import "dart:developer";
 
 import "package:flutter/material.dart";
@@ -9,12 +10,15 @@ import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
+import "package:shared_preferences/shared_preferences.dart";
 import "package:table_calendar/table_calendar.dart";
 
 import "../../core/foreground/background_setup.dart";
@@ -71,11 +75,38 @@ class _HomeScreenState extends State<HomeScreen> {
     FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await requestPermissions().then((value) {
-        initService().then((value) {
-          startService();
-        });
-      });
+      bool result = await requestPermissions();
+      if (result) {
+        await initService();
+        await startService();
+      }
+
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+
+      String? actionDataRaw = sharedPreferences.getString("actionData");
+      int? actionDataTime = sharedPreferences.getInt("actionDataTime");
+      if (actionDataRaw != null && actionDataTime != null) {
+        if (DateTime.now().millisecondsSinceEpoch - actionDataTime < 50000) {
+          customNavigation(jsonDecode(actionDataRaw));
+        }
+      }
+      await sharedPreferences.clear();
+      every1Stream().listen(
+        (event) async {
+          await sharedPreferences.reload();
+          String? actionDataRaw = sharedPreferences.getString("actionData");
+          int? actionDataTime = sharedPreferences.getInt("actionDataTime");
+          log(actionDataRaw.toString(), name: "actionData");
+          if (actionDataRaw != null && actionDataTime != null) {
+            if (DateTime.now().millisecondsSinceEpoch - actionDataTime <
+                50000) {
+              customNavigation(jsonDecode(actionDataRaw));
+              await sharedPreferences.clear();
+            }
+          }
+        },
+      );
     });
 
     every30Stream().listen((event) async {
@@ -98,6 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Stream<int> every1Stream() {
+    return Stream<int>.periodic(const Duration(seconds: 1), (computationCount) {
+      return computationCount;
+    });
+  }
+
   final userDB = Hive.box("user_db");
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
@@ -108,34 +145,24 @@ class _HomeScreenState extends State<HomeScreen> {
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
   }
 
-  // void checkNotificationsAction() async {
-  //   await Alarm.checkAlarm();
-  //   if (await Alarm.isRinging()) {
-  //     AlarmSet? alarmSet = await Alarm.ringing.first;
-  //     String? payload = alarmSet.alarms.first.payload;
-  //     if (payload != null) {
-  //       WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //         Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => TakeMedicinePage(
-  //               currentMedicationToTake: ReminderModel.fromJson(payload),
-  //               alarmID: alarmSet.alarms.first.id,
-  //             ),
-  //           ),
-  //         );
-  //       });
-  //     }
-  //   }
-  // }
-  // TODO : Relecae alarm package notification
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Pill Reminder"),
         actions: [
+          IconButton(
+            onPressed: () {
+              pushNotifications(
+                id: 0,
+                title: "title",
+                body: "body",
+                isPreReminder: false,
+                data: homeController.listOfTodaysReminder.value.first,
+              );
+            },
+            icon: const Icon(Icons.notification_add),
+          ),
           if (isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),

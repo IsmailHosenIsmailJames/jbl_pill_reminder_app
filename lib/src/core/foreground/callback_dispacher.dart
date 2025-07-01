@@ -43,7 +43,6 @@ Future<void> analyzeDatabaseForeground() async {
               "Pre-Reminder: ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"}",
           body:
               "You have a dose of ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"} scheduled in 15 minutes.",
-          time: preReminderTime,
           isPreReminder: true,
           data: reminderModel,
         );
@@ -82,7 +81,6 @@ Future<void> analyzeDatabaseForeground() async {
             id: idAsInt,
             title: title,
             body: body,
-            time: exactMedicationTime,
             isPreReminder: false,
             data: reminderModel,
           );

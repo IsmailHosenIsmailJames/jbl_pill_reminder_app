@@ -6,11 +6,10 @@ import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart"
 import "package:permission_handler/permission_handler.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
-Future<void> requestPermissions() async {
-  final NotificationPermission notificationPermission =
-      await FlutterForegroundTask.checkNotificationPermission();
-  if (notificationPermission != NotificationPermission.granted) {
-    await FlutterForegroundTask.requestNotificationPermission();
+Future<bool> requestPermissions() async {
+  var notificationPermission = await Permission.notification.status;
+  if (notificationPermission != PermissionStatus.granted) {
+    notificationPermission = await Permission.notification.request();
   }
 
   var ignoreBatteryOpt = await Permission.ignoreBatteryOptimizations.status;
@@ -27,6 +26,7 @@ Future<void> requestPermissions() async {
       await FlutterForegroundTask.openAlarmsAndRemindersSettings();
     }
   }
+  return notificationPermission == PermissionStatus.granted;
 }
 
 Future<void> initService() async {

@@ -10,7 +10,6 @@ Future<void> pushNotifications({
   required String title,
   required String body,
   required bool isPreReminder,
-  required DateTime time,
   required ReminderModel data,
 }) async {
   await NotificationsService.initNotifications();
@@ -39,12 +38,6 @@ Future<void> pushNotifications({
       customSound: "resource://raw/shaking_pill_bottle",
       category: NotificationCategory.Reminder,
       payload: {"payloadString": data.toJson()},
-    ),
-    schedule: NotificationCalendar.fromDate(
-      date: time,
-      repeats: true,
-      preciseAlarm: true,
-      allowWhileIdle: true,
     ),
     actionButtons: isPreReminder
         ? null
