@@ -48,11 +48,22 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove();
+    final PageTransitionsTheme pageTransitionsTheme =
+        const PageTransitionsTheme(
+      builders: <TargetPlatform, PageTransitionsBuilder>{
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.linux: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
+      },
+    );
     return MaterialApp(
       navigatorKey: App.navigatorKey,
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData.light().copyWith(
+        pageTransitionsTheme: pageTransitionsTheme,
         inputDecorationTheme: InputDecorationTheme(
           border: InputBorder.none,
           hintStyle: TextStyle(
