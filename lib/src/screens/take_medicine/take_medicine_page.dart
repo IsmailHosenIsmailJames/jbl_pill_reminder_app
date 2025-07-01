@@ -104,7 +104,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           ),
                         ),
                         onPressed: () {
-                          Get.back();
+                          Navigator.pop(context);
                         },
                         icon: const Icon(
                           Icons.arrow_back,

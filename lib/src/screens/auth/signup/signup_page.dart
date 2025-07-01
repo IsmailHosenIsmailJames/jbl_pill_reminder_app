@@ -536,7 +536,7 @@ class _SignupPageState extends State<SignupPage> {
             autoCloseDuration: const Duration(seconds: 2),
             type: ToastificationType.success,
           );
-          Get.back();
+          Navigator.pop(context);
         }
       } else if (response.statusCode == StatusCode.BAD_REQUEST) {
         toastification.show(

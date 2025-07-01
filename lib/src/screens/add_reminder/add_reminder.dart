@@ -866,7 +866,7 @@ class _AddReminderState extends State<AddReminder> {
                             homeController.listOfAllReminder.removeWhere(
                                 (element) => element.id == reminderModel.id);
                             homeController.listOfAllReminder.add(reminderModel);
-                            Get.back();
+                            Navigator.pop(context);
                           } else {
                             toastification.show(
                               context: context,
@@ -890,7 +890,7 @@ class _AddReminderState extends State<AddReminder> {
                               type: ToastificationType.success,
                             );
                             homeController.listOfAllReminder.add(reminderModel);
-                            Get.back();
+                            Navigator.pop(context);
                           } else {
                             toastification.show(
                               context: context,
