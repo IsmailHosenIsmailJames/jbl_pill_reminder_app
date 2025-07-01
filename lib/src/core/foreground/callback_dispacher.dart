@@ -11,7 +11,7 @@ import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
 Future<void> analyzeDatabaseForeground() async {
   await Hive.initFlutter();
-  await Hive.close();
+
   final reminderDB = await Hive.openBox("reminder_db");
   List<ReminderModel> allReminder = [];
   for (var element in reminderDB.values) {
