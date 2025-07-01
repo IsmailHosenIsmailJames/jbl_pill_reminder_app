@@ -10,6 +10,42 @@ import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class AwesomeNotificationsService {
+  static Future<void> initPreReminderNotifications() async {
+    await AwesomeNotifications().initialize(
+      null,
+      [
+        NotificationChannel(
+          channelKey: "pre_reminders",
+          channelName: "Pre-Reminders",
+          channelDescription:
+              "This channel is used for Pre-Reminders. This channel will be used to remind the user before the actual reminder time.",
+          defaultColor: Colors.orangeAccent,
+          // A different color for pre-reminders
+          ledColor: Colors.white,
+          importance: NotificationImportance.Max,
+          channelShowBadge: true,
+          locked: true,
+          playSound: true,
+          enableVibration: true,
+          groupAlertBehavior: GroupAlertBehavior.All,
+          defaultPrivacy: NotificationPrivacy.Public,
+          enableLights: true,
+          ledOffMs: 500,
+          ledOnMs: 500,
+          soundSource: "resource://raw/shaking_pill_bottle",
+          defaultRingtoneType: DefaultRingtoneType
+              .Notification, // Keep as notification, not alarm
+        ),
+      ],
+    );
+
+    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
+  }
+
   static Future<void> initNotifications() async {
     await AwesomeNotifications().initialize(
       null,

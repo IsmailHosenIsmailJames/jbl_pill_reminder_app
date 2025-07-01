@@ -4,7 +4,6 @@ import "package:flutter/foundation.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart";
 import "package:permission_handler/permission_handler.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
 Future<bool> requestPermissions() async {
   var notificationPermission = await Permission.notification.status;
@@ -30,10 +29,6 @@ Future<bool> requestPermissions() async {
 }
 
 Future<void> initService() async {
-  final SharedPreferences info = await SharedPreferences.getInstance();
-  final timeInterval = info.getInt("time_interval");
-  // final minimumDistance = info.getInt("minimum_distance");
-
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
       channelId: "foreground_service",
@@ -42,6 +37,7 @@ Future<void> initService() async {
           "This notification appears when the foreground location service is running.",
       channelImportance: NotificationChannelImportance.LOW,
       priority: NotificationPriority.LOW,
+      visibility: NotificationVisibility.VISIBILITY_PUBLIC,
     ),
     iosNotificationOptions: const IOSNotificationOptions(
       showNotification: true,
@@ -52,7 +48,7 @@ Future<void> initService() async {
       autoRunOnMyPackageReplaced: true,
       allowWakeLock: true,
       allowWifiLock: true,
-      eventAction: ForegroundTaskEventAction.repeat(timeInterval ?? 60000),
+      eventAction: ForegroundTaskEventAction.repeat(15000),
     ),
   );
 }

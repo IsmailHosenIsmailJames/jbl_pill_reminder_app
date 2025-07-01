@@ -2,48 +2,16 @@ import "dart:developer";
 
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
-
-import "../../screens/add_reminder/model/reminder_model.dart";
-import "../functions/find_date_medicine.dart";
 
 @pragma("vm:entry-point")
 void startCallback() {
-  FlutterForegroundTask.setTaskHandler(MyTaskHandler());
+  FlutterForegroundTask.setTaskHandler(MyForegroundTaskHandler());
 }
 
-class MyTaskHandler extends TaskHandler {
-  TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
-    listOfTime.sort(
-        (a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
-    for (TimeModel time in listOfTime) {
-      if (time.hour * 60 + time.minute > now.hour * 60 + now.minute) {
-        return time;
-      }
-    }
-    return null;
-  }
-
-  ReminderModel? getNextReminder(
-      List<ReminderModel> reminderList, DateTime now) {
-    log("nextMedicine");
-
-    List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
-
-    Map<int, ReminderModel> todayReminderHave = {};
-
-    for (ReminderModel reminder in todaysMedicine) {
-      TimeModel? time = getFirstNextTime(reminder.schedule!.times!, now);
-      if (time != null) {
-        todayReminderHave.addAll({(time.hour * 60 + time.minute): reminder});
-      }
-    }
-    List<int> timesList = todayReminderHave.keys.toList();
-    timesList.sort();
-
-    log(timesList.toString());
-    return timesList.isEmpty ? null : todayReminderHave[timesList.first];
-  }
+class MyForegroundTaskHandler extends TaskHandler {
+  static List<int> notificationShown = [];
+  static List<int> reminderNotificationShown = [];
+  static List<int> alarmShown = [];
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {

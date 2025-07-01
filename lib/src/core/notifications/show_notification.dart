@@ -14,7 +14,37 @@ Future<void> pushNotifications({
   required ReminderModel data,
   required bool isAlarm,
 }) async {
-  if (isAlarm == false) {
+  if (isPreReminder == true) {
+    await AwesomeNotificationsService.initPreReminderNotifications();
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id,
+        // Ensure this ID is unique for pre-reminders
+        channelKey: "pre_reminders",
+        // Define this channel in NotificationsService
+        title: title,
+        // Differentiate title
+        body: title,
+        locked: false,
+        // Pre-reminders are usually not locked
+        actionType: ActionType.Default,
+        // Opens the app or a specific screen
+        customSound: "resource://raw/shaking_pill_bottle",
+        // Optional: a softer sound
+        category: NotificationCategory.Reminder,
+        payload: {"payloadString": data.toJson(), "isPreReminder": "true"},
+      ),
+      // Pre-reminders might not need action buttons or could have simpler ones
+      actionButtons: [
+        NotificationActionButton(
+          key: "acknowledge_pre_reminder",
+          label: "Acknowledge",
+          actionType: ActionType.DismissAction, // Simple dismiss
+        ),
+      ],
+    );
+    log("Pre-Reminder Notification Shown");
+  } else if (isAlarm == false) {
     await AwesomeNotificationsService.initNotifications();
     AwesomeNotifications().createNotification(
       content: NotificationContent(
