@@ -154,11 +154,13 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () {
               pushNotifications(
-                id: 0,
+                id: int.parse(
+                    homeController.listOfTodaysReminder.value.first.id),
                 title: "title",
                 body: "body",
                 isPreReminder: false,
                 data: homeController.listOfTodaysReminder.value.first,
+                isAlarm: true,
               );
             },
             icon: const Icon(Icons.notification_add),

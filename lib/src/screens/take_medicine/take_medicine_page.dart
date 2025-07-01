@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:developer";
 
+import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
@@ -18,6 +19,7 @@ class TakeMedicinePage extends StatefulWidget {
   final String? payload;
   final ReminderModel currentMedicationToTake;
   final int? alarmID;
+
   const TakeMedicinePage({
     super.key,
     this.title,
@@ -34,6 +36,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
   final homeController = Get.put(HomeController());
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
+
   @override
   void initState() {
     super.initState();
@@ -142,15 +145,13 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           );
 
                           try {
-                            if (widget.alarmID != null) {
-                              // await Alarm.stop(widget.alarmID!);
-                              // TODO: replace Alarm Package functionality
-                            }
+                            AwesomeNotifications().dismiss(
+                                int.parse(widget.currentMedicationToTake.id));
                           } catch (e) {
                             log(e.toString(), name: "alarm");
                           }
 
-                          Get.back();
+                          Navigator.pop(context);
                         },
                         icon: const Icon(Icons.done),
                         label: const Text("Done"),

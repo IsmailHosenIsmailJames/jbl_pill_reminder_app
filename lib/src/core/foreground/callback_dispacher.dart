@@ -45,6 +45,7 @@ Future<void> analyzeDatabaseForeground() async {
               "You have a dose of ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"} scheduled in 15 minutes.",
           isPreReminder: true,
           data: reminderModel,
+          isAlarm: false,
         );
       }
 
@@ -63,19 +64,14 @@ Future<void> analyzeDatabaseForeground() async {
         String body =
             "Time for ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "take medicine"}";
         if (reminderModel.reminderType == ReminderType.alarm) {
-          // AlarmSettings? previousConfig = await Alarm.getAlarm(idAsInt);
-          // if (previousConfig == null) {
-          //   await setAlarm(getAlarmConfig(
-          //     id: idAsInt,
-          //     timeOfAlarm: exactMedicationTime,
-          //     title: title,
-          //     body: body,
-          //     data: reminderModel,
-          //   ));
-          // } else {
-          //   print("Already alarm set");
-          // }
-          // TODO : repleace Alrm package functionality
+          await pushNotifications(
+            id: idAsInt,
+            title: title,
+            body: body,
+            isPreReminder: false,
+            data: reminderModel,
+            isAlarm: true,
+          );
         } else {
           await pushNotifications(
             id: idAsInt,
@@ -83,6 +79,7 @@ Future<void> analyzeDatabaseForeground() async {
             body: body,
             isPreReminder: false,
             data: reminderModel,
+            isAlarm: false,
           );
         }
       }

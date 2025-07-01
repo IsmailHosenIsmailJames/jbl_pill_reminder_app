@@ -9,7 +9,7 @@ import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_p
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
-class NotificationsService {
+class AwesomeNotificationsService {
   static Future<void> initNotifications() async {
     await AwesomeNotifications().initialize(
       null,
@@ -41,13 +41,46 @@ class NotificationsService {
         AwesomeNotifications().requestPermissionToSendNotifications();
       }
     });
+  }
 
-    await AwesomeNotifications().setListeners(
-      onActionReceivedMethod: onActionReceivedMethod,
-      onNotificationCreatedMethod: onNotificationCreatedMethod,
-      onNotificationDisplayedMethod: onNotificationDisplayedMethod,
-      onDismissActionReceivedMethod: onDismissActionReceivedMethod,
+  static Future<void> initAlarms() async {
+    await AwesomeNotifications().initialize(
+      null, // null for default icon
+      [
+        NotificationChannel(
+          channelKey: "alarms_channel",
+          channelName: "Pill Reminder Alarms",
+          // Changed for clarity
+          channelDescription:
+              "Channel for critical pill reminder alarms that need immediate attention.",
+          // Changed for clarity
+          defaultColor: MyAppColors.primaryColor,
+          ledColor: Colors.white,
+          importance: NotificationImportance.Max,
+          // Max importance for alarms
+          channelShowBadge: true,
+          locked: true,
+          // If true, notifications are not dismissible by swiping
+          playSound: true,
+          enableVibration: true,
+          defaultPrivacy: NotificationPrivacy.Public,
+          enableLights: true,
+          ledOffMs: 500,
+          ledOnMs: 500,
+          soundSource: "resource://raw/shaking_pill_bottle",
+          // Your custom alarm sound
+          defaultRingtoneType: DefaultRingtoneType.Alarm,
+          // IMPORTANT for alarms
+          criticalAlerts: true, // IMPORTANT for iOS to bypass Do Not Disturb
+        ),
+      ],
     );
+
+    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   /// Use this method to detect when a new notification or a schedule is created
@@ -76,11 +109,11 @@ class NotificationsService {
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
     final actionNavigationDB = await SharedPreferences.getInstance();
+
     await actionNavigationDB.setString(
         "actionData", jsonEncode(receivedAction.toMap()));
     await actionNavigationDB.setInt(
         "actionDataTime", DateTime.now().millisecondsSinceEpoch);
-    log("Data saved on actionData shared_pref", name: "onActionReceivedMethod");
   }
 }
 

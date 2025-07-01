@@ -1,9 +1,11 @@
 import "dart:developer";
 
+import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:get/get.dart";
 import "package:google_fonts/google_fonts.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
@@ -25,6 +27,16 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   void initState() {
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod:
+          AwesomeNotificationsService.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          AwesomeNotificationsService.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          AwesomeNotificationsService.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          AwesomeNotificationsService.onDismissActionReceivedMethod,
+    );
     super.initState();
   }
 
