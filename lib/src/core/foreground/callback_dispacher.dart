@@ -1,9 +1,8 @@
 import "dart:developer";
 
-import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
-import "package:shared_preferences/shared_preferences.dart";
+import "package:intl/intl.dart";
 
 import "/src/core/functions/find_date_medicine.dart";
 import "/src/core/notifications/show_notification.dart";
@@ -24,13 +23,22 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
     }
   }
 
-  SharedPreferences sharedPref = await SharedPreferences.getInstance();
+  final notificationBox = await Hive.openBox("notificationHistory");
+
+  log(
+    [
+      notificationBox.get("reminderNotificationShown").toString(),
+      notificationBox.get("notificationShown").toString(),
+      notificationBox.get("alarmShown").toString()
+    ].toString(),
+    name: "onRepeatEvent -> analyzeDatabaseForeground",
+  );
 
   List<String> reminderNotificationShown =
-      sharedPref.getStringList("reminderNotificationShown") ?? [];
+      notificationBox.get("reminderNotificationShown") ?? [];
   List<String> notificationShown =
-      sharedPref.getStringList("notificationShown") ?? [];
-  List<String> alarmShown = sharedPref.getStringList("alarmShown") ?? [];
+      notificationBox.get("notificationShown") ?? [];
+  List<String> alarmShown = notificationBox.get("alarmShown") ?? [];
 
   final reminderDB = await Hive.openBox("reminder_db");
   List<ReminderModel> allReminder = [];
@@ -48,23 +56,26 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
   for (ReminderModel reminderModel in todaysReminder) {
     for (TimeModel timeModel in reminderModel.schedule?.times ?? []) {
       int idAsInt = int.parse(timeModel.id);
+      String uniqueId =
+          "${DateFormat("yyyyMMdd").format(DateTime.now())}_$idAsInt";
       DateTime exactMedicationTime = now.copyWith(
-          hour: timeModel.hour,
-          minute: timeModel.minute,
-          second: 0,
-          millisecond: 0,
-          microsecond: 0);
+        hour: timeModel.hour,
+        minute: timeModel.minute,
+        second: 0,
+        millisecond: 0,
+        microsecond: 0,
+      );
 
       DateTime preReminderTime =
           exactMedicationTime.subtract(const Duration(minutes: 15));
       log(exactMedicationTime.difference(now).inSeconds.abs().toString());
       // check time difference less then 1 minute
       if (preReminderTime.difference(now).inSeconds.abs() <= 60) {
-        if (!reminderNotificationShown.contains(idAsInt.toString())) {
-          reminderNotificationShown.add(idAsInt.toString());
-          await sharedPref.setStringList(
+        if (!reminderNotificationShown.contains(uniqueId)) {
+          reminderNotificationShown.add(uniqueId);
+          await notificationBox.put(
               "reminderNotificationShown", reminderNotificationShown);
-          await AwesomeNotifications().dismiss(idAsInt);
+          // await AwesomeNotifications().dismiss(idAsInt);
           await pushNotifications(
             id: idAsInt,
             title:
@@ -97,11 +108,11 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
         // check if the time difference is less then 1 minute
 
         if (reminderModel.reminderType == ReminderType.alarm) {
-          if (!alarmShown.contains(idAsInt.toString())) {
-            alarmShown.add(idAsInt.toString());
-            await sharedPref.setStringList("alarmShown", alarmShown);
+          if (!alarmShown.contains(uniqueId)) {
+            alarmShown.add(uniqueId);
+            await notificationBox.put("alarmShown", alarmShown);
 
-            await AwesomeNotifications().dismiss(idAsInt);
+            // await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,
               title: title,
@@ -114,12 +125,11 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
             log("Already Shown $idAsInt", name: "alarm");
           }
         } else {
-          if (!notificationShown.contains(idAsInt.toString())) {
-            notificationShown.add(idAsInt.toString());
-            await sharedPref.setStringList(
-                "notificationShown", notificationShown);
+          if (!notificationShown.contains(uniqueId)) {
+            notificationShown.add(uniqueId);
+            await notificationBox.put("notificationShown", notificationShown);
 
-            await AwesomeNotifications().dismiss(idAsInt);
+            // await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,
               title: title,

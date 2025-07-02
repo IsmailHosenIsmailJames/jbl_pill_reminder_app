@@ -74,14 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
     FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      await sharedPreferences.reload();
       bool result = await requestPermissions();
       if (result) {
         await initService();
         await startService();
       }
-
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");
@@ -105,7 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             if (timeDiff.abs() < 50000) {
               customNavigation(jsonDecode(actionDataRaw));
-              await sharedPreferences.clear();
+              await sharedPreferences.remove("actionData");
+              await sharedPreferences.remove("actionDataTime");
             }
           }
         },

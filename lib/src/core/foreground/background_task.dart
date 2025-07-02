@@ -2,7 +2,6 @@ import "dart:developer";
 
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
-import "package:shared_preferences/shared_preferences.dart";
 
 @pragma("vm:entry-point")
 void startCallback() {
@@ -17,13 +16,6 @@ class MyForegroundTaskHandler extends TaskHandler {
 
   @override
   Future<void> onRepeatEvent(DateTime timestamp) async {
-    SharedPreferences sharedPref = await SharedPreferences.getInstance();
-
-    log([
-      sharedPref.get("reminderNotificationShown").toString(),
-      sharedPref.get("notificationShown").toString(),
-      sharedPref.get("alarmShown").toString()
-    ].toString());
     analyzeDatabaseForeground(reloadDB: true);
   }
 
