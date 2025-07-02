@@ -10,7 +10,9 @@ import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class AwesomeNotificationsService {
+  static bool isListening = false;
   static Future<void> initPreReminderNotifications() async {
+    await registerListenNotifications();
     await AwesomeNotifications().initialize(
       null,
       [
@@ -47,6 +49,7 @@ class AwesomeNotificationsService {
   }
 
   static Future<void> initNotifications() async {
+    await registerListenNotifications();
     await AwesomeNotifications().initialize(
       null,
       [
@@ -81,6 +84,7 @@ class AwesomeNotificationsService {
   }
 
   static Future<void> initAlarms() async {
+    await registerListenNotifications();
     await AwesomeNotifications().initialize(
       null, // null for default icon
       [
@@ -147,20 +151,38 @@ class AwesomeNotificationsService {
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
     final actionNavigationDB = await SharedPreferences.getInstance();
-
+    await actionNavigationDB.reload();
+    log("onActionReceivedMethod");
     await actionNavigationDB.setString(
         "actionData", jsonEncode(receivedAction.toMap()));
     await actionNavigationDB.setInt(
         "actionDataTime", DateTime.now().millisecondsSinceEpoch);
   }
+
+  static Future<void> registerListenNotifications() async {
+    if (!isListening) {
+      isListening = true;
+      AwesomeNotifications().setListeners(
+        onActionReceivedMethod:
+            AwesomeNotificationsService.onActionReceivedMethod,
+        onNotificationCreatedMethod:
+            AwesomeNotificationsService.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            AwesomeNotificationsService.onNotificationDisplayedMethod,
+        onDismissActionReceivedMethod:
+            AwesomeNotificationsService.onDismissActionReceivedMethod,
+      );
+    }
+  }
 }
 
 void customNavigation(Map? actionData) async {
+  log(actionData.toString(), name: "customNavigation");
   if (actionData != null) {
-    log(actionData.toString(), name: "actionData");
     ReceivedAction receivedAction =
         ReceivedAction().fromMap(Map<String, dynamic>.from(actionData));
     String? reminderRawData = receivedAction.payload?["payloadString"];
+    log(reminderRawData.toString(), name: "actionData");
     if (reminderRawData != null) {
       App.navigatorKey.currentState?.push(
         MaterialPageRoute(

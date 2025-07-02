@@ -3,7 +3,7 @@ import "dart:developer";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
-import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 import "/src/core/functions/find_date_medicine.dart";
 import "/src/core/notifications/show_notification.dart";
@@ -11,8 +11,26 @@ import "/src/screens/add_reminder/model/reminder_model.dart";
 import "/src/screens/add_reminder/model/schedule_model.dart";
 import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
-Future<void> analyzeDatabaseForeground() async {
+Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
+  // Ensure Hive is initialized for the foreground task
   await Hive.initFlutter();
+
+  if (reloadDB) {
+    await Hive.close();
+    await Hive.initFlutter();
+    if (Hive.isBoxOpen("reminder_db")) {
+      await Hive.box("reminder_db").close();
+      await Hive.openBox("reminder_db");
+    }
+  }
+
+  SharedPreferences sharedPref = await SharedPreferences.getInstance();
+
+  List<String> reminderNotificationShown =
+      sharedPref.getStringList("reminderNotificationShown") ?? [];
+  List<String> notificationShown =
+      sharedPref.getStringList("notificationShown") ?? [];
+  List<String> alarmShown = sharedPref.getStringList("alarmShown") ?? [];
 
   final reminderDB = await Hive.openBox("reminder_db");
   List<ReminderModel> allReminder = [];
@@ -42,9 +60,10 @@ Future<void> analyzeDatabaseForeground() async {
       log(exactMedicationTime.difference(now).inSeconds.abs().toString());
       // check time difference less then 1 minute
       if (preReminderTime.difference(now).inSeconds.abs() <= 60) {
-        if (!MyForegroundTaskHandler.reminderNotificationShown
-            .contains(idAsInt)) {
-          MyForegroundTaskHandler.reminderNotificationShown.add(idAsInt);
+        if (!reminderNotificationShown.contains(idAsInt.toString())) {
+          reminderNotificationShown.add(idAsInt.toString());
+          await sharedPref.setStringList(
+              "reminderNotificationShown", reminderNotificationShown);
           await AwesomeNotifications().dismiss(idAsInt);
           await pushNotifications(
             id: idAsInt,
@@ -78,8 +97,10 @@ Future<void> analyzeDatabaseForeground() async {
         // check if the time difference is less then 1 minute
 
         if (reminderModel.reminderType == ReminderType.alarm) {
-          if (!MyForegroundTaskHandler.alarmShown.contains(idAsInt)) {
-            MyForegroundTaskHandler.alarmShown.add(idAsInt);
+          if (!alarmShown.contains(idAsInt.toString())) {
+            alarmShown.add(idAsInt.toString());
+            await sharedPref.setStringList("alarmShown", alarmShown);
+
             await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,
@@ -93,8 +114,11 @@ Future<void> analyzeDatabaseForeground() async {
             log("Already Shown $idAsInt", name: "alarm");
           }
         } else {
-          if (!MyForegroundTaskHandler.notificationShown.contains(idAsInt)) {
-            MyForegroundTaskHandler.notificationShown.add(idAsInt);
+          if (!notificationShown.contains(idAsInt.toString())) {
+            notificationShown.add(idAsInt.toString());
+            await sharedPref.setStringList(
+                "notificationShown", notificationShown);
+
             await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,

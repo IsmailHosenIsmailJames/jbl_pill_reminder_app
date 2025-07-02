@@ -8,7 +8,6 @@ import "package:get/get.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/show_notification.dart";
@@ -61,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     }
-    analyzeDatabaseForeground();
   }
 
   @override
@@ -95,13 +93,17 @@ class _HomeScreenState extends State<HomeScreen> {
       await sharedPreferences.clear();
       every1Stream().listen(
         (event) async {
+          sharedPreferences = await SharedPreferences.getInstance();
           await sharedPreferences.reload();
           String? actionDataRaw = sharedPreferences.getString("actionData");
           int? actionDataTime = sharedPreferences.getInt("actionDataTime");
-
           if (actionDataRaw != null && actionDataTime != null) {
-            if (DateTime.now().millisecondsSinceEpoch - actionDataTime <
-                50000) {
+            int timeDiff =
+                DateTime.now().millisecondsSinceEpoch - actionDataTime;
+
+            log(timeDiff.toString(), name: "timeDiff");
+
+            if (timeDiff.abs() < 50000) {
               customNavigation(jsonDecode(actionDataRaw));
               await sharedPreferences.clear();
             }
@@ -161,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 body: "body",
                 isPreReminder: false,
                 data: homeController.listOfTodaysReminder.value.first,
-                isAlarm: true,
+                isAlarm: false,
               );
             },
             icon: const Icon(Icons.notification_add),
