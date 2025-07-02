@@ -33,7 +33,6 @@ class TakeMedicinePage extends StatefulWidget {
 }
 
 class _TakeMedicinePageState extends State<TakeMedicinePage> {
-  final homeController = Get.put(HomeController());
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
@@ -85,7 +84,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
               ] +
               [
                 cardOfReminderForSummary(
-                  homeController.nextReminder.value!,
+                  widget.currentMedicationToTake,
                   context,
                   showTitle: false,
                 )

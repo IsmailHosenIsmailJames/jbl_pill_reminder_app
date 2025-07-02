@@ -3,6 +3,7 @@ import "dart:developer";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:hive_flutter/hive_flutter.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart";
 
 import "/src/core/functions/find_date_medicine.dart";
 import "/src/core/notifications/show_notification.dart";
@@ -27,9 +28,10 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
 
   log(
     [
+      MyForegroundTaskHandler.foregroundNotification.toString(),
       notificationBox.get("reminderNotificationShown").toString(),
       notificationBox.get("notificationShown").toString(),
-      notificationBox.get("alarmShown").toString()
+      notificationBox.get("alarmShown").toString(),
     ].toString(),
     name: "onRepeatEvent -> analyzeDatabaseForeground",
   );
@@ -68,14 +70,27 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
 
       DateTime preReminderTime =
           exactMedicationTime.subtract(const Duration(minutes: 15));
-      log(exactMedicationTime.difference(now).inSeconds.abs().toString());
       // check time difference less then 1 minute
-      if (preReminderTime.difference(now).inSeconds.abs() <= 60) {
+      // reminder notification before actual [exactMedicationTime] notification or alarm
+      // it will show 15 minutes early.
+      // difference between [preReminderTime]
+      Duration durationDiff = preReminderTime.difference(now);
+      if (durationDiff.inMinutes.abs() <= 15 &&
+          now.isBefore(exactMedicationTime)) {
+        if (!upcomingRemindersInNext15Min
+            .any((r) => r.id == reminderModel.id)) {
+          upcomingRemindersInNext15Min.add(reminderModel);
+        }
+
+        log(
+            upcomingRemindersInNext15Min.length.toString() +
+                upcomingRemindersInNext15Min.toString(),
+            name: "UPCN");
+
         if (!reminderNotificationShown.contains(uniqueId)) {
           reminderNotificationShown.add(uniqueId);
           await notificationBox.put(
               "reminderNotificationShown", reminderNotificationShown);
-          // await AwesomeNotifications().dismiss(idAsInt);
           await pushNotifications(
             id: idAsInt,
             title:
@@ -91,15 +106,8 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
         }
       }
 
-      if (exactMedicationTime.isBefore(fifteenMinutesFromNow)) {
-        // To avoid adding the same reminder multiple times if it has multiple schedules in the next 15 mins
-        if (!upcomingRemindersInNext15Min
-            .any((r) => r.id == reminderModel.id)) {
-          upcomingRemindersInNext15Min.add(reminderModel);
-        }
-      }
-
-      if (exactMedicationTime.difference(now).inSeconds.abs() <= 60) {
+      if (now.isAfter(exactMedicationTime) &&
+          now.difference(exactMedicationTime).inMinutes <= 15) {
         String title =
             "It's time for take ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "medicine"}";
         String body =
@@ -112,7 +120,6 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
             alarmShown.add(uniqueId);
             await notificationBox.put("alarmShown", alarmShown);
 
-            // await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,
               title: title,
@@ -129,7 +136,6 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
             notificationShown.add(uniqueId);
             await notificationBox.put("notificationShown", notificationShown);
 
-            // await AwesomeNotifications().dismiss(idAsInt);
             await pushNotifications(
               id: idAsInt,
               title: title,
@@ -145,21 +151,50 @@ Future<void> analyzeDatabaseForeground({bool reloadDB = false}) async {
       }
     }
   }
-
   if (upcomingRemindersInNext15Min.isNotEmpty) {
-    for (var reminderModel in upcomingRemindersInNext15Min) {
-      try {
-        String title =
+    log("I am not Empty -> ${upcomingRemindersInNext15Min.length}",
+        name: "XYZ");
+    try {
+      String title;
+      String body;
+      if (upcomingRemindersInNext15Min.length == 1) {
+        var reminderModel = upcomingRemindersInNext15Min.first;
+        title =
             "Pre-Reminder: ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"}";
-        String body =
+        body =
             "You have a dose of ${reminderModel.medicine?.brandName ?? reminderModel.medicine?.genericName ?? "Take medicine"} scheduled in 15 minutes.";
+      } else {
+        // more info
+        title = "Upcoming Medications Reminder";
+        body =
+            "You have ${upcomingRemindersInNext15Min.length} medications scheduled in the next 15 minutes.";
+        // List all upcoming medications
+        String medicationList = upcomingRemindersInNext15Min
+            .map((reminder) =>
+                reminder.medicine?.brandName ??
+                reminder.medicine?.genericName ??
+                "Unknown Medicine")
+            .join(", ");
+        body += " Medications: $medicationList.";
+      }
+      bool isSetBefore = true;
+      for (ReminderModel model in upcomingRemindersInNext15Min) {
+        String uniqueId =
+            "${DateFormat("yyyyMMdd").format(DateTime.now())}_${model.id}";
+        if (!MyForegroundTaskHandler.foregroundNotification
+            .contains(uniqueId)) {
+          isSetBefore = false;
+          MyForegroundTaskHandler.foregroundNotification.add(uniqueId);
+        }
+      }
+      if (!isSetBefore) {
         FlutterForegroundTask.updateService(
           notificationTitle: title,
           notificationText: body,
         );
-      } catch (e) {
-        log(e.toString(), name: "upcomingRemindersInNext15Min");
       }
+    } catch (e) {
+      log(e.toString(), name: "upcomingRemindersInNext15Min");
     }
   } else {
     FlutterForegroundTask.updateService(

@@ -9,6 +9,8 @@ void startCallback() {
 }
 
 class MyForegroundTaskHandler extends TaskHandler {
+  static List<String> foregroundNotification = [];
+
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     analyzeDatabaseForeground(reloadDB: true);
