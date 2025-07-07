@@ -35,8 +35,8 @@ Future<void> initService() async {
       channelName: "Foreground Service Notification",
       channelDescription:
           "This notification appears when the foreground location service is running.",
-      channelImportance: NotificationChannelImportance.MAX,
-      priority: NotificationPriority.MAX,
+      channelImportance: NotificationChannelImportance.LOW,
+      priority: NotificationPriority.LOW,
       visibility: NotificationVisibility.VISIBILITY_PUBLIC,
     ),
     iosNotificationOptions: const IOSNotificationOptions(
