@@ -27,6 +27,7 @@ Future<void> pushNotifications({
         body: title,
         locked: false,
         // Pre-reminders are usually not locked
+        wakeUpScreen: true,
         actionType: ActionType.Default,
         // Opens the app or a specific screen
         customSound: "resource://raw/shaking_pill_bottle",
@@ -55,6 +56,7 @@ Future<void> pushNotifications({
         title: title,
         body: body,
         locked: isPreReminder ? false : true,
+        wakeUpScreen: true,
         actionType: ActionType.KeepOnTop,
         customSound: "resource://raw/shaking_pill_bottle",
         category: NotificationCategory.Reminder,

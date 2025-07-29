@@ -18,6 +18,7 @@ class MyForegroundTaskHandler extends TaskHandler {
 
   @override
   Future<void> onRepeatEvent(DateTime timestamp) async {
+    log("onRepeatEvent Foreground Task");
     analyzeDatabaseForeground(reloadDB: true);
   }
 
