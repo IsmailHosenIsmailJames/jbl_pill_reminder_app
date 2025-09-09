@@ -2,7 +2,7 @@ name: jbl_pills_reminder_app
 description: "jbl pills reminder app"
 publish_to: 'none'
 
-version: 1.1.1+8
+version: 1.1.2+9
 
 environment:
   sdk: ^3.6.1
