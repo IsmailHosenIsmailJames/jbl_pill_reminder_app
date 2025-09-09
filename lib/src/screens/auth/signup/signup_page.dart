@@ -291,7 +291,8 @@ class _SignupPageState extends State<SignupPage> {
                           const Gap(5),
                           customTextFieldDecoration(
                             textFormField: DropdownButtonFormField(
-                              initialValue: signupPageController.choosenThana.value,
+                              initialValue:
+                                  signupPageController.choosenThana.value,
                               decoration: textFieldInputDecoration(
                                   hint: "Select Thana"),
                               items: thana
@@ -542,6 +543,7 @@ class _SignupPageState extends State<SignupPage> {
         toastification.show(
           context: context,
           title: const Text("Information is not valid"),
+          description: const Text("You may already have account."),
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
         );
