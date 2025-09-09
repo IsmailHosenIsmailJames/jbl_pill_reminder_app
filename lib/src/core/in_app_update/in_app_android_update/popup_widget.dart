@@ -320,7 +320,7 @@ class _PopupWidgetState extends State<PopupWidget> {
         final result = await OpenFile.open(filePath);
 
         if (result.type != ResultType.done) {
-          Fluttertoast.showToast(msg: "Something went wrong");
+          Fluttertoast.showToast(msg: "Something went wrong #003");
         }
         log(result.message);
       } catch (e) {

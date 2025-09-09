@@ -76,6 +76,7 @@ class _AddReminderState extends State<AddReminder> {
 
   @override
   void initState() {
+    dev.log(addNewReminderModelController.reminders.value.id);
     loadMedicineList();
     super.initState();
   }
@@ -763,7 +764,7 @@ class _AddReminderState extends State<AddReminder> {
                   decoration: textFieldInputDecoration(
                     hint: "Select reminder type",
                   ),
-                  value: reminderModel.reminderType,
+                  initialValue: reminderModel.reminderType,
                   validator: (value) {
                     if (value == null) {
                       return "Please select reminder type";
@@ -871,7 +872,7 @@ class _AddReminderState extends State<AddReminder> {
                           } else {
                             toastification.show(
                               context: context,
-                              title: const Text("Something went wrong"),
+                              title: const Text("Something went wrong #001"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.error,
                             );
@@ -895,7 +896,7 @@ class _AddReminderState extends State<AddReminder> {
                           } else {
                             toastification.show(
                               context: context,
-                              title: const Text("Something went wrong"),
+                              title: const Text("Something went wrong #002"),
                               autoCloseDuration: const Duration(seconds: 2),
                               type: ToastificationType.error,
                             );

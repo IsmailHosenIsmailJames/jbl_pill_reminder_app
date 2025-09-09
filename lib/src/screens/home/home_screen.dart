@@ -1,5 +1,6 @@
 import "dart:convert";
 import "dart:developer";
+import "dart:math" as math;
 
 import "package:flutter/material.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
@@ -11,6 +12,7 @@ import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
@@ -207,6 +209,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.zero,
               ),
               onPressed: () async {
+                final AddNewReminderModelController
+                    addNewReminderModelController =
+                    Get.put(AddNewReminderModelController());
+                addNewReminderModelController.reminders.value.id =
+                    (math.Random().nextInt(100000000) + 100000000).toString();
                 await Navigator.push(
                   context,
                   MaterialPageRoute(

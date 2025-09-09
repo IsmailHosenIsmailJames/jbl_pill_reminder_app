@@ -187,7 +187,7 @@ class _SignupPageState extends State<SignupPage> {
                     const Gap(5),
                     customTextFieldDecoration(
                       textFormField: DropdownButtonFormField(
-                        value: signupPageController.gender.value,
+                        initialValue: signupPageController.gender.value,
                         decoration: textFieldInputDecoration(
                           hint: "type your gender here...",
                         ),
@@ -239,7 +239,7 @@ class _SignupPageState extends State<SignupPage> {
                         children: [
                           customTextFieldDecoration(
                             textFormField: DropdownButtonFormField(
-                              value: choosenDivision,
+                              initialValue: choosenDivision,
                               decoration: textFieldInputDecoration(
                                   hint: "Select Division"),
                               items: dvision
@@ -266,7 +266,7 @@ class _SignupPageState extends State<SignupPage> {
                           const Gap(5),
                           customTextFieldDecoration(
                             textFormField: DropdownButtonFormField(
-                              value: choosenDistrict,
+                              initialValue: choosenDistrict,
                               decoration: textFieldInputDecoration(
                                   hint: "Select District"),
                               items: district
@@ -291,7 +291,7 @@ class _SignupPageState extends State<SignupPage> {
                           const Gap(5),
                           customTextFieldDecoration(
                             textFormField: DropdownButtonFormField(
-                              value: signupPageController.choosenThana.value,
+                              initialValue: signupPageController.choosenThana.value,
                               decoration: textFieldInputDecoration(
                                   hint: "Select Thana"),
                               items: thana
@@ -573,7 +573,7 @@ class _SignupPageState extends State<SignupPage> {
       log(e.toString());
       toastification.show(
         context: context,
-        title: const Text("Something went wrong"),
+        title: const Text("Something went wrong #005"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );

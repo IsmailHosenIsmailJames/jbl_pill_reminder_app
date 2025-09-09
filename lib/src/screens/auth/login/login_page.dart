@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
       log(e.toString());
       toastification.show(
         context: context,
-        title: const Text("Something went wrong"),
+        title: const Text("Something went wrong #004"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
