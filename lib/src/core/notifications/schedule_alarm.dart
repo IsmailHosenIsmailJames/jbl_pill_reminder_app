@@ -12,6 +12,7 @@ Future<void> scheduleAlarm({
     alarmSettings: AlarmSettings(
       id: id,
       dateTime: time,
+      androidFullScreenIntent: true,
       assetAudioPath: "assets/sound/shaking_pill_bottle.mp3",
       volumeSettings:
           const VolumeSettings.fixed(volume: 1, volumeEnforced: true),
