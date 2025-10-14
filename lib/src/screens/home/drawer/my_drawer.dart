@@ -2,6 +2,7 @@ import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
@@ -144,6 +145,8 @@ class MyDrawer extends StatelessWidget {
                           Navigator.pop(context);
                           await Hive.box("user_db").clear();
                           await Hive.box("reminder_db").clear();
+                          await cancelAllScheduledTask();
+                          await Hive.initFlutter();
                           // Get.offAll(() => const LoginPage());
                           Navigator.pushAndRemoveUntil(
                             context,

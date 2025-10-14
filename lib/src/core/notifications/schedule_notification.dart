@@ -6,17 +6,23 @@ import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 
 import "../../screens/add_reminder/model/reminder_model.dart";
 
-Future<void> pushNotifications({
+Future<void> scheduleNotification({
   required int id,
   required String title,
   required String body,
+  required DateTime time,
   required bool isPreReminder,
-  required ReminderModel data,
-  required bool isAlarm,
+  ReminderModel? data,
 }) async {
   if (isPreReminder == true) {
     await AwesomeNotificationsService.initPreReminderNotifications();
     AwesomeNotifications().createNotification(
+      schedule: NotificationCalendar.fromDate(
+        date: time,
+        preciseAlarm: true,
+        allowWhileIdle: true,
+        repeats: false,
+      ),
       content: NotificationContent(
         id: id,
         // Ensure this ID is unique for pre-reminders
@@ -33,55 +39,29 @@ Future<void> pushNotifications({
         customSound: "resource://raw/shaking_pill_bottle",
         // Optional: a softer sound
         category: NotificationCategory.Reminder,
-        payload: {"payloadString": data.toJson(), "isPreReminder": "true"},
+        payload: {"payloadString": data?.toJson(), "isPreReminder": "true"},
       ),
       // Pre-reminders might not need action buttons or could have simpler ones
-      actionButtons: [
-        NotificationActionButton(
-          key: "acknowledge_pre_reminder",
-          label: "Acknowledge",
-          actionType: ActionType.DismissAction, // Simple dismiss
-        ),
-      ],
-    );
-    log("Pre-Reminder Notification Shown");
-  } else if (isAlarm == false) {
-    await AwesomeNotificationsService.initNotifications();
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: id,
-        // Must be unique for each notification
-        channelKey: "reminders",
-        // The channel key you created
-        title: title,
-        body: body,
-        locked: isPreReminder ? false : true,
-        wakeUpScreen: true,
-        actionType: ActionType.KeepOnTop,
-        customSound: "resource://raw/shaking_pill_bottle",
-        category: NotificationCategory.Reminder,
-        payload: {"payloadString": data.toJson()},
-      ),
-      actionButtons: isPreReminder
+      actionButtons: data == null
           ? null
           : [
               NotificationActionButton(
-                key: "dismiss",
-                label: "Dismiss",
-                actionType: ActionType.DismissAction,
-              ),
-              NotificationActionButton(
-                key: "take_medicine",
-                label: "Take Medicine",
-                actionType: ActionType.Default,
+                key: "acknowledge_pre_reminder",
+                label: "Acknowledge",
+                actionType: ActionType.DismissAction, // Simple dismiss
               ),
             ],
     );
-    log("Reminder Notification Shown");
   } else {
     await AwesomeNotificationsService.initAlarms();
     // Implementation for Alarm notification
     AwesomeNotifications().createNotification(
+      schedule: NotificationCalendar.fromDate(
+        date: time,
+        preciseAlarm: true,
+        allowWhileIdle: true,
+        repeats: false,
+      ),
       content: NotificationContent(
         id: id,
         // Ensure this ID is unique for alarms, potentially offset from reminder IDs
@@ -89,7 +69,7 @@ Future<void> pushNotifications({
         // IMPORTANT: Define this channel in NotificationsService
         title: title,
         body: body,
-        category: NotificationCategory.Alarm,
+        category: NotificationCategory.Reminder,
         wakeUpScreen: true,
         // Wake up the screen
         fullScreenIntent: true,
@@ -102,13 +82,13 @@ Future<void> pushNotifications({
         // Indicates a critical alert (iOS specific, good practice)
         customSound: "resource://raw/shaking_pill_bottle",
         // Or a more alarm-like sound
-        payload: {"payloadString": data.toJson(), "alarmId": id.toString()},
+        payload: {"payloadString": data?.toJson(), "alarmId": id.toString()},
         backgroundColor: Colors.blueAccent, // Optional: for visual distinction
       ),
       actionButtons: [
         NotificationActionButton(
           key: "dismiss_alarm",
-          label: "Dismiss Alarm",
+          label: "Dismiss Notification",
           actionType: ActionType.DismissAction,
           isDangerousOption: true,
         ),
@@ -118,8 +98,6 @@ Future<void> pushNotifications({
           actionType: ActionType.Default, // Opens the app
         ),
       ],
-      schedule:
-          null, // For immediate alarms, schedule is null. For scheduled, you'd set it.
     );
     log("Alarm Notification Shown");
   }

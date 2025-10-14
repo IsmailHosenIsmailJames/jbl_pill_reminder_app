@@ -7,6 +7,7 @@ import "package:get/get.dart";
 import "package:hive_ce_flutter/adapters.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
@@ -267,6 +268,7 @@ Card cardOfReminderForSummary(
                           id: (Random().nextInt(100000000) + 100000000)
                               .toString());
                       reloadAllReminderList(Get.find());
+                      analyzeDatabaseAndScheduleReminder();
                     },
                     icon: Icon(
                       FluentIcons.edit_24_regular,

@@ -16,7 +16,6 @@ dependencies:
   fluentui_system_icons: ^1.1.273
   flutter:
     sdk: flutter
-  flutter_foreground_task: ^9.1.0
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.5
   fluttertoast: ^8.2.12
@@ -39,6 +38,11 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   table_calendar: ^3.2.0
   toastification: ^3.0.1
+  alarm:
+    git:
+      url: https://github.com/IsmailHosenIsmailJames/alarm.git
+  workmanager: ^0.9.0+3
+  dartx: ^1.2.0
 
 
 dev_dependencies:

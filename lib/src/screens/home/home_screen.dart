@@ -3,12 +3,13 @@ import "dart:developer";
 import "dart:math" as math;
 
 import "package:flutter/material.dart";
-import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_ce_flutter/adapters.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/main.dart";
+import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
@@ -21,7 +22,6 @@ import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import "package:table_calendar/table_calendar.dart";
 
-import "../../core/foreground/background_setup.dart";
 import "../../core/functions/find_date_medicine.dart";
 import "../../theme/const_values.dart";
 import "../../widgets/medication_card.dart";
@@ -57,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         reminderDB.put(reminderModel.id, reminderModel.toJson());
       }
       reloadAllReminderList(homeController);
+      await analyzeDatabaseAndScheduleReminder();
       setState(() {
         isLoading = false;
       });
@@ -72,17 +73,11 @@ class _HomeScreenState extends State<HomeScreen> {
     getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
 
-    FlutterForegroundTask.addTaskDataCallback(onReceiveTaskData);
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       await sharedPreferences.reload();
-      bool result = await requestPermissions();
-      if (result) {
-        await initService();
-        await startService();
-      }
+      await requestPermissions();
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");
@@ -156,20 +151,24 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("Pill Reminder"),
         actions: [
-          // IconButton(
-          //   onPressed: () {
-          //     pushNotifications(
-          //       id: int.parse(
-          //           homeController.listOfTodaysReminder.value.first.id),
-          //       title: "title",
-          //       body: "body",
-          //       isPreReminder: false,
-          //       data: homeController.listOfTodaysReminder.value.first,
-          //       isAlarm: false,
-          //     );
-          //   },
-          //   icon: const Icon(Icons.notification_add),
-          // ),
+          IconButton(
+            onPressed: () async {
+              await analyzeDatabaseAndScheduleReminder();
+              // scheduleAlarm(
+              //     title: "Test",
+              //     description: "Testing Alarm",
+              //     time: DateTime.now().add(const Duration(seconds: 15)),
+              //     data: homeController.listOfTodaysReminder.first);
+              // await pushNotifications(
+              //   id: 1,
+              //   title: "Test",
+              //   body: "Text",
+              //   time: DateTime.now().add(const Duration(seconds: 15)),
+              //   isPreReminder: true,
+              // );
+            },
+            icon: const Icon(Icons.notification_add),
+          ),
           if (isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),
@@ -221,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
                 reloadAllReminderList(homeController);
+                await analyzeDatabaseAndScheduleReminder();
               },
               icon: const Icon(
                 Icons.add,
