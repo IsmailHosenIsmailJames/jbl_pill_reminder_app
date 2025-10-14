@@ -8,7 +8,7 @@ import "package:flutter/material.dart";
 import "package:fluttertoast/fluttertoast.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_flutter/hive_flutter.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:open_file/open_file.dart";
 import "package:path_provider/path_provider.dart";

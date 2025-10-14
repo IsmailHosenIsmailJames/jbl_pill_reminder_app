@@ -2,7 +2,7 @@ import "dart:convert";
 import "dart:developer";
 
 import "package:flutter/material.dart";
-import "package:hive/hive.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:http/http.dart" as http;
 import "package:get/get.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";

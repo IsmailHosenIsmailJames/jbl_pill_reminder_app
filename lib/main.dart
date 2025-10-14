@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
-import "package:hive_flutter/hive_flutter.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:jbl_pills_reminder_app/app.dart";
 
 bool isUpdateChecked = false;

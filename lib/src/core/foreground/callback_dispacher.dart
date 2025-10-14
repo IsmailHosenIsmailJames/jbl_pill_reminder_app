@@ -1,7 +1,7 @@
 import "dart:developer";
 
 import "package:flutter_foreground_task/flutter_foreground_task.dart";
-import "package:hive_flutter/hive_flutter.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/background_task.dart";
 

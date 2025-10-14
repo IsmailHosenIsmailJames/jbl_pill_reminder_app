@@ -4,7 +4,7 @@ import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive/hive.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";

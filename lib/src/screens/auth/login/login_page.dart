@@ -5,7 +5,7 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:hive/hive.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:http/http.dart";
 import "package:http_status_code/http_status_code.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";

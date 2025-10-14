@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive/hive.dart";
+import "package:hive_ce_flutter/adapters.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
