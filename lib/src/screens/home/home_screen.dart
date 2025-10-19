@@ -10,7 +10,6 @@ import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/core/in_app_update/in_app_android_update/in_app_update_android.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -66,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    inAppUpdateAndroid(context);
     loadUserData();
     // checkNotificationsAction();
 
@@ -149,26 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text("Pill Reminder"),
         actions: [
-          IconButton(
-            onPressed: () async {
-              await analyzeDatabaseAndScheduleReminder();
-              // scheduleAlarm(
-              //     title: "Test",
-              //     description: "Testing Alarm",
-              //     time: DateTime.now().add(const Duration(seconds: 15)),
-              //     data: homeController.listOfTodaysReminder.first);
-              // await pushNotifications(
-              //   id: 1,
-              //   title: "Test",
-              //   body: "Text",
-              //   time: DateTime.now().add(const Duration(seconds: 15)),
-              //   isPreReminder: true,
-              // );
-            },
-            icon: const Icon(Icons.notification_add),
-          ),
+
           if (isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),

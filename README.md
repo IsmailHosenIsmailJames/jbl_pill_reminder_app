@@ -71,3 +71,19 @@ The application relies on two main mechanisms for background operations:
 * **WorkManager:** Periodic background tasks are scheduled to analyze the reminder database, set
   alarms, and queue notifications, ensuring that even if the app is killed, future reminders are
   still processed.
+
+JBL Pill Reminder is your personal medication assistant, designed to help you manage your health with confidence and ease. Never worry about forgetting a dose again with our reliable and
+user-friendly app.
+
+Key Features:
+
+ * Effortless Medication Management: Easily add and organize all your medications in one place.
+ * Flexible & Custom Reminders: Set up reminders for any schedule. Whether it's multiple times a day, specific days of the week, or a custom recurring pattern, we've got you covered.
+ * Smart Notifications: Receive timely alerts for your medication. Get a pre-reminder before the dose is due, and an alarm at the exact time, so you're always prepared.
+ * Interactive Calendar: Visualize your medication schedule with our clear and intuitive calendar view. See your upcoming doses at a glance and stay organized.
+ * Reliable Background Operation: Our app works tirelessly in the background to ensure you get your reminders on time, every time, even if the app is closed.
+ * Track Your Progress: Keep a history of your taken medications to monitor your adherence and share it with your doctor.
+ * Secure & Private: Your data is stored securely on your device, ensuring your medical information remains private.
+
+With JBL Pill Reminder, you can take control of your medication schedule and focus on what matters most - your health. Download now and experience the peace of mind that comes with having a
+reliable pill reminder in your pocket.
