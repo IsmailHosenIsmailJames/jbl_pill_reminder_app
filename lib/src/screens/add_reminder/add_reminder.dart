@@ -9,8 +9,8 @@ import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_ce_flutter/adapters.dart";
 import "package:http_status_code/http_status_code.dart";
-import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -842,8 +842,7 @@ class _AddReminderState extends State<AddReminder> {
                       setState(() {
                         isAsyncLoading = true;
                       });
-                      if (await InternetConnectionChecker
-                          .instance.hasConnection) {
+                      if (await hasInternetConnection()) {
                         Map<String, dynamic> data = reminderModel.toMap();
                         data["phone_number"] =
                             profileController.userInfo.value!.phone;

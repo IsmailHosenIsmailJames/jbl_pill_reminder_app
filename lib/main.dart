@@ -22,27 +22,70 @@ void callbackDispatcher() {
   });
 }
 
-Future<bool> requestPermissions() async {
-  var notificationPermission = await Permission.notification.status;
-  if (notificationPermission != PermissionStatus.granted) {
-    notificationPermission = await Permission.notification.request();
+Future<bool> requestPermissions(BuildContext context) async {
+  var notificationStatus = await Permission.notification.status;
+  var ignoreBatteryStatus = await Permission.ignoreBatteryOptimizations.status;
+  var scheduleExactAlarmStatus = PermissionStatus.granted;
+
+  if (Platform.isAndroid) {
+    scheduleExactAlarmStatus = await Permission.scheduleExactAlarm.status;
   }
 
-  var ignoreBatteryOpt = await Permission.ignoreBatteryOptimizations.status;
-  if (ignoreBatteryOpt != PermissionStatus.granted) {
-    ignoreBatteryOpt = await Permission.ignoreBatteryOptimizations.request();
+  if (notificationStatus == PermissionStatus.granted &&
+      ignoreBatteryStatus == PermissionStatus.granted &&
+      scheduleExactAlarmStatus == PermissionStatus.granted) {
+    return true;
+  }
+
+  bool isUserProceedToPermission = await showModalBottomSheet<bool>(
+        context: context,
+        builder: (context) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "This app requires notification and background permissions to send you timely pill reminders, even when the app is closed. Please grant these permissions to ensure you don't miss any doses.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 40,
+                width: MediaQuery.of(context).size.width,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text("Grant Permissions"),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ) ??
+      false;
+
+  if (!isUserProceedToPermission) return false;
+
+  if (notificationStatus != PermissionStatus.granted) {
+    notificationStatus = await Permission.notification.request();
+  }
+
+  if (ignoreBatteryStatus != PermissionStatus.granted) {
+    ignoreBatteryStatus = await Permission.ignoreBatteryOptimizations.request();
   }
 
   if (Platform.isAndroid) {
-    if (!await Permission.ignoreBatteryOptimizations.isGranted) {
-      await Permission.ignoreBatteryOptimizations.request();
-    }
-
-    if (!await Permission.scheduleExactAlarm.isGranted) {
-      await Permission.scheduleExactAlarm.request();
+    if (scheduleExactAlarmStatus != PermissionStatus.granted) {
+      scheduleExactAlarmStatus = await Permission.scheduleExactAlarm.request();
     }
   }
-  return notificationPermission == PermissionStatus.granted;
+
+  return notificationStatus == PermissionStatus.granted;
 }
 
 void main() async {

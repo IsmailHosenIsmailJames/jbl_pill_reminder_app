@@ -6,10 +6,10 @@ import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_ce_flutter/adapters.dart";
-import "package:internet_connection_checker/internet_connection_checker.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
 
   Future<void> getAndSaveAllReminderFromServer() async {
-    if (await InternetConnectionChecker.instance.hasConnection) {
+    if (await hasInternetConnection()) {
       setState(() {
         isLoading = true;
       });
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       await sharedPreferences.reload();
-      await requestPermissions();
+      await requestPermissions(context);
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");
@@ -150,7 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         title: const Text("Pill Reminder"),
         actions: [
-
           if (isLoading)
             const Padding(
               padding: EdgeInsets.all(8.0),
