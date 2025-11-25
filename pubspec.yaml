@@ -11,14 +11,14 @@ dependencies:
   app_settings: ^6.1.1
   awesome_notifications: ^0.10.1
   clipboard: ^2.0.2
-  device_info_plus: ^11.3.3
+  device_info_plus: ^12.2.0
   dio: ^5.8.0+1
   fluentui_system_icons: ^1.1.273
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.5
-  fluttertoast: ^8.2.12
+  fluttertoast: ^9.0.0
   gap: ^3.0.1
   get: ^5.0.0-release-candidate-9.3.2
   google_fonts: ^6.2.1
@@ -29,7 +29,7 @@ dependencies:
   icons_launcher: ^3.0.1
   internet_connection_checker: ^3.0.1
   intl: ^0.20.2
-  package_info_plus: ^8.3.0
+  package_info_plus: ^9.0.0
   path_provider: ^2.1.5
   permission_handler: ^12.0.0+1
   searchfield: ^1.2.6
