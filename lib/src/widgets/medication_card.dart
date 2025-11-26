@@ -6,7 +6,7 @@ import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:hive_ce_flutter/adapters.dart";
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/core/foreground/callback_dispacher.dart";
+import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
