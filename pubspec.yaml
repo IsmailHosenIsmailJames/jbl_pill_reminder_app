@@ -42,6 +42,7 @@ dependencies:
   workmanager: ^0.9.0+3
   dartx: ^1.2.0
   connectivity_plus: ^7.0.0
+  open_settings_plus: ^0.4.0
 
 
 dev_dependencies:
