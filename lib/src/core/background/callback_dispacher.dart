@@ -17,6 +17,7 @@ import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
 Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
   // Ensure Hive is initialized for the foreground task
+  await Alarm.init();
   await Hive.initFlutter();
   await Hive.openBox("reminder_db");
 

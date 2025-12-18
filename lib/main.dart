@@ -1,25 +1,25 @@
 import "dart:io";
 
 import "package:alarm/alarm.dart";
+import "package:android_alarm_manager_plus/android_alarm_manager_plus.dart";
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:hive_ce_flutter/adapters.dart";
 import "package:jbl_pills_reminder_app/app.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:permission_handler/permission_handler.dart";
-import "package:workmanager/workmanager.dart";
 
 bool isUpdateChecked = false;
 
 List<String> foregroundNotification = [];
 
 @pragma("vm:entry-point")
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    await analyzeDatabaseAndScheduleReminder(
-        reloadDB: inputData?["inputData"] == true);
-    return Future.value(true);
-  });
+void alarmCallback(int id) async {
+  if (id == 1) {
+    await analyzeDatabaseAndScheduleReminder(reloadDB: true);
+  } else if (id == 2) {
+    await analyzeDatabaseAndScheduleReminder(reloadDB: true);
+  }
 }
 
 Future<bool> requestPermissions(BuildContext context) async {
@@ -93,27 +93,28 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Alarm.init();
-  await Workmanager().initialize(callbackDispatcher);
+  await AndroidAlarmManager.initialize();
 
-  await Workmanager().registerPeriodicTask(
-    "background_task",
-    "process_db",
-    inputData: {"reloadDB": true},
-    frequency: const Duration(minutes: 15),
+  await AndroidAlarmManager.periodic(
+    const Duration(minutes: 15),
+    1,
+    alarmCallback,
+    wakeup: true,
+    exact: true,
+    rescheduleOnReboot: true,
   );
 
   DateTime now = DateTime.now();
-  Duration diff = now
-      .add(Duration(days: now.day + 1))
-      .copyWith(hour: 0, minute: 0)
-      .difference(now);
+  DateTime startAt =
+      now.add(Duration(days: 1)).copyWith(hour: 0, minute: 0, second: 0);
 
-  await Workmanager().registerPeriodicTask(
-    "day_task",
-    "process_db",
-    inputData: {"reloadDB": true},
-    initialDelay: diff,
-    frequency: const Duration(days: 1),
+  await AndroidAlarmManager.periodic(
+    const Duration(days: 1),
+    2,
+    alarmCallback,
+    startAt: startAt,
+    wakeup: true,
+    rescheduleOnReboot: true,
   );
 
   await Hive.initFlutter();

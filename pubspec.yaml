@@ -8,9 +8,9 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
-  app_settings: ^6.1.1
+  app_settings: ^7.0.0
   awesome_notifications: ^0.10.1
-  clipboard: ^2.0.2
+  clipboard: ^3.0.8
   device_info_plus: ^12.2.0
   dio: ^5.8.0+1
   fluentui_system_icons: ^1.1.273
@@ -33,15 +33,15 @@ dependencies:
   permission_handler: ^12.0.0+1
   searchfield: ^1.2.6
   shared_preferences: ^2.5.3
-  smooth_page_indicator: ^1.2.1
+  smooth_page_indicator: ^2.0.1
   table_calendar: ^3.2.0
   toastification: ^3.0.1
   alarm:
     git:
       url: https://github.com/IsmailHosenIsmailJames/alarm.git
-  workmanager: ^0.9.0+3
   dartx: ^1.2.0
   connectivity_plus: ^7.0.0
+  android_alarm_manager_plus: ^5.0.0
 
 
 dev_dependencies:
