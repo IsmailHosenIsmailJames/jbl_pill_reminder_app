@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:developer";
 import "dart:math" as math;
+import "package:awesome_notifications/awesome_notifications.dart";
 
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
@@ -56,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
         reminderDB.put(reminderModel.id, reminderModel.toJson());
       }
       reloadAllReminderList(homeController);
-      await analyzeDatabaseAndScheduleReminder();
+      bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+      if (isAllowed) {
+        await analyzeDatabaseAndScheduleReminder();
+      }
       setState(() {
         isLoading = false;
       });
@@ -68,7 +72,6 @@ class _HomeScreenState extends State<HomeScreen> {
     loadUserData();
     // checkNotificationsAction();
 
-    getAndSaveAllReminderFromServer();
     reloadAllReminderList(homeController);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -76,6 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
           await SharedPreferences.getInstance();
       await sharedPreferences.reload();
       await requestPermissions(context);
+
+      // Now that permissions are handled, fetch and schedule
+      getAndSaveAllReminderFromServer();
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");

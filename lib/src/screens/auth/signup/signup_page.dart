@@ -89,380 +89,338 @@ class _SignupPageState extends State<SignupPage> {
           child: SingleChildScrollView(
             controller: scrollController,
             padding: const EdgeInsets.all(10),
-            child: Form(
-              key: formKey,
-              child: AutofillGroup(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppIntroPages(pageController: pageController),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
-                      child: Center(
-                        child: SmoothPageIndicator(
-                          controller: pageController,
-                          count: listOfPagesInfo.length,
-                          effect: ExpandingDotsEffect(
-                            activeDotColor: MyAppColors.primaryColor,
-                            dotHeight: 5,
-                            dotWidth: MediaQuery.of(context).size.width / 10,
-                            expansionFactor: 7,
-                            spacing: 5,
-                          ),
-                        ),
+            child: Column(
+              children: [
+                AppIntroPages(pageController: pageController),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
+                  child: Center(
+                    child: SmoothPageIndicator(
+                      controller: pageController,
+                      count: listOfPagesInfo.length,
+                      effect: ExpandingDotsEffect(
+                        activeDotColor: MyAppColors.primaryColor,
+                        dotHeight: 5,
+                        dotWidth: MediaQuery.of(context).size.width / 10,
+                        expansionFactor: 7,
+                        spacing: 5,
                       ),
                     ),
-                    const Gap(30),
-                    Text(
-                      widget.userInfoModel == null
-                          ? "Sign In"
-                          : "Update Profile",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                    const Gap(5),
-                    Text(
-                      widget.userInfoModel == null
-                          ? "Please fill the information to sign in"
-                          : "Please change information to update your profile",
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                    const Gap(10),
-                    getTitlesForFields(
-                      title: "Name",
-                      isFieldRequired: true,
-                    ),
-                    const Gap(5),
-                    customTextFieldDecoration(
-                      textFormField: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your name";
-                          }
-                          return null;
-                        },
-                        keyboardType: TextInputType.name,
-                        autofillHints: const [AutofillHints.name],
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: textEditingControllerName,
-                        decoration: textFieldInputDecoration(
-                          hint: "type your name here...",
-                        ),
-                      ),
-                    ),
-                    const Gap(10),
-                    getTitlesForFields(
-                      title: "Age",
-                      isFieldRequired: true,
-                    ),
-                    const Gap(5),
-                    customTextFieldDecoration(
-                      textFormField: TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your age";
-                          }
-                          if (int.tryParse(value) == null ||
-                              int.parse(value) < 0) {
-                            return "Please enter a valid age";
-                          }
-                          return null;
-                        },
-                        keyboardType: TextInputType.number,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        controller: textEditingControllerAge,
-                        decoration: textFieldInputDecoration(
-                          hint: "type your age here...",
-                        ),
-                      ),
-                    ),
-                    const Gap(10),
-                    getTitlesForFields(
-                      title: "Gender",
-                      isFieldRequired: true,
-                    ),
-                    const Gap(5),
-                    customTextFieldDecoration(
-                      textFormField: DropdownButtonFormField(
-                        initialValue: signupPageController.gender.value,
-                        decoration: textFieldInputDecoration(
-                          hint: "type your gender here...",
-                        ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: "Male",
-                            child: Text("Male"),
-                          ),
-                          const DropdownMenuItem(
-                            value: "Female",
-                            child: Text("Female"),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          signupPageController.gender.value = value;
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please select your gender";
-                          }
-                          return null;
-                        },
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                      ),
-                    ),
-                    const Gap(10),
-                    getTitlesForFields(
-                      title: "Address",
-                      isFieldRequired: true,
-                    ),
-                    const Gap(5),
-                    Obx(() {
-                      String? choosenDivision =
-                          signupPageController.choosenDivision.value;
-                      String? choosenDistrict =
-                          signupPageController.choosenDistrict.value;
-                      List<String> dvision =
-                          divisionDistrictThana.keys.toList();
-                      List<String> district =
-                          divisionDistrictThana[choosenDivision]
-                                  ?.keys
-                                  .toList() ??
-                              [];
-                      List<String> thana =
-                          divisionDistrictThana[choosenDivision]
-                                  ?[choosenDistrict] ??
-                              [];
-                      return Column(
-                        children: [
-                          customTextFieldDecoration(
-                            textFormField: DropdownButtonFormField(
-                              initialValue: choosenDivision,
-                              decoration: textFieldInputDecoration(
-                                  hint: "Select Division"),
-                              items: dvision
-                                  .map((e) => DropdownMenuItem(
-                                      value: e, child: Text(e)))
-                                  .toList(),
-                              onChanged: (value) {
-                                signupPageController.choosenDivision.value =
-                                    value;
-                                signupPageController.choosenDistrict.value =
-                                    null;
-                                signupPageController.choosenThana.value = null;
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please select your division";
-                                }
-                                return null;
-                              },
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
+                  ),
+                ),
+                const Gap(30),
+                Card(
+                  elevation: 4,
+                  shadowColor: Colors.black12,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: formKey,
+                      child: AutofillGroup(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.userInfoModel == null
+                                  ? "Create an Account"
+                                  : "Update Profile",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: MyAppColors.primaryColor,
+                                  ),
                             ),
-                          ),
-                          const Gap(5),
-                          customTextFieldDecoration(
-                            textFormField: DropdownButtonFormField(
-                              initialValue: choosenDistrict,
-                              decoration: textFieldInputDecoration(
-                                  hint: "Select District"),
-                              items: district
-                                  .map((e) => DropdownMenuItem(
-                                      value: e, child: Text(e)))
-                                  .toList(),
-                              onChanged: (value) {
-                                signupPageController.choosenDistrict.value =
-                                    value;
-                                signupPageController.choosenThana.value = null;
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please select your district";
-                                }
-                                return null;
-                              },
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
+                            const Gap(5),
+                            Text(
+                              widget.userInfoModel == null
+                                  ? "Please fill the information to sign up"
+                                  : "Please change information to update your profile",
+                              style: const TextStyle(color: Colors.grey),
                             ),
-                          ),
-                          const Gap(5),
-                          customTextFieldDecoration(
-                            textFormField: DropdownButtonFormField(
-                              initialValue:
-                                  signupPageController.choosenThana.value,
-                              decoration: textFieldInputDecoration(
-                                  hint: "Select Thana"),
-                              items: thana
-                                  .map((e) => DropdownMenuItem(
-                                      value: e, child: Text(e)))
-                                  .toList(),
-                              onChanged: (value) {
-                                signupPageController.choosenThana.value = value;
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Please select your thana";
-                                }
-                                return null;
-                              },
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
+                            const Gap(10),
+                            getTitlesForFields(
+                              title: "Name",
+                              isFieldRequired: true,
                             ),
-                          ),
-                        ],
-                      );
-                    }),
-                    const Gap(10),
-                    if (widget.userInfoModel == null)
-                      getTitlesForFields(
-                        title: "Phone Number",
-                        isFieldRequired: true,
-                      ),
-                    if (widget.userInfoModel == null) const Gap(5),
-                    if (widget.userInfoModel == null)
-                      customTextFieldDecoration(
-                        textFormField: TextFormField(
-                          controller: textEditingControllerPhoneNumber,
-                          autofillHints: const [AutofillHints.telephoneNumber],
-                          decoration: textFieldInputDecoration(
-                            hint: "+8801xxxxxxxxx",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please enter your phone number";
-                            }
-                            if (value.length != 11 && value.length != 14) {
-                              return "Please enter a valid phone number";
-                            }
-                            return null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType: TextInputType.phone,
-                        ),
-                      ),
-                    const Gap(10),
-                    if (widget.userInfoModel == null)
-                      getTitlesForFields(
-                        title: "Password",
-                        isFieldRequired: true,
-                      ),
-                    if (widget.userInfoModel == null) const Gap(5),
-                    if (widget.userInfoModel == null)
-                      customTextFieldDecoration(
-                        textFormField: TextFormField(
-                          controller: textEditingControllerPassword,
-                          autofillHints: const [AutofillHints.newPassword],
-                          onEditingComplete: () =>
-                              TextInput.finishAutofillContext(),
-                          decoration: textFieldInputDecoration(
-                            hint: "type your password here...",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please enter your password";
-                            }
-                            if (value.length < 6) {
-                              return "Password must be at least 6 characters";
-                            }
-                            return null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          obscureText: true,
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-                      ),
-                    if (widget.userInfoModel == null) const Gap(10),
-                    if (widget.userInfoModel == null)
-                      getTitlesForFields(
-                        title: "Confirm Password",
-                        isFieldRequired: true,
-                      ),
-                    if (widget.userInfoModel == null) const Gap(5),
-                    if (widget.userInfoModel == null)
-                      customTextFieldDecoration(
-                        textFormField: TextFormField(
-                          controller: textEditingControllerConfirmPassword,
-                          autofillHints: [AutofillHints.newPassword],
-                          decoration: textFieldInputDecoration(
-                            hint: "type your confirm password here...",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Please enter your confirm password";
-                            }
-                            if (value != textEditingControllerPassword.text) {
-                              return "Password does not match";
-                            }
-                            return null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          obscureText: true,
-                          keyboardType: TextInputType.visiblePassword,
-                        ),
-                      ),
-                    const Gap(10),
-                    Center(
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: MyAppColors.primaryColor,
-                          ),
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              TextInput.finishAutofillContext(shouldSave: true);
-                              await signupOrUpdate(context);
-                            }
-                          },
-                          child: Text(
-                            widget.userInfoModel == null
-                                ? "Sign up"
-                                : "Save changes",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Gap(10),
-                    if (widget.userInfoModel == null)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Center(
-                            child: Text("Already have an account?",
-                                style: TextStyle(color: Colors.black),
-                                textAlign: TextAlign.center),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
+                            const Gap(5),
+                            customTextFieldDecoration(
+                              textFormField: TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Please enter your name";
+                                  }
+                                  return null;
+                                },
+                                keyboardType: TextInputType.name,
+                                autofillHints: const [AutofillHints.name],
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                controller: textEditingControllerName,
+                                decoration: textFieldInputDecoration(
+                                  hint: "type your name here...",
+                                  prefixIcon: const Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Colors.grey),
                                 ),
-                                (route) => false,
-                              );
-                            },
-                            child: const Text(
-                              "Log in",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                        ],
+                            const Gap(10),
+                            getTitlesForFields(
+                              title: "Age",
+                              isFieldRequired: true,
+                            ),
+                            const Gap(5),
+                            customTextFieldDecoration(
+                              textFormField: TextFormField(
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Please enter your age";
+                                  }
+                                  if (int.tryParse(value) == null ||
+                                      int.parse(value) < 0) {
+                                    return "Please enter a valid age";
+                                  }
+                                  return null;
+                                },
+                                keyboardType: TextInputType.number,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                controller: textEditingControllerAge,
+                                decoration: textFieldInputDecoration(
+                                  hint: "type your age here...",
+                                  prefixIcon: const Icon(Icons.cake_outlined,
+                                      color: Colors.grey),
+                                ),
+                              ),
+                            ),
+                            const Gap(10),
+                            getTitlesForFields(
+                              title: "Gender",
+                              isFieldRequired: true,
+                            ),
+                            const Gap(5),
+                            customTextFieldDecoration(
+                              textFormField: DropdownButtonFormField(
+                                initialValue: signupPageController.gender.value,
+                                decoration: textFieldInputDecoration(
+                                  hint: "type your gender here...",
+                                  prefixIcon: const Icon(Icons.wc_outlined,
+                                      color: Colors.grey),
+                                ),
+                                items: [
+                                  const DropdownMenuItem(
+                                    value: "Male",
+                                    child: Text("Male"),
+                                  ),
+                                  const DropdownMenuItem(
+                                    value: "Female",
+                                    child: Text("Female"),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  signupPageController.gender.value = value;
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return "Please select your gender";
+                                  }
+                                  return null;
+                                },
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                              ),
+                            ),
+                            const Gap(10),
+                            getTitlesForFields(
+                              title: "Address",
+                              isFieldRequired: true,
+                            ),
+                            const Gap(5),
+                            _AddressSelectionWidget(
+                                controller: signupPageController),
+                            const Gap(10),
+                            if (widget.userInfoModel == null)
+                              getTitlesForFields(
+                                title: "Phone Number",
+                                isFieldRequired: true,
+                              ),
+                            if (widget.userInfoModel == null) const Gap(5),
+                            if (widget.userInfoModel == null)
+                              customTextFieldDecoration(
+                                textFormField: TextFormField(
+                                  controller: textEditingControllerPhoneNumber,
+                                  autofillHints: const [
+                                    AutofillHints.telephoneNumber
+                                  ],
+                                  decoration: textFieldInputDecoration(
+                                    hint: "+8801xxxxxxxxx",
+                                    prefixIcon: const Icon(
+                                        Icons.phone_android_rounded,
+                                        color: Colors.grey),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter your phone number";
+                                    }
+                                    if (value.length != 11 &&
+                                        value.length != 14) {
+                                      return "Please enter a valid phone number";
+                                    }
+                                    return null;
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  keyboardType: TextInputType.phone,
+                                ),
+                              ),
+                            const Gap(10),
+                            if (widget.userInfoModel == null)
+                              getTitlesForFields(
+                                title: "Password",
+                                isFieldRequired: true,
+                              ),
+                            if (widget.userInfoModel == null) const Gap(5),
+                            if (widget.userInfoModel == null)
+                              customTextFieldDecoration(
+                                textFormField: TextFormField(
+                                  controller: textEditingControllerPassword,
+                                  autofillHints: const [
+                                    AutofillHints.newPassword
+                                  ],
+                                  onEditingComplete: () =>
+                                      TextInput.finishAutofillContext(),
+                                  decoration: textFieldInputDecoration(
+                                    hint: "type your password here...",
+                                    prefixIcon: const Icon(
+                                        Icons.lock_outline_rounded,
+                                        color: Colors.grey),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter your password";
+                                    }
+                                    if (value.length < 6) {
+                                      return "Password must be at least 6 characters";
+                                    }
+                                    return null;
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  obscureText: true,
+                                  keyboardType: TextInputType.visiblePassword,
+                                ),
+                              ),
+                            if (widget.userInfoModel == null) const Gap(10),
+                            if (widget.userInfoModel == null)
+                              getTitlesForFields(
+                                title: "Confirm Password",
+                                isFieldRequired: true,
+                              ),
+                            if (widget.userInfoModel == null) const Gap(5),
+                            if (widget.userInfoModel == null)
+                              customTextFieldDecoration(
+                                textFormField: TextFormField(
+                                  controller:
+                                      textEditingControllerConfirmPassword,
+                                  autofillHints: [AutofillHints.newPassword],
+                                  decoration: textFieldInputDecoration(
+                                    hint: "type your confirm password here...",
+                                    prefixIcon: const Icon(Icons.lock_rounded,
+                                        color: Colors.grey),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter your confirm password";
+                                    }
+                                    if (value !=
+                                        textEditingControllerPassword.text) {
+                                      return "Password does not match";
+                                    }
+                                    return null;
+                                  },
+                                  autovalidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  obscureText: true,
+                                  keyboardType: TextInputType.visiblePassword,
+                                ),
+                              ),
+                            const Gap(10),
+                            const Gap(15),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: MyAppColors.primaryColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    TextInput.finishAutofillContext(
+                                        shouldSave: true);
+                                    await signupOrUpdate(context);
+                                  }
+                                },
+                                child: Text(
+                                  widget.userInfoModel == null
+                                      ? "Sign up"
+                                      : "Save changes",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Gap(10),
+                            if (widget.userInfoModel == null)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Center(
+                                    child: Text("Already have an account?",
+                                        style: TextStyle(color: Colors.black),
+                                        textAlign: TextAlign.center),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginPage(),
+                                        ),
+                                        (route) => false,
+                                      );
+                                    },
+                                    child: const Text(
+                                      "Log in",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            const Gap(10),
+                          ],
+                        ),
                       ),
-                    const Gap(10),
-                  ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -580,5 +538,103 @@ class _SignupPageState extends State<SignupPage> {
         type: ToastificationType.error,
       );
     }
+  }
+}
+
+class _AddressSelectionWidget extends StatelessWidget {
+  final SignupPageController controller;
+
+  const _AddressSelectionWidget({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      String? choosenDivision = controller.choosenDivision.value;
+      String? choosenDistrict = controller.choosenDistrict.value;
+
+      List<String> dvision = divisionDistrictThana.keys.toList();
+      List<String> district =
+          divisionDistrictThana[choosenDivision]?.keys.toList() ?? [];
+      List<String> thana =
+          divisionDistrictThana[choosenDivision]?[choosenDistrict] ?? [];
+
+      return Column(
+        children: [
+          customTextFieldDecoration(
+            textFormField: DropdownButtonFormField(
+              initialValue: choosenDivision,
+              decoration: textFieldInputDecoration(
+                hint: "Select Division",
+                prefixIcon: const Icon(Icons.map_outlined, color: Colors.grey),
+              ),
+              items: dvision
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) {
+                controller.choosenDivision.value = value;
+                controller.choosenDistrict.value = null;
+                controller.choosenThana.value = null;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please select your division";
+                }
+                return null;
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+            ),
+          ),
+          const Gap(5),
+          customTextFieldDecoration(
+            textFormField: DropdownButtonFormField(
+              initialValue: choosenDistrict,
+              decoration: textFieldInputDecoration(
+                hint: "Select District",
+                prefixIcon: const Icon(Icons.location_city_outlined,
+                    color: Colors.grey),
+              ),
+              items: district
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) {
+                controller.choosenDistrict.value = value;
+                controller.choosenThana.value = null;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please select your district";
+                }
+                return null;
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+            ),
+          ),
+          const Gap(5),
+          customTextFieldDecoration(
+            textFormField: DropdownButtonFormField(
+              initialValue: controller.choosenThana.value,
+              decoration: textFieldInputDecoration(
+                hint: "Select Thana",
+                prefixIcon:
+                    const Icon(Icons.my_location_outlined, color: Colors.grey),
+              ),
+              items: thana
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged: (value) {
+                controller.choosenThana.value = value;
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Please select your thana";
+                }
+                return null;
+              },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+            ),
+          ),
+        ],
+      );
+    });
   }
 }

@@ -16,6 +16,11 @@ import "/src/screens/add_reminder/model/schedule_model.dart";
 import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
 
 Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  if (!isAllowed) {
+    log("Notification permissions not granted, skipping background task processing");
+    return;
+  }
   // Ensure Hive is initialized for the foreground task
   await Hive.initFlutter();
   await Hive.openBox("reminder_db");

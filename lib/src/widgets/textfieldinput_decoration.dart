@@ -7,6 +7,7 @@ InputDecoration textFieldInputDecoration({
   String? hint,
   String? label,
   Widget? suffixIcon,
+  Widget? prefixIcon,
 }) {
   return InputDecoration(
     border: InputBorder.none,
@@ -16,6 +17,7 @@ InputDecoration textFieldInputDecoration({
     alignLabelWithHint: true,
     floatingLabelAlignment: FloatingLabelAlignment.center,
     suffix: suffixIcon,
+    prefixIcon: prefixIcon,
   );
 }
 
