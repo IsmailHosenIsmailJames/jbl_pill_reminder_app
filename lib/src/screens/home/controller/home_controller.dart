@@ -9,6 +9,7 @@ import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connectio
 import "package:http/http.dart" as http;
 import "package:get/get.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:toastification/toastification.dart";
 
@@ -26,9 +27,17 @@ class HomeController extends GetxController {
   Future<void> reloadLocalReminders() async {
     final map = await _localDb.getAllReminders();
     final reminders =
-        map.values.map((e) => ReminderModel.fromJson(e)).toList()
-          ..sort((a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate));
-    listOfAllReminder.value = reminders;
+        map.values.map((e) => ReminderModel.fromJson(e)).toList();
+    listOfAllReminder.assignAll(sortRemindersBasedOnCreatedDate(reminders));
+    updateDailyReminders(selectedDay.value);
+  }
+
+  void updateDailyReminders(DateTime date) {
+    log("updateDailyReminders for $date");
+    final todaysMedication = findDateMedicine(listOfAllReminder, date);
+    listOfTodaysReminder
+        .assignAll(sortRemindersBasedOnCreatedDate(todaysMedication));
+    nextReminder.value = getNextReminder(listOfAllReminder);
   }
 
   /// Fetches reminders from the server, saves them locally, then reloads the

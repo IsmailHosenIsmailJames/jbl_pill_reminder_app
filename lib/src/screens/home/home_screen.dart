@@ -11,8 +11,6 @@ import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.da
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
@@ -402,11 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
       onDaySelected: (selectedDay, focusedDay) {
-        homeController.selectedDay.value = selectedDay;
-        List<ReminderModel> todaysMedication =
-            findDateMedicine(homeController.listOfAllReminder, selectedDay);
-
-        homeController.listOfTodaysReminder.value = todaysMedication;
+        homeController.updateDailyReminders(selectedDay);
       },
       selectedDayPredicate: (day) {
         return isSameDay(homeController.selectedDay.value, day);
@@ -445,51 +439,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-List<ReminderModel> findMedicineForSelectedDay(
-    HomeController homeController, DateTime selectedDay) {
-  homeController.selectedDay.value = selectedDay;
-  List<ReminderModel> todaysMedication =
-      findDateMedicine(homeController.listOfAllReminder, selectedDay);
-
-  return sortRemindersBasedOnCreatedDate(todaysMedication);
-}
-
-ReminderModel? getNextReminder(List<ReminderModel> reminderList) {
-  log("nextMedicine");
-
-  DateTime now = DateTime.now().subtract(const Duration(minutes: 5));
-  List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
-
-  Map<int, ReminderModel> todayReminderHave = {};
-
-  for (ReminderModel reminder in todaysMedicine) {
-    TimeModel? time = getFirstNextTime(reminder.schedule!.times!, now);
-    if (time != null) {
-      todayReminderHave.addAll({(time.hour * 60 + time.minute): reminder});
-    }
-  }
-  List<int> timesList = todayReminderHave.keys.toList();
-  timesList.sort();
-
-  log(timesList.toString());
-  return timesList.isEmpty ? null : todayReminderHave[timesList.first];
-}
-
-TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
-  listOfTime.sort(
-      (a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
-  for (TimeModel time in listOfTime) {
-    if (time.hour * 60 + time.minute > now.hour * 60 + now.minute) {
-      return time;
-    }
-  }
-  return null;
-}
-
-List<ReminderModel> sortRemindersBasedOnCreatedDate(
-    List<ReminderModel> listOfReminders) {
-  listOfReminders.sort(
-    (a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate),
-  );
-  return listOfReminders;
-}

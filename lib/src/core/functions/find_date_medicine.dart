@@ -2,7 +2,6 @@ import "dart:developer";
 
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 
 import "../../resources/frequency.dart";
 import "../../screens/add_reminder/model/schedule_model.dart";
@@ -91,4 +90,44 @@ List<ReminderModel> findMedicineForSelectedDay(
   List<ReminderModel> listOfTodaysReminder =
       sortRemindersBasedOnCreatedDate(todaysMedication);
   return listOfTodaysReminder;
+}
+
+List<ReminderModel> sortRemindersBasedOnCreatedDate(
+    List<ReminderModel> listOfReminders) {
+  final sorted = List<ReminderModel>.from(listOfReminders);
+  sorted.sort(
+    (a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate),
+  );
+  return sorted;
+}
+
+ReminderModel? getNextReminder(List<ReminderModel> reminderList) {
+  log("getNextReminder");
+  DateTime now = DateTime.now().subtract(const Duration(minutes: 5));
+  List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
+
+  Map<int, ReminderModel> todayReminderHave = {};
+
+  for (ReminderModel reminder in todaysMedicine) {
+    TimeModel? time = getFirstNextTime(reminder.schedule!.times!, now);
+    if (time != null) {
+      todayReminderHave.addAll({(time.hour * 60 + time.minute): reminder});
+    }
+  }
+  List<int> timesList = todayReminderHave.keys.toList();
+  timesList.sort();
+
+  return timesList.isEmpty ? null : todayReminderHave[timesList.first];
+}
+
+TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
+  final sortedTimes = List<TimeModel>.from(listOfTime);
+  sortedTimes.sort(
+      (a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
+  for (TimeModel time in sortedTimes) {
+    if (time.hour * 60 + time.minute > now.hour * 60 + now.minute) {
+      return time;
+    }
+  }
+  return null;
 }
