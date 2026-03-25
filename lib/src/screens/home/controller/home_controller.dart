@@ -1,8 +1,11 @@
 import "dart:convert";
 import "dart:developer";
 
+import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
+import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:http/http.dart" as http;
 import "package:get/get.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
@@ -11,10 +14,57 @@ import "package:toastification/toastification.dart";
 
 class HomeController extends GetxController {
   Rx<DateTime> selectedDay = DateTime.now().obs;
+  RxBool isLoading = false.obs;
 
   Rx<ReminderModel?> nextReminder = Rx<ReminderModel?>(null);
   RxList<ReminderModel> listOfTodaysReminder = RxList<ReminderModel>([]);
   RxList<ReminderModel> listOfAllReminder = RxList<ReminderModel>([]);
+
+  final _localDb = LocalDbRepository();
+
+  /// Loads all locally saved reminders into [listOfAllReminder].
+  Future<void> reloadLocalReminders() async {
+    final map = await _localDb.getAllReminders();
+    final reminders =
+        map.values.map((e) => ReminderModel.fromJson(e)).toList()
+          ..sort((a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate));
+    listOfAllReminder.value = reminders;
+  }
+
+  /// Fetches reminders from the server, saves them locally, then reloads the
+  /// list and reschedules notifications. No-ops when offline.
+  Future<void> syncRemindersFromServer(String phoneNumber) async {
+    if (!await hasInternetConnection()) return;
+
+    isLoading.value = true;
+    try {
+      final serverData = await _fetchAllFromServer(phoneNumber);
+      for (final reminder in serverData) {
+        final model = ReminderModel.fromMap(reminder);
+        await _localDb.saveReminder(model.id, model.toJson());
+      }
+      await reloadLocalReminders();
+      if (await AwesomeNotifications().isNotificationAllowed()) {
+        await analyzeDatabaseAndScheduleReminder();
+      }
+    } catch (e) {
+      log("syncRemindersFromServer error: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAllFromServer(
+      String phoneNumber) async {
+    final url = Uri.parse("${baseAPI}reminders/$phoneNumber");
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> body = jsonDecode(response.body);
+      return body.cast<Map<String, dynamic>>();
+    }
+    log("_fetchAllFromServer failed: ${response.statusCode}");
+    return [];
+  }
 
   static Future<List<Map<String, dynamic>>> getAllRemindersFromServer(
       BuildContext context, String phoneNumber) async {

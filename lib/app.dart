@@ -13,10 +13,12 @@ import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
 import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
 
 class App extends StatefulWidget {
+  final bool isLoggedIn;
+
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
-  const App({super.key});
+  const App({super.key, required this.isLoggedIn});
 
   @override
   State<App> createState() => _AppState();
@@ -90,7 +92,7 @@ class _AppState extends State<App> {
         log(settings.arguments.toString(), name: "settings");
 
         if (settings.name == Routes.rootRoute) {
-          if (userInfoController.userInfo.value != null) {
+          if (widget.isLoggedIn || userInfoController.userInfo.value != null) {
             return MaterialPageRoute(builder: (context) => const HomeScreen());
           } else {
             return MaterialPageRoute(builder: (context) => const LoginPage());

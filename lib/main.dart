@@ -3,6 +3,7 @@ import "dart:io";
 import "package:alarm/alarm.dart";
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/core/database/sqlite_helper.dart";
 import "package:jbl_pills_reminder_app/app.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
@@ -118,5 +119,9 @@ void main() async {
 
   await SqliteHelper.initDB();
 
-  runApp(const App());
+  final localDb = LocalDbRepository();
+  String? userInfo = await localDb.getPreference("user_info");
+  bool isLoggedIn = userInfo != null;
+
+  runApp(App(isLoggedIn: isLoggedIn));
 }

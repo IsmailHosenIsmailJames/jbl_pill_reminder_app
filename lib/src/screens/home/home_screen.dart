@@ -1,16 +1,13 @@
 import "dart:convert";
 import "dart:developer";
 import "dart:math" as math;
-import "package:awesome_notifications/awesome_notifications.dart";
 
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
@@ -25,7 +22,6 @@ import "package:table_calendar/table_calendar.dart";
 import "../../core/functions/find_date_medicine.dart";
 import "../../theme/const_values.dart";
 import "../../widgets/medication_card.dart";
-import "../auth/signup/model/signup_models.dart";
 import "../profile_page/controller/profile_page_controller.dart";
 import "../take_medicine/take_medicine_page.dart";
 
@@ -38,41 +34,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final homeController = Get.put(HomeController());
-  final LocalDbRepository localDb = LocalDbRepository();
-
-  bool isLoading = false;
-
-  Future<void> getAndSaveAllReminderFromServer() async {
-    if (await hasInternetConnection()) {
-      setState(() {
-        isLoading = true;
-      });
-      final List<Map<String, dynamic>> reminderData =
-          await HomeController.getAllRemindersFromServer(
-        context,
-        profilePageController.userInfo.value!.phone,
-      );
-      for (var reminder in reminderData) {
-        ReminderModel reminderModel = ReminderModel.fromMap(reminder);
-        await localDb.saveReminder(reminderModel.id, reminderModel.toJson());
-      }
-      await reloadAllReminderList(homeController);
-      bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-      if (isAllowed) {
-        await analyzeDatabaseAndScheduleReminder();
-      }
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   void initState() {
     loadUserData();
-    // checkNotificationsAction();
 
-    reloadAllReminderList(homeController);
+    homeController.reloadLocalReminders();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences sharedPreferences =
@@ -80,8 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
       await sharedPreferences.reload();
       await requestPermissions(context);
 
-      // Now that permissions are handled, fetch and schedule
-      getAndSaveAllReminderFromServer();
+      // Sync latest data from server after permissions granted
+      if (profilePageController.userInfo.value != null) {
+        homeController.syncRemindersFromServer(
+            profilePageController.userInfo.value!.phone);
+      }
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");
@@ -141,9 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.put(ProfilePageController());
 
   Future<void> loadUserData() async {
-    String? userInfo = await localDb.getPreference("user_info");
-    profilePageController.userInfo.value =
-        userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
+    await profilePageController.loadUser();
         
     if (profilePageController.userInfo.value != null) {
       HomeController.backupReminderHistory(
@@ -153,22 +121,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return Obx(() {
+      if (profilePageController.userInfo.value == null) {
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      }
+
+      return Scaffold(
+        appBar: AppBar(
         centerTitle: true,
         title: const Text("Pill Reminder"),
         actions: [
-          if (isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 30,
-                width: 30,
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.grey,
+          Obx(() {
+            if (homeController.isLoading.value) {
+              return const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: 30,
+                  width: 30,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.grey,
+                  ),
                 ),
-              ),
-            ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
       drawer: MyDrawer(
@@ -208,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => const AddReminder(),
                   ),
                 );
-                await reloadAllReminderList(homeController);
+                await homeController.reloadLocalReminders();
                 await analyzeDatabaseAndScheduleReminder();
               },
               icon: const Icon(
@@ -389,7 +370,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-  }
+  });
+}
 
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
@@ -478,23 +460,6 @@ TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
   return null;
 }
 
-Future<void> reloadAllReminderList(HomeController homeController) async {
-  final localDb = LocalDbRepository();
-
-  List<ReminderModel> tem = [];
-  final map = await localDb.getAllReminders();
-  for (var element in map.values) {
-    tem.add(ReminderModel.fromJson(element));
-  }
-  homeController.listOfAllReminder.value = sortRemindersBasedOnCreatedDate(tem);
-  homeController.listOfTodaysReminder.value =
-      findMedicineForSelectedDay(homeController, DateTime.now());
-  homeController.nextReminder.value = getNextReminder(
-    sortRemindersBasedOnCreatedDate(homeController.listOfTodaysReminder.value),
-  );
-
-  log(homeController.nextReminder.value?.toJson() ?? "Empty");
-}
 
 List<ReminderModel> sortRemindersBasedOnCreatedDate(
     List<ReminderModel> listOfReminders) {

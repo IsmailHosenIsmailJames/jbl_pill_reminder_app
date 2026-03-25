@@ -12,7 +12,6 @@ import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dar
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 import "package:toastification/toastification.dart";
 
@@ -267,7 +266,7 @@ Card cardOfReminderForSummary(
                       addMedicationController.reminders.value = ReminderModel(
                           id: (Random().nextInt(100000000) + 100000000)
                               .toString());
-                      reloadAllReminderList(Get.find());
+                      Get.find<HomeController>().reloadLocalReminders();
                       analyzeDatabaseAndScheduleReminder();
                     },
                     icon: Icon(
@@ -332,7 +331,7 @@ Card cardOfReminderForSummary(
 
                                     Navigator.pop(context);
 
-                                    await reloadAllReminderList(homeController);
+                                    await homeController.reloadLocalReminders();
 
                                     toastification.show(
                                       context: context,

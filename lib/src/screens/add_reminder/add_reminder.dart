@@ -17,7 +17,6 @@ import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_n
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
@@ -921,7 +920,7 @@ class _AddReminderState extends State<AddReminder> {
                       );
                     }
                   }
-                  reloadAllReminderList(homeController);
+                  homeController.reloadLocalReminders();
                 },
                 icon: isAsyncLoading
                     ? const SizedBox(
