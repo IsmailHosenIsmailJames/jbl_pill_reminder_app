@@ -55,6 +55,8 @@ class _SignupPageState extends State<SignupPage> {
 
   ScrollController scrollController = ScrollController();
 
+  bool isAsyncLoading = false;
+
   @override
   void initState() {
     signupPageController.gender.value = widget.userInfoModel?.gender;
@@ -363,23 +365,34 @@ class _SignupPageState extends State<SignupPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: () async {
-                                  if (formKey.currentState!.validate()) {
-                                    TextInput.finishAutofillContext(
-                                        shouldSave: true);
-                                    await signupOrUpdate(context);
-                                  }
-                                },
-                                child: Text(
-                                  widget.userInfoModel == null
-                                      ? "Sign up"
-                                      : "Save changes",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
+                                onPressed: isAsyncLoading
+                                    ? null
+                                    : () async {
+                                        if (formKey.currentState!.validate()) {
+                                          TextInput.finishAutofillContext(
+                                              shouldSave: true);
+                                          await signupOrUpdate(context);
+                                        }
+                                      },
+                                child: isAsyncLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Text(
+                                        widget.userInfoModel == null
+                                            ? "Sign up"
+                                            : "Save changes",
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
                               ),
                             ),
                             const Gap(10),
@@ -429,6 +442,9 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> signupOrUpdate(BuildContext context) async {
+    setState(() {
+      isAsyncLoading = true;
+    });
     String phone = textEditingControllerPhoneNumber.text;
     if (!phone.startsWith("+88")) {
       phone = "+88$phone";
@@ -537,6 +553,10 @@ class _SignupPageState extends State<SignupPage> {
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
+    } finally {
+      setState(() {
+        isAsyncLoading = false;
+      });
     }
   }
 }

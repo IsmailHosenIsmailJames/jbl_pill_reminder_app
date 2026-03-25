@@ -35,6 +35,8 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController();
   TextEditingController textEditingControllerPassword = TextEditingController();
 
+  bool isAsyncLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,21 +173,33 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: () async {
-                                  if (formKey.currentState!.validate()) {
-                                    TextInput.finishAutofillContext(
-                                        shouldSave: true);
-                                    await login(context);
-                                  }
-                                },
-                                child: const Text(
-                                  "Log in",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
+                                onPressed: isAsyncLoading
+                                    ? null
+                                    : () async {
+                                        if (formKey.currentState!.validate()) {
+                                          TextInput.finishAutofillContext(
+                                              shouldSave: true);
+                                          log("Login button pressed");
+                                          await login(context);
+                                        }
+                                      },
+                                child: isAsyncLoading
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        "Log in",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
                               ),
                             ),
                             const Gap(15),
@@ -229,6 +243,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> login(BuildContext context) async {
+    setState(() {
+      isAsyncLoading = true;
+    });
     String phone = textEditingControllerPhoneNumber.text;
     if (phone.startsWith("88")) {
       phone = "+$phone";
@@ -236,6 +253,11 @@ class _LoginPageState extends State<LoginPage> {
       phone = "+88$phone";
     }
     try {
+      log("Login Request: ${jsonEncode({
+            "phone": phone,
+            "password": textEditingControllerPassword.text,
+          })}");
+      log("loginAPI: $loginAPI");
       final response = await post(
         Uri.parse(loginAPI),
         body: jsonEncode({
@@ -270,6 +292,7 @@ class _LoginPageState extends State<LoginPage> {
           (route) => false,
         );
       } else {
+        log("Login Failed with ${response.body}");
         String errorMsg = jsonDecode(response.body)["message"];
         toastification.show(
           context: context,
@@ -280,6 +303,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } on HttpException catch (e) {
+      log("HttpException Login Failed with ${e.message}");
       toastification.show(
         context: context,
         title: Text(e.message),
@@ -287,6 +311,7 @@ class _LoginPageState extends State<LoginPage> {
         type: ToastificationType.error,
       );
     } on SocketException catch (e) {
+      log("SocketException Login Failed with ${e.message}");
       toastification.show(
         context: context,
         title: Text(e.message),
@@ -294,13 +319,17 @@ class _LoginPageState extends State<LoginPage> {
         type: ToastificationType.error,
       );
     } catch (e) {
-      log(e.toString());
+      log("Login Failed with ${e.toString()}");
       toastification.show(
         context: context,
         title: const Text("Something went wrong #004"),
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.error,
       );
+    } finally {
+      setState(() {
+        isAsyncLoading = false;
+      });
     }
   }
 }
