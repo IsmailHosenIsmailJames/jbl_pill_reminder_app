@@ -90,7 +90,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
 
-
     super.initState();
   }
 
@@ -112,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> loadUserData() async {
     await profilePageController.loadUser();
-        
+
     if (profilePageController.userInfo.value != null) {
       HomeController.backupReminderHistory(
           profilePageController.userInfo.value!.phone);
@@ -132,246 +131,273 @@ class _HomeScreenState extends State<HomeScreen> {
 
       return Scaffold(
         appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Pill Reminder"),
-        actions: [
-          Obx(() {
-            if (homeController.isLoading.value) {
-              return const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.grey,
-                  ),
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          }),
-        ],
-      ),
-      drawer: MyDrawer(
-        phone: profilePageController.userInfo.value!.phone,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(10),
-        children: [
-          Obx(
-            () => Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(borderRadius),
-                color: MyAppColors.shadedMutedColor,
-              ),
-              child: tableCalendar(),
-            ),
-          ),
-          const Gap(10),
-          SizedBox(
-            height: 35,
-            child: ElevatedButton.icon(
-              style: IconButton.styleFrom(
-                backgroundColor: MyAppColors.primaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.zero,
-              ),
-              onPressed: () async {
-                final AddNewReminderModelController
-                    addNewReminderModelController =
-                    Get.put(AddNewReminderModelController());
-                addNewReminderModelController.reminders.value.id =
-                    (math.Random().nextInt(100000000) + 100000000).toString();
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddReminder(),
-                  ),
-                );
-                await homeController.reloadLocalReminders();
-                await analyzeDatabaseAndScheduleReminder();
-              },
-              icon: const Icon(
-                Icons.add,
-              ),
-              label: const Text(
-                "Add New Reminder",
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
-          const Gap(10),
-          const Text(
-            "Next Reminder",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Gap(5),
-          Obx(
-            () {
-              if (homeController.nextReminder.value != null) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TakeMedicinePage(
-                            currentMedicationToTake:
-                                homeController.nextReminder.value!,
-                          ),
-                        ));
-                  },
-                  child: cardOfReminderForSummary(
-                    homeController.nextReminder.value!,
-                    context,
-                    isSelectedToday: true,
-                    color: MyAppColors.shadedMutedColor,
-                  ),
-                );
-              } else {
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    side: BorderSide(
-                      color: MyAppColors.shadedMutedColor,
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: const Text(
-                      "No next reminder for today.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+          centerTitle: true,
+          title: const Text("Pill Reminder"),
+          actions: [
+            Obx(() {
+              if (homeController.isLoading.value) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.grey,
                     ),
                   ),
                 );
               }
-            },
-          ),
-          const Gap(15),
-          Obx(
-            () => Text(
-              isSameDay(homeController.selectedDay.value, DateTime.now()) ==
-                      true
-                  ? "Today's Reminder"
-                  : "Reminder on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              return const SizedBox.shrink();
+            }),
+          ],
+        ),
+        drawer: MyDrawer(
+          phone: profilePageController.userInfo.value!.phone,
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(10),
+          children: [
+            Obx(
+              () => Card(
+                elevation: 4,
+                shadowColor: Colors.black12,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(borderRadius)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: tableCalendar(),
+                ),
               ),
             ),
-          ),
-          const Gap(5),
-          Obx(
-            () {
-              if (homeController.listOfTodaysReminder.isNotEmpty) {
-                return Column(
-                  children: List.generate(
-                    homeController.listOfTodaysReminder.length,
-                    (index) {
-                      return cardOfReminderForSummary(
-                        homeController.listOfTodaysReminder[index],
-                        context,
-                        isSelectedToday: true,
-                        color: Colors.blue.withValues(
-                          alpha: 0.2,
-                        ),
-                      );
+            const Gap(10),
+            SizedBox(
+              height: 50,
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: MyAppColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () async {
+                  final AddNewReminderModelController
+                      addNewReminderModelController =
+                      Get.put(AddNewReminderModelController());
+                  addNewReminderModelController.reminders.value.id =
+                      (math.Random().nextInt(100000000) + 100000000).toString();
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddReminder()));
+                  await homeController.reloadLocalReminders();
+                  await analyzeDatabaseAndScheduleReminder();
+                },
+                icon: const Icon(Icons.add),
+                label: const Text(
+                  "Add New Reminder",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
+            const Gap(10),
+            Text(
+              "Next Reminder",
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: MyAppColors.primaryColor,
+                  ),
+            ),
+            const Gap(5),
+            Obx(
+              () {
+                if (homeController.nextReminder.value != null) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TakeMedicinePage(
+                              currentMedicationToTake:
+                                  homeController.nextReminder.value!,
+                            ),
+                          ));
                     },
-                  ),
-                );
-              } else {
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    side: BorderSide(
+                    child: cardOfReminderForSummary(
+                      homeController.nextReminder.value!,
+                      context,
+                      isSelectedToday: true,
                       color: MyAppColors.shadedMutedColor,
                     ),
-                  ),
-                  child: Container(
-                    height: 150,
-                    decoration: BoxDecoration(
+                  );
+                } else {
+                  return Card(
+                    elevation: 0,
+                    color: MyAppColors.shadedMutedColor.withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(borderRadius),
-                      image: const DecorationImage(
-                        image: AssetImage(
-                          "assets/img/pills.png",
-                        ),
-                        opacity: 0.1,
-                      ),
+                      side: BorderSide(
+                          color: MyAppColors.shadedMutedColor, width: 1.5),
                     ),
-                    child: const Center(
-                      child: Text(
-                        "No reminder for this day",
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 20),
+                      width: double.infinity,
+                      child: const Text(
+                        "No upcoming reminder for today. Relax! \u{1F60A}",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                );
-              }
-            },
-          ),
-          const Gap(15),
-          const Text(
-            "All Reminders",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+                  );
+                }
+              },
             ),
-          ),
-          const Gap(5),
-          Obx(
-            () {
-              return Column(
-                children: List<Widget>.generate(
-                      homeController.listOfAllReminder.length,
+            const Gap(15),
+            Obx(
+              () => Text(
+                isSameDay(homeController.selectedDay.value, DateTime.now()) ==
+                        true
+                    ? "Today's Reminder"
+                    : "Reminder on ${DateFormat.yMMMMd().format(homeController.selectedDay.value)}",
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: MyAppColors.primaryColor,
+                    ),
+              ),
+            ),
+            const Gap(5),
+            Obx(
+              () {
+                if (homeController.listOfTodaysReminder.isNotEmpty) {
+                  return Column(
+                    children: List.generate(
+                      homeController.listOfTodaysReminder.length,
                       (index) {
                         return cardOfReminderForSummary(
-                            homeController.listOfAllReminder[index], context,
-                            isEditable: true,
-                            color: Colors.orange.withValues(
-                              alpha: 0.1,
-                            ));
-                      },
-                    ) +
-                    <Widget>[
-                      if (homeController.listOfAllReminder.isEmpty)
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.only(
-                              right: 5, bottom: 5, top: 5),
-                          decoration: BoxDecoration(
-                            image: const DecorationImage(
-                              image: AssetImage("assets/img/box_empty.png"),
-                              opacity: 0.1,
-                            ),
-                            color: MyAppColors.shadedMutedColor,
-                            borderRadius: BorderRadius.circular(borderRadius),
+                          homeController.listOfTodaysReminder[index],
+                          context,
+                          isSelectedToday: true,
+                          color: Colors.blue.withValues(
+                            alpha: 0.2,
                           ),
-                          alignment: Alignment.center,
-                          child: const Text("Empty"),
-                        ),
-                    ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  });
-}
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  return Card(
+                    elevation: 0,
+                    color: MyAppColors.shadedMutedColor.withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      side: BorderSide(
+                          color: MyAppColors.shadedMutedColor, width: 1.5),
+                    ),
+                    child: Container(
+                      height: 160,
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Opacity(
+                            opacity: 0.5,
+                            child:
+                                Image.asset("assets/img/pills.png", height: 60),
+                          ),
+                          const Gap(15),
+                          const Text(
+                            "No reminder for this day",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+            const Gap(15),
+            Text(
+              "All Reminders",
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: MyAppColors.primaryColor,
+                  ),
+            ),
+            const Gap(5),
+            Obx(
+              () {
+                return Column(
+                  children: List<Widget>.generate(
+                        homeController.listOfAllReminder.length,
+                        (index) {
+                          return cardOfReminderForSummary(
+                              homeController.listOfAllReminder[index], context,
+                              isEditable: true,
+                              color: Colors.orange.withValues(
+                                alpha: 0.1,
+                              ));
+                        },
+                      ) +
+                      <Widget>[
+                        if (homeController.listOfAllReminder.isEmpty)
+                          Card(
+                            elevation: 0,
+                            margin: const EdgeInsets.only(top: 5),
+                            color: MyAppColors.shadedMutedColor
+                                .withValues(alpha: 0.3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(borderRadius),
+                              side: BorderSide(
+                                  color: MyAppColors.shadedMutedColor,
+                                  width: 1.5),
+                            ),
+                            child: Container(
+                              height: 160,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Opacity(
+                                    opacity: 0.6,
+                                    child: Image.asset(
+                                        "assets/img/box_empty.png",
+                                        height: 60),
+                                  ),
+                                  const Gap(15),
+                                  const Text(
+                                    "No reminders found",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    });
+  }
 
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(
@@ -459,7 +485,6 @@ TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
   }
   return null;
 }
-
 
 List<ReminderModel> sortRemindersBasedOnCreatedDate(
     List<ReminderModel> listOfReminders) {
