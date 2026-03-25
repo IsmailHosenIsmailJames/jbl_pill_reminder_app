@@ -1,4 +1,4 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
+import "package:connectivity_plus/connectivity_plus.dart";
 
 Future<bool> hasInternetConnection() async {
   final List<ConnectivityResult> connectivityResult =

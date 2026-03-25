@@ -6,8 +6,8 @@ import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
@@ -38,7 +38,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final homeController = Get.put(HomeController());
-  final reminderDB = Hive.box("reminder_db");
+  final LocalDbRepository localDb = LocalDbRepository();
 
   bool isLoading = false;
 
@@ -54,9 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       for (var reminder in reminderData) {
         ReminderModel reminderModel = ReminderModel.fromMap(reminder);
-        reminderDB.put(reminderModel.id, reminderModel.toJson());
+        await localDb.saveReminder(reminderModel.id, reminderModel.toJson());
       }
-      reloadAllReminderList(homeController);
+      await reloadAllReminderList(homeController);
       bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
       if (isAllowed) {
         await analyzeDatabaseAndScheduleReminder();
@@ -120,8 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
 
-    HomeController.backupReminderHistory(
-        profilePageController.userInfo.value!.phone);
 
     super.initState();
   }
@@ -139,14 +137,18 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  final userDB = Hive.box("user_db");
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
-  void loadUserData() {
-    String? userInfo = userDB.get("user_info", defaultValue: null);
+  Future<void> loadUserData() async {
+    String? userInfo = await localDb.getPreference("user_info");
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
+        
+    if (profilePageController.userInfo.value != null) {
+      HomeController.backupReminderHistory(
+          profilePageController.userInfo.value!.phone);
+    }
   }
 
   @override
@@ -206,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => const AddReminder(),
                   ),
                 );
-                reloadAllReminderList(homeController);
+                await reloadAllReminderList(homeController);
                 await analyzeDatabaseAndScheduleReminder();
               },
               icon: const Icon(
@@ -476,11 +478,12 @@ TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
   return null;
 }
 
-void reloadAllReminderList(HomeController homeController) {
-  final reminderDB = Hive.box("reminder_db");
+Future<void> reloadAllReminderList(HomeController homeController) async {
+  final localDb = LocalDbRepository();
 
   List<ReminderModel> tem = [];
-  for (var element in reminderDB.values) {
+  final map = await localDb.getAllReminders();
+  for (var element in map.values) {
     tem.add(ReminderModel.fromJson(element));
   }
   homeController.listOfAllReminder.value = sortRemindersBasedOnCreatedDate(tem);

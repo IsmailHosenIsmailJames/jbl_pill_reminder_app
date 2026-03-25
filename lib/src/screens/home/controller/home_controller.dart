@@ -2,7 +2,7 @@ import "dart:convert";
 import "dart:developer";
 
 import "package:flutter/material.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http/http.dart" as http;
 import "package:get/get.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
@@ -118,9 +118,10 @@ class HomeController extends GetxController {
 
   static Future<void> backupReminderHistory(String phone) async {
     log("backupReminderHistory");
-    final reminderDoneDB = await Hive.openBox("reminder_done");
+    final localDb = LocalDbRepository();
+    final allDone = await localDb.getAllRemindersDone();
 
-    reminderDoneDB.toMap().forEach(
+    allDone.forEach(
       (key, value) async {
         Map reminderData = jsonDecode(value);
         final isDoneBackup = reminderData["doneBackup"];
@@ -128,7 +129,7 @@ class HomeController extends GetxController {
           if (await backupSingleHistory(
               Map<String, dynamic>.from(reminderData), phone)) {
             reminderData["doneBackup"] = true;
-            await reminderDoneDB.put(key, jsonEncode(reminderData));
+            await localDb.saveReminderDone(key, jsonEncode(reminderData));
           }
         }
       },

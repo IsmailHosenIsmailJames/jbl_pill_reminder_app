@@ -4,8 +4,8 @@ import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
@@ -326,18 +326,13 @@ Card cardOfReminderForSummary(
                                           profile.userInfo.value!.phone,
                                           id);
                                   if (isDeleted) {
-                                    final reminderDB = Hive.box("reminder_db");
-                                    await reminderDB.delete(id);
+                                    await LocalDbRepository().deleteReminder(id);
                                     final HomeController homeController =
                                         Get.find();
 
-                                    for (var element in reminderDB.values) {
-                                      homeController.listOfAllReminder
-                                          .add(ReminderModel.fromJson(element));
-                                    }
                                     Navigator.pop(context);
 
-                                    reloadAllReminderList(homeController);
+                                    await reloadAllReminderList(homeController);
 
                                     toastification.show(
                                       context: context,

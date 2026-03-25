@@ -3,7 +3,7 @@ import "dart:io";
 import "package:alarm/alarm.dart";
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/sqlite_helper.dart";
 import "package:jbl_pills_reminder_app/app.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:permission_handler/permission_handler.dart";
@@ -116,10 +116,7 @@ void main() async {
     frequency: const Duration(days: 1),
   );
 
-  await Hive.initFlutter();
-  await Hive.openBox("user_db");
-  await Hive.openBox("reminder_db");
-  await Hive.openBox("reminder_done");
+  await SqliteHelper.initDB();
 
   runApp(const App());
 }

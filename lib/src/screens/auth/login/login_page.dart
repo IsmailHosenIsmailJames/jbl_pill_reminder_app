@@ -5,7 +5,7 @@ import "dart:io";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http/http.dart";
 import "package:http_status_code/http_status_code.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
@@ -252,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
         TextInput.finishAutofillContext(shouldSave: true);
         final data = Map<String, dynamic>.from(jsonDecode(response.body));
         data.addAll({"password": textEditingControllerPassword.text});
-        await Hive.box("user_db").put(
+        await LocalDbRepository().savePreference(
           "user_info",
           jsonEncode(data),
         );

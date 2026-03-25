@@ -7,7 +7,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http_status_code/http_status_code.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
@@ -855,8 +855,8 @@ class _AddReminderState extends State<AddReminder> {
                             data,
                           );
                           if (isSuccessful) {
-                            await Hive.box("reminder_db")
-                                .put(reminderModel.id, jsonEncode(data));
+                            await LocalDbRepository()
+                                .saveReminder(reminderModel.id, jsonEncode(data));
 
                             toastification.show(
                               context: context,
@@ -881,8 +881,8 @@ class _AddReminderState extends State<AddReminder> {
                               .createReminder(data);
                           if (response != null &&
                               response.statusCode == StatusCode.CREATED) {
-                            await Hive.box("reminder_db")
-                                .put(reminderModel.id, jsonEncode(data));
+                            await LocalDbRepository()
+                                .saveReminder(reminderModel.id, jsonEncode(data));
 
                             toastification.show(
                               context: context,

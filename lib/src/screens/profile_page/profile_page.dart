@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
@@ -18,7 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final ProfilePageController profilePageController =
       Get.put(ProfilePageController());
 
-  final userDB = Hive.box("user_db");
+  final localDb = LocalDbRepository();
 
   @override
   void initState() {
@@ -26,8 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
   }
 
-  void loadUserData() {
-    String? userInfo = userDB.get("user_info", defaultValue: null);
+  Future<void> loadUserData() async {
+    String? userInfo = await localDb.getPreference("user_info");
     profilePageController.userInfo.value =
         userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
   }

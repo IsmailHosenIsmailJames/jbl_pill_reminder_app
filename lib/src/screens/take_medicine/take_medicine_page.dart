@@ -5,7 +5,7 @@ import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
@@ -122,11 +122,10 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           ),
                         ),
                         onPressed: () async {
-                          final reminderDoneDB = Hive.box("reminder_done");
                           Map<String, dynamic> reminderData =
                               widget.currentMedicationToTake.toMap();
                           reminderData["doneBackup"] = false;
-                          await reminderDoneDB.put(
+                          await LocalDbRepository().saveReminderDone(
                             DateTime.now().millisecondsSinceEpoch.toString(),
                             jsonEncode(reminderData),
                           );

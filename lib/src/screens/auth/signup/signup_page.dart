@@ -6,7 +6,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http/http.dart" as http;
 import "package:http_status_code/http_status_code.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
@@ -467,7 +467,7 @@ class _SignupPageState extends State<SignupPage> {
 
         if (widget.userInfoModel == null) {
           TextInput.finishAutofillContext(shouldSave: true);
-          await Hive.box("user_db").put(
+          await LocalDbRepository().savePreference(
             "user_info",
             userInfoModel.toJson(),
           );
@@ -484,7 +484,7 @@ class _SignupPageState extends State<SignupPage> {
               ),
               (route) => false);
         } else {
-          await Hive.box("user_db").put(
+          await LocalDbRepository().savePreference(
             "user_info",
             userInfoModel.toJson(),
           );

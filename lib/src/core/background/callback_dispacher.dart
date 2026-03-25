@@ -4,7 +4,8 @@ import "package:alarm/alarm.dart";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:dartx/dartx.dart";
 import "package:flutter/material.dart";
-import "package:hive_ce_flutter/adapters.dart";
+import "package:jbl_pills_reminder_app/src/core/database/sqlite_helper.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/schedule_alarm.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
@@ -21,25 +22,28 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
     log("Notification permissions not granted, skipping background task processing");
     return;
   }
-  // Ensure Hive is initialized for the foreground task
-  await Hive.initFlutter();
-  await Hive.openBox("reminder_db");
+  // Ensure Sqlite is initialized for the foreground task
+  await SqliteHelper.initDB();
 
-  final notificationBox = await Hive.openBox("notificationHistory");
+  final localDb = LocalDbRepository();
+
+  final reminderNotificationShown = await localDb.getPreference("reminderNotificationShown");
+  final notificationShown = await localDb.getPreference("notificationShown");
+  final alarmShown = await localDb.getPreference("alarmShown");
 
   log(
     [
       foregroundNotification.toString(),
-      notificationBox.get("reminderNotificationShown").toString(),
-      notificationBox.get("notificationShown").toString(),
-      notificationBox.get("alarmShown").toString(),
+      reminderNotificationShown.toString(),
+      notificationShown.toString(),
+      alarmShown.toString(),
     ].toString(),
     name: "onRepeatEvent -> analyzeDatabaseForeground",
   );
 
-  final reminderDB = await Hive.openBox("reminder_db");
+  Map<String, String> reminderDataMap = await localDb.getAllReminders();
   List<ReminderModel> allReminder = [];
-  for (var element in reminderDB.values) {
+  for (var element in reminderDataMap.values) {
     allReminder.add(ReminderModel.fromJson(element));
   }
   allReminder = sortRemindersBasedOnCreatedDate(allReminder);
