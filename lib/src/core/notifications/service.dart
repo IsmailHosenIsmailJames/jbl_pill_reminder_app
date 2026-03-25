@@ -10,23 +10,30 @@ import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 class AwesomeNotificationsService {
-  static bool isListening = false;
-  static Future<void> initPreReminderNotifications() async {
-    await registerListenNotifications();
+  static bool _isInitialized = false;
+  static bool _isListening = false;
+
+  /// Initialize AwesomeNotifications ONCE with ALL channels.
+  /// Must be called in main() and at the start of the background isolate.
+  /// Safe to call multiple times — subsequent calls are no-ops.
+  static Future<void> initAllChannels() async {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
     await AwesomeNotifications().initialize(
       null,
       [
+        // Channel for pre-reminders (15 min before)
         NotificationChannel(
           channelKey: "pre_reminders",
           channelName: "Pre-Reminders",
           channelDescription:
-              "This channel is used for Pre-Reminders. This channel will be used to remind the user before the actual reminder time.",
+              "Reminds you before the actual pill-taking time so you can prepare.",
           defaultColor: Colors.orangeAccent,
-          // A different color for pre-reminders
           ledColor: Colors.white,
-          importance: NotificationImportance.Max,
+          importance: NotificationImportance.High,
           channelShowBadge: true,
-          locked: true,
+          locked: false,
           playSound: true,
           enableVibration: true,
           groupAlertBehavior: GroupAlertBehavior.All,
@@ -34,30 +41,14 @@ class AwesomeNotificationsService {
           enableLights: true,
           ledOffMs: 500,
           ledOnMs: 500,
-          soundSource: "resource://raw/shaking_pill_bottle",
-          defaultRingtoneType: DefaultRingtoneType
-              .Notification, // Keep as notification, not alarm
+          defaultRingtoneType: DefaultRingtoneType.Notification,
         ),
-      ],
-    );
-
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
-  }
-
-  static Future<void> initNotifications() async {
-    await registerListenNotifications();
-    await AwesomeNotifications().initialize(
-      null,
-      [
+        // Channel for standard reminders
         NotificationChannel(
           channelKey: "reminders",
-          channelName: "Used for Reminders",
+          channelName: "Pill Reminders",
           channelDescription:
-              "This channel is used for Reminders. When User add a Reminder, this channel will be used for remind the user",
+              "Standard notifications for your scheduled pill reminders.",
           defaultColor: MyAppColors.primaryColor,
           ledColor: Colors.white,
           importance: NotificationImportance.Max,
@@ -70,38 +61,19 @@ class AwesomeNotificationsService {
           enableLights: true,
           ledOffMs: 500,
           ledOnMs: 500,
-          soundSource: "resource://raw/shaking_pill_bottle",
           defaultRingtoneType: DefaultRingtoneType.Notification,
         ),
-      ],
-    );
-
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
-  }
-
-  static Future<void> initAlarms() async {
-    await registerListenNotifications();
-    await AwesomeNotifications().initialize(
-      null, // null for default icon
-      [
+        // Channel for critical alarm-style notifications
         NotificationChannel(
           channelKey: "alarms_channel",
           channelName: "Pill Reminder Alarms",
-          // Changed for clarity
           channelDescription:
-              "Channel for critical pill reminder alarms that need immediate attention.",
-          // Changed for clarity
+              "Critical pill reminder alarms that need immediate attention.",
           defaultColor: MyAppColors.primaryColor,
           ledColor: Colors.white,
           importance: NotificationImportance.Max,
-          // Max importance for alarms
           channelShowBadge: true,
           locked: true,
-          // If true, notifications are not dismissible by swiping
           playSound: true,
           enableVibration: true,
           defaultPrivacy: NotificationPrivacy.Public,
@@ -109,41 +81,37 @@ class AwesomeNotificationsService {
           groupAlertBehavior: GroupAlertBehavior.All,
           ledOffMs: 500,
           ledOnMs: 500,
-          soundSource: "resource://raw/shaking_pill_bottle",
-          // Your custom alarm sound
           defaultRingtoneType: DefaultRingtoneType.Alarm,
-          // IMPORTANT for alarms
-          criticalAlerts: true, // IMPORTANT for iOS to bypass Do Not Disturb
+          criticalAlerts: true,
         ),
       ],
     );
 
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications();
-      }
-    });
+    await registerListenNotifications();
   }
 
   /// Use this method to detect when a new notification or a schedule is created
   @pragma("vm:entry-point")
   static Future<void> onNotificationCreatedMethod(
       ReceivedNotification receivedNotification) async {
-    // Your code goes here
+    log("Notification created: id=${receivedNotification.id}",
+        name: "AwesomeNotificationsService");
   }
 
   /// Use this method to detect every time that a new notification is displayed
   @pragma("vm:entry-point")
   static Future<void> onNotificationDisplayedMethod(
       ReceivedNotification receivedNotification) async {
-    // Your code goes here
+    log("Notification displayed: id=${receivedNotification.id}",
+        name: "AwesomeNotificationsService");
   }
 
   /// Use this method to detect if the user dismissed a notification
   @pragma("vm:entry-point")
   static Future<void> onDismissActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    // Your code goes here
+    log("Notification dismissed: id=${receivedAction.id}",
+        name: "AwesomeNotificationsService");
   }
 
   /// Use this method to detect when the user taps on a notification or action button
@@ -152,7 +120,8 @@ class AwesomeNotificationsService {
       ReceivedAction receivedAction) async {
     final actionNavigationDB = await SharedPreferences.getInstance();
     await actionNavigationDB.reload();
-    log("onActionReceivedMethod");
+    log("onActionReceivedMethod: id=${receivedAction.id}",
+        name: "AwesomeNotificationsService");
     await actionNavigationDB.setString(
         "actionData", jsonEncode(receivedAction.toMap()));
     await actionNavigationDB.setInt(
@@ -160,8 +129,8 @@ class AwesomeNotificationsService {
   }
 
   static Future<void> registerListenNotifications() async {
-    if (!isListening) {
-      isListening = true;
+    if (!_isListening) {
+      _isListening = true;
       AwesomeNotifications().setListeners(
         onActionReceivedMethod:
             AwesomeNotificationsService.onActionReceivedMethod,

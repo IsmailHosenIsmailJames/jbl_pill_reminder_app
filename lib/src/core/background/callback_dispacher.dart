@@ -10,25 +10,32 @@ import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/schedule_alarm.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
 
-import "/src/core/functions/find_date_medicine.dart";
+import "../functions/find_date_medicine.dart";
 import "../notifications/schedule_notification.dart";
-import "/src/screens/add_reminder/model/reminder_model.dart";
-import "/src/screens/add_reminder/model/schedule_model.dart";
-import "/src/screens/home/home_screen.dart" hide findMedicineForSelectedDay;
+import "../../screens/add_reminder/model/reminder_model.dart";
+import "../../screens/add_reminder/model/schedule_model.dart";
 
-Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
+/// Large offset to separate pre-reminder IDs from main notification IDs,
+/// preventing collisions when schedules have sequential base IDs.
+const int _preReminderIdOffset = 100000;
+
+Future<void> analyzeDatabaseAndScheduleReminder(
+    {bool reloadDB = false}) async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {
     log("Notification permissions not granted, skipping background task processing");
     return;
   }
-  // Ensure Sqlite is initialized for the foreground task
+
+  // Ensure Sqlite is initialized (needed in background isolate)
   await SqliteHelper.initDB();
 
   final localDb = LocalDbRepository();
 
-  final reminderNotificationShown = await localDb.getPreference("reminderNotificationShown");
-  final notificationShown = await localDb.getPreference("notificationShown");
+  final reminderNotificationShown =
+      await localDb.getPreference("reminderNotificationShown");
+  final notificationShown =
+      await localDb.getPreference("notificationShown");
   final alarmShown = await localDb.getPreference("alarmShown");
 
   log(
@@ -44,12 +51,18 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
   Map<String, String> reminderDataMap = await localDb.getAllReminders();
   List<ReminderModel> allReminder = [];
   for (var element in reminderDataMap.values) {
-    allReminder.add(ReminderModel.fromJson(element));
+    try {
+      allReminder.add(ReminderModel.fromJson(element));
+    } catch (e) {
+      log("Error parsing reminder: $e");
+    }
   }
   allReminder = sortRemindersBasedOnCreatedDate(allReminder);
   List<ReminderModel> todaysReminder = findMedicineForSelectedDay(
       allReminder, DateTime.now().subtract(const Duration(minutes: 5)));
-  log("analyzeDatabaseForeground -> ${todaysReminder.length}");
+  log("analyzeDatabaseForeground -> ${todaysReminder.length} reminders for today");
+
+  final DateTime now = DateTime.now();
 
   for (ReminderModel reminderModel in todaysReminder) {
     MedicineModel? medicine = reminderModel.medicine;
@@ -61,17 +74,25 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
 
     for (TimeModel scheduleTime in medicineScheduleTimes) {
       log("Schedule Medicine : -> ${scheduleTime.toJson()}");
-      DateTime now = DateTime.now();
-      DateTime timeToShow = DateTime.now()
-          .copyWith(hour: scheduleTime.hour, minute: scheduleTime.minute);
-      if (timeToShow.hour < now.hour) {
+
+      DateTime timeToShow = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        scheduleTime.hour,
+        scheduleTime.minute,
+      );
+
+      // Skip if the scheduled time has already passed
+      if (timeToShow.isBefore(now)) {
+        log("Skipping past schedule: ${scheduleTime.toJson()}");
         continue;
-      } else if (timeToShow.hour == now.hour) {
-        if (timeToShow.minute < now.minute) {
-          continue;
-        }
       }
-      // schedule alarm
+
+      final String formattedTime = formatTimeOfDay(
+          TimeOfDay(hour: scheduleTime.hour, minute: scheduleTime.minute));
+
+      // Schedule alarm or notification for the main reminder
       if (reminderModel.reminderType == ReminderType.alarm) {
         int id = scheduleTime.id.toIntOrNull() ?? 0;
         AlarmSettings? alarmSettings = await Alarm.getAlarm(id);
@@ -81,12 +102,9 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
           await scheduleAlarm(
             id: id,
             title:
-                "At ${formatTimeOfDay(TimeOfDay(hour: scheduleTime.hour, minute: scheduleTime.minute))}, Take '$medicineName' Medicine .",
+                "At $formattedTime, Take '$medicineName' Medicine .",
             description: "Don't Miss your scheduled medicine. Take it now.",
-            time: DateTime.now().copyWith(
-              hour: scheduleTime.hour,
-              minute: scheduleTime.minute,
-            ),
+            time: timeToShow,
             data: reminderModel,
           );
         } else {
@@ -96,38 +114,37 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
         log(scheduleTime.id, name: "Notification ->");
         await scheduleNotification(
           title:
-              "At ${formatTimeOfDay(TimeOfDay(hour: scheduleTime.hour, minute: scheduleTime.minute))}, Take '$medicineName' Medicine .",
+              "At $formattedTime, Take '$medicineName' Medicine .",
           body: "Don't Miss your scheduled medicine. Take it now.",
-          time: DateTime.now().copyWith(
-            hour: scheduleTime.hour,
-            minute: scheduleTime.minute,
-            second: 0,
-          ),
+          time: timeToShow,
           data: reminderModel,
           isPreReminder: false,
           id: scheduleTime.id.toIntOrNull() ?? 0,
         );
       }
 
-      // schedule notification
-      await scheduleNotification(
-        id: (scheduleTime.id.toIntOrNull() ?? 0) + 10,
-        title:
-            "Reminder: You have Medicine '$medicineName' at ${formatTimeOfDay(TimeOfDay(hour: scheduleTime.hour, minute: scheduleTime.minute))}",
-        body: "Don't Miss your upcoming medicine. Get ready for take medicine.",
-        time: DateTime.now()
-            .copyWith(
-              hour: scheduleTime.hour,
-              minute: scheduleTime.minute,
-              second: 0,
-            )
-            .subtract(const Duration(minutes: 15)),
-        isPreReminder: true,
-      );
+      // Schedule a pre-reminder 15 minutes before
+      // Use a large offset to avoid ID collisions with the main notification
+      final DateTime preReminderTime =
+          timeToShow.subtract(const Duration(minutes: 15));
+
+      if (preReminderTime.isAfter(now)) {
+        await scheduleNotification(
+          id: (scheduleTime.id.toIntOrNull() ?? 0) + _preReminderIdOffset,
+          title:
+              "Reminder: You have Medicine '$medicineName' at $formattedTime",
+          body:
+              "Don't Miss your upcoming medicine. Get ready for take medicine.",
+          time: preReminderTime,
+          isPreReminder: true,
+        );
+      } else {
+        log("Skipping pre-reminder — time already passed: ${preReminderTime.toIso8601String()}");
+      }
     }
   }
 
-  log("Finished Task");
+  log("Finished scheduling task");
 }
 
 String formatTimeOfDay(TimeOfDay timeOfDay) {

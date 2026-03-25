@@ -7,6 +7,7 @@ import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dar
 import "package:jbl_pills_reminder_app/src/core/database/sqlite_helper.dart";
 import "package:jbl_pills_reminder_app/app.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:workmanager/workmanager.dart";
 
@@ -17,9 +18,17 @@ List<String> foregroundNotification = [];
 @pragma("vm:entry-point")
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    await analyzeDatabaseAndScheduleReminder(
-        reloadDB: inputData?["inputData"] == true);
-    return Future.value(true);
+    try {
+      // Initialize notification channels in the background isolate
+      await AwesomeNotificationsService.initAllChannels();
+      await analyzeDatabaseAndScheduleReminder(
+          reloadDB: inputData?["reloadDB"] == true);
+      return Future.value(true);
+    } catch (e) {
+      // Return true even on error to prevent WorkManager from retrying
+      // indefinitely — the next periodic run will try again.
+      return Future.value(true);
+    }
   });
 }
 
@@ -93,21 +102,27 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await Alarm.init();
-  await Workmanager().initialize(callbackDispatcher);
+  // Initialize notification channels ONCE with all channels
+  await AwesomeNotificationsService.initAllChannels();
 
+  await Alarm.init();
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+
+  // Use ExistingWorkPolicy.replace to prevent duplicate tasks from accumulating
+  // on each app launch.
   await Workmanager().registerPeriodicTask(
     "background_task",
     "process_db",
     inputData: {"reloadDB": true},
     frequency: const Duration(minutes: 15),
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
+    constraints: Constraints(networkType: NetworkType.notRequired),
   );
 
-  DateTime now = DateTime.now();
-  Duration diff = now
-      .add(Duration(days: now.day + 1))
-      .copyWith(hour: 0, minute: 0)
-      .difference(now);
+  // Calculate delay until next midnight for the daily task
+  final now = DateTime.now();
+  final nextMidnight = DateTime(now.year, now.month, now.day + 1);
+  final diff = nextMidnight.difference(now);
 
   await Workmanager().registerPeriodicTask(
     "day_task",
@@ -115,6 +130,8 @@ void main() async {
     inputData: {"reloadDB": true},
     initialDelay: diff,
     frequency: const Duration(days: 1),
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
+    constraints: Constraints(networkType: NetworkType.notRequired),
   );
 
   await SqliteHelper.initDB();
