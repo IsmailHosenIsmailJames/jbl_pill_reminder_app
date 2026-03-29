@@ -241,130 +241,137 @@ Card cardOfReminderForSummary(
           ),
           const Gap(7),
           if (isEditable)
-            SizedBox(
-              height: 30,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: MyAppColors.shadedMutedColor,
-                      padding: EdgeInsets.zero,
-                    ),
-                    onPressed: () async {
-                      final addMedicationController =
-                          Get.put(AddNewReminderModelController());
-                      addMedicationController.reminders.value = currentReminder;
+            SafeArea(
+              child: SizedBox(
+                height: 30,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: MyAppColors.shadedMutedColor,
+                        padding: EdgeInsets.zero,
+                      ),
+                      onPressed: () async {
+                        final addMedicationController =
+                            Get.put(AddNewReminderModelController());
+                        addMedicationController.reminders.value =
+                            currentReminder;
 
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddReminder(
-                              editMode: true,
-                            ),
-                          ));
-                      addMedicationController.reminders.value = ReminderModel(
-                          id: (Random().nextInt(100000000) + 100000000)
-                              .toString());
-                      Get.find<HomeController>().reloadLocalReminders();
-                      analyzeDatabaseAndScheduleReminder();
-                    },
-                    icon: Icon(
-                      FluentIcons.edit_24_regular,
-                      size: 18,
-                      color: MyAppColors.primaryColor,
-                    ),
-                  ),
-                  const Gap(5),
-                  IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.red.shade100,
-                      padding: EdgeInsets.zero,
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            insetPadding: const EdgeInsets.all(10),
-                            title: const Text("Are you sure?"),
-                            content: const Text(
-                                "Once you delete, you can't recover it again."),
-                            actions: [
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: const Icon(Icons.cancel),
-                                label: const Text("Cancel"),
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddReminder(
+                                editMode: true,
                               ),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  if (await hasInternetConnection() == false) {
-                                    toastification.show(
-                                      context: context,
-                                      title: const Text("No internet"),
-                                      autoCloseDuration:
-                                          const Duration(seconds: 2),
-                                      type: ToastificationType.error,
-                                    );
-                                    return;
-                                  }
-                                  String id = currentReminder.id;
-
-                                  ProfilePageController profile = Get.find();
-                                  final bool isDeleted =
-                                      await HomeController.deleteReminder(
-                                          context,
-                                          profile.userInfo.value!.phone,
-                                          id);
-                                  if (isDeleted) {
-                                    await LocalDbRepository().deleteReminder(id);
-                                    final HomeController homeController =
-                                        Get.find();
-
-                                    Navigator.pop(context);
-
-                                    await homeController.reloadLocalReminders();
-
-                                    toastification.show(
-                                      context: context,
-                                      title: const Text("Successfully deleted"),
-                                      type: ToastificationType.success,
-                                      autoCloseDuration:
-                                          const Duration(seconds: 2),
-                                    );
-                                  } else {
-                                    toastification.show(
-                                      context: context,
-                                      title: const Text("Failed to delete"),
-                                      type: ToastificationType.error,
-                                      autoCloseDuration:
-                                          const Duration(seconds: 2),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(Icons.delete),
-                                label: const Text("Delete"),
-                              )
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    icon: const Icon(
-                      FluentIcons.delete_24_regular,
-                      size: 18,
-                      color: Colors.red,
+                            ));
+                        addMedicationController.reminders.value = ReminderModel(
+                            id: (Random().nextInt(100000000) + 100000000)
+                                .toString());
+                        Get.find<HomeController>().reloadLocalReminders();
+                        analyzeDatabaseAndScheduleReminder();
+                      },
+                      icon: Icon(
+                        FluentIcons.edit_24_regular,
+                        size: 18,
+                        color: MyAppColors.primaryColor,
+                      ),
                     ),
-                  ),
-                ],
+                    const Gap(5),
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.red.shade100,
+                        padding: EdgeInsets.zero,
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              insetPadding: const EdgeInsets.all(10),
+                              title: const Text("Are you sure?"),
+                              content: const Text(
+                                  "Once you delete, you can't recover it again."),
+                              actions: [
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(Icons.cancel),
+                                  label: const Text("Cancel"),
+                                ),
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    if (await hasInternetConnection() ==
+                                        false) {
+                                      toastification.show(
+                                        context: context,
+                                        title: const Text("No internet"),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 2),
+                                        type: ToastificationType.error,
+                                      );
+                                      return;
+                                    }
+                                    String id = currentReminder.id;
+
+                                    ProfilePageController profile = Get.find();
+                                    final bool isDeleted =
+                                        await HomeController.deleteReminder(
+                                            context,
+                                            profile.userInfo.value!.phone,
+                                            id);
+                                    if (isDeleted) {
+                                      await LocalDbRepository()
+                                          .deleteReminder(id);
+                                      final HomeController homeController =
+                                          Get.find();
+
+                                      Navigator.pop(context);
+
+                                      await homeController
+                                          .reloadLocalReminders();
+
+                                      toastification.show(
+                                        context: context,
+                                        title:
+                                            const Text("Successfully deleted"),
+                                        type: ToastificationType.success,
+                                        autoCloseDuration:
+                                            const Duration(seconds: 2),
+                                      );
+                                    } else {
+                                      toastification.show(
+                                        context: context,
+                                        title: const Text("Failed to delete"),
+                                        type: ToastificationType.error,
+                                        autoCloseDuration:
+                                            const Duration(seconds: 2),
+                                      );
+                                    }
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                  label: const Text("Delete"),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(
+                        FluentIcons.delete_24_regular,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],

@@ -106,7 +106,7 @@ void main() async {
   await AwesomeNotificationsService.initAllChannels();
 
   await Alarm.init();
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
+  await Workmanager().initialize(callbackDispatcher);
 
   // Use ExistingWorkPolicy.replace to prevent duplicate tasks from accumulating
   // on each app launch.
