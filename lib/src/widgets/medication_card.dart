@@ -328,6 +328,8 @@ Card cardOfReminderForSummary(
                                             profile.userInfo.value!.phone,
                                             id);
                                     if (isDeleted) {
+                                      await cancelNotificationsForReminder(
+                                          currentReminder);
                                       await LocalDbRepository()
                                           .deleteReminder(id);
                                       final HomeController homeController =

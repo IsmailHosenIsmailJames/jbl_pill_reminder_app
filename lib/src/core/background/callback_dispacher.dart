@@ -19,8 +19,7 @@ import "../../screens/add_reminder/model/schedule_model.dart";
 /// preventing collisions when schedules have sequential base IDs.
 const int _preReminderIdOffset = 100000;
 
-Future<void> analyzeDatabaseAndScheduleReminder(
-    {bool reloadDB = false}) async {
+Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {
     log("Notification permissions not granted, skipping background task processing");
@@ -34,8 +33,7 @@ Future<void> analyzeDatabaseAndScheduleReminder(
 
   final reminderNotificationShown =
       await localDb.getPreference("reminderNotificationShown");
-  final notificationShown =
-      await localDb.getPreference("notificationShown");
+  final notificationShown = await localDb.getPreference("notificationShown");
   final alarmShown = await localDb.getPreference("alarmShown");
 
   log(
@@ -101,8 +99,7 @@ Future<void> analyzeDatabaseAndScheduleReminder(
             alarmSettings.dateTime.minute == scheduleTime.minute)) {
           await scheduleAlarm(
             id: id,
-            title:
-                "At $formattedTime, Take '$medicineName' Medicine .",
+            title: "At $formattedTime, Take '$medicineName' Medicine .",
             description: "Don't Miss your scheduled medicine. Take it now.",
             time: timeToShow,
             data: reminderModel,
@@ -113,8 +110,7 @@ Future<void> analyzeDatabaseAndScheduleReminder(
       } else {
         log(scheduleTime.id, name: "Notification ->");
         await scheduleNotification(
-          title:
-              "At $formattedTime, Take '$medicineName' Medicine .",
+          title: "At $formattedTime, Take '$medicineName' Medicine .",
           body: "Don't Miss your scheduled medicine. Take it now.",
           time: timeToShow,
           data: reminderModel,
@@ -160,4 +156,23 @@ String formatTimeOfDay(TimeOfDay timeOfDay) {
 Future<void> cancelAllScheduledTask() async {
   await Alarm.stopAll();
   await AwesomeNotifications().cancelAll();
+}
+
+/// Cancels all scheduled notifications and alarms for a specific reminder.
+/// This covers:
+///   - The main alarm (alarm package) or main notification (awesome_notifications)
+///   - The pre-reminder notification (main id + [_preReminderIdOffset])
+Future<void> cancelNotificationsForReminder(ReminderModel reminder) async {
+  final times = reminder.schedule?.times ?? [];
+  for (final scheduleTime in times) {
+    final int id = int.tryParse(scheduleTime.id) ?? 0;
+    final int preReminderId = id + _preReminderIdOffset;
+
+    if (reminder.reminderType == ReminderType.alarm) {
+      await Alarm.stop(id);
+    }
+    // Always cancel awesome_notifications entries (main + pre-reminder)
+    await AwesomeNotifications().cancel(id);
+    await AwesomeNotifications().cancel(preReminderId);
+  }
 }
