@@ -1,20 +1,14 @@
-import "dart:convert";
-import "dart:developer";
-import "dart:io";
-
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:http/http.dart";
-import "package:http_status_code/http_status_code.dart";
-import "package:jbl_pills_reminder_app/src/api/apis.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:smooth_page_indicator/smooth_page_indicator.dart";
 import "package:toastification/toastification.dart";
+import "package:get/get.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 
 import "../../../theme/colors.dart";
 import "../../../widgets/intro_pages.dart";
@@ -173,33 +167,65 @@ class _LoginPageState extends State<LoginPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: isAsyncLoading
-                                    ? null
-                                    : () async {
-                                        if (formKey.currentState!.validate()) {
-                                          TextInput.finishAutofillContext(
-                                              shouldSave: true);
-                                          log("Login button pressed");
-                                          await login(context);
-                                        }
-                                      },
-                                child: isAsyncLoading
-                                    ? const SizedBox(
-                                        height: 24,
-                                        width: 24,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
+                                onPressed: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    TextInput.finishAutofillContext(
+                                        shouldSave: true);
+                                    final authController =
+                                        Get.find<AuthController>();
+
+                                    String phone =
+                                        textEditingControllerPhoneNumber.text;
+                                    if (phone.startsWith("80")) {
+                                      // Correct prefix according to requested format or common BD format
+                                      // User example: 8801741095333
+                                    }
+
+                                    final success = await authController.login(
+                                      textEditingControllerPhoneNumber.text,
+                                      textEditingControllerPassword.text,
+                                    );
+
+                                    if (success) {
+                                      toastification.show(
+                                        context: context,
+                                        title: const Text("Login Successful"),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 2),
+                                        type: ToastificationType.success,
+                                      );
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const HomeScreen(),
                                         ),
-                                      )
-                                    : const Text(
-                                        "Log in",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1,
-                                        ),
-                                      ),
+                                        (route) => false,
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Obx(() {
+                                  final authController =
+                                      Get.find<AuthController>();
+                                  return authController.isLoading.value
+                                      ? const SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Text(
+                                          "Log in",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1,
+                                          ),
+                                        );
+                                }),
                               ),
                             ),
                             const Gap(15),
@@ -240,96 +266,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  Future<void> login(BuildContext context) async {
-    setState(() {
-      isAsyncLoading = true;
-    });
-    String phone = textEditingControllerPhoneNumber.text;
-    if (phone.startsWith("88")) {
-      phone = "+$phone";
-    } else if (phone.startsWith("0")) {
-      phone = "+88$phone";
-    }
-    try {
-      log("Login Request: ${jsonEncode({
-            "phone": phone,
-            "password": textEditingControllerPassword.text,
-          })}");
-      log("loginAPI: $loginAPI");
-      final response = await post(
-        Uri.parse(loginAPI),
-        body: jsonEncode({
-          "phone": phone,
-          "password": textEditingControllerPassword.text,
-        }),
-        headers: {"Content-Type": "application/json"},
-      );
-
-      log("Hit : $loginAPI", name: "HTTP");
-      log(response.statusCode.toString(), name: "HTTP");
-      log(response.body, name: "HTTP");
-      if (response.statusCode == StatusCode.OK) {
-        TextInput.finishAutofillContext(shouldSave: true);
-        final data = Map<String, dynamic>.from(jsonDecode(response.body));
-        data.addAll({"password": textEditingControllerPassword.text});
-        await LocalDbRepository().savePreference(
-          "user_info",
-          jsonEncode(data),
-        );
-        toastification.show(
-          context: context,
-          title: const Text("Login Successful"),
-          autoCloseDuration: const Duration(seconds: 2),
-          type: ToastificationType.success,
-        );
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
-          (route) => false,
-        );
-      } else {
-        log("Login Failed with ${response.body}");
-        String errorMsg = jsonDecode(response.body)["message"];
-        toastification.show(
-          context: context,
-          title: const Text("Login Failed"),
-          description: Text(errorMsg),
-          autoCloseDuration: const Duration(seconds: 2),
-          type: ToastificationType.error,
-        );
-      }
-    } on HttpException catch (e) {
-      log("HttpException Login Failed with ${e.message}");
-      toastification.show(
-        context: context,
-        title: Text(e.message),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } on SocketException catch (e) {
-      log("SocketException Login Failed with ${e.message}");
-      toastification.show(
-        context: context,
-        title: Text(e.message),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } catch (e) {
-      log("Login Failed with ${e.toString()}");
-      toastification.show(
-        context: context,
-        title: const Text("Something went wrong #004"),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } finally {
-      setState(() {
-        isAsyncLoading = false;
-      });
-    }
   }
 }

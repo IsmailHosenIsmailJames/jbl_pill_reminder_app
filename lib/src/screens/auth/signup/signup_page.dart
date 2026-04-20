@@ -1,17 +1,11 @@
-import "dart:convert";
-import "dart:developer";
-import "dart:io";
-
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:http/http.dart" as http;
-import "package:http_status_code/http_status_code.dart";
-import "package:jbl_pills_reminder_app/src/api/apis.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/controller/signip_page_controller.dart";
+
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
@@ -365,34 +359,77 @@ class _SignupPageState extends State<SignupPage> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                onPressed: isAsyncLoading
-                                    ? null
-                                    : () async {
-                                        if (formKey.currentState!.validate()) {
-                                          TextInput.finishAutofillContext(
-                                              shouldSave: true);
-                                          await signupOrUpdate(context);
-                                        }
-                                      },
-                                child: isAsyncLoading
-                                    ? const SizedBox(
-                                        height: 24,
-                                        width: 24,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
+                                onPressed: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    TextInput.finishAutofillContext(
+                                        shouldSave: true);
+
+                                    final authController =
+                                        Get.find<AuthController>();
+
+                                    Map<String, dynamic> signupData = {
+                                      "name": textEditingControllerName.text,
+                                      "mobile":
+                                          textEditingControllerPhoneNumber.text,
+                                      "password":
+                                          textEditingControllerPassword.text,
+                                      "age": int.parse(
+                                          textEditingControllerAge.text),
+                                      "division": signupPageController
+                                          .choosenDivision.value,
+                                      "district": signupPageController
+                                          .choosenDistrict.value,
+                                      "upazila": signupPageController
+                                          .choosenThana.value,
+                                      "gender":
+                                          signupPageController.gender.value,
+                                    };
+
+                                    final success =
+                                        await authController.signup(signupData);
+
+                                    if (success) {
+                                      toastification.show(
+                                        context: context,
+                                        title: const Text("Signup Successful"),
+                                        autoCloseDuration:
+                                            const Duration(seconds: 2),
+                                        type: ToastificationType.success,
+                                      );
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const HomeScreen(),
                                         ),
-                                      )
-                                    : Text(
-                                        widget.userInfoModel == null
-                                            ? "Sign up"
-                                            : "Save changes",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1,
-                                        ),
-                                      ),
+                                        (route) => false,
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Obx(() {
+                                  final authController =
+                                      Get.find<AuthController>();
+                                  return authController.isLoading.value
+                                      ? const SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : Text(
+                                          widget.userInfoModel == null
+                                              ? "Sign up"
+                                              : "Save changes",
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1,
+                                          ),
+                                        );
+                                }),
                               ),
                             ),
                             const Gap(10),
@@ -439,125 +476,6 @@ class _SignupPageState extends State<SignupPage> {
         ),
       ),
     );
-  }
-
-  Future<void> signupOrUpdate(BuildContext context) async {
-    setState(() {
-      isAsyncLoading = true;
-    });
-    String phone = textEditingControllerPhoneNumber.text;
-    if (!phone.startsWith("+88")) {
-      phone = "+88$phone";
-    }
-
-    try {
-      UserInfoModel userInfoModel = UserInfoModel(
-        name: textEditingControllerName.text,
-        age: int.parse(textEditingControllerAge.text),
-        gender: signupPageController.gender.value!,
-        division: signupPageController.choosenDivision.value!,
-        district: signupPageController.choosenDistrict.value!,
-        thana: signupPageController.choosenThana.value!,
-        phone: phone,
-        password: textEditingControllerPassword.text,
-      );
-
-      final http.Response? response;
-      if (widget.userInfoModel == null) {
-        response = await http.post(Uri.parse(signUpAPI),
-            body: userInfoModel.toJson(),
-            headers: {"Content-Type": "application/json"});
-      } else {
-        Map<String, dynamic> data = userInfoModel.toMap();
-        data.remove("password");
-        response = await http.put(
-          Uri.parse(updateUserInfoAPI),
-          body: jsonEncode(data),
-          headers: {"Content-Type": "application/json"},
-        );
-      }
-
-      if (response.statusCode == StatusCode.CREATED ||
-          response.statusCode == StatusCode.OK) {
-        log(response.body);
-
-        if (widget.userInfoModel == null) {
-          TextInput.finishAutofillContext(shouldSave: true);
-          await LocalDbRepository().savePreference(
-            "user_info",
-            userInfoModel.toJson(),
-          );
-          toastification.show(
-            context: context,
-            title: const Text("Signup Success"),
-            autoCloseDuration: const Duration(seconds: 2),
-            type: ToastificationType.success,
-          );
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-              (route) => false);
-        } else {
-          await LocalDbRepository().savePreference(
-            "user_info",
-            userInfoModel.toJson(),
-          );
-
-          toastification.show(
-            context: context,
-            title: const Text("Update Success"),
-            autoCloseDuration: const Duration(seconds: 2),
-            type: ToastificationType.success,
-          );
-          Navigator.pop(context);
-        }
-      } else if (response.statusCode == StatusCode.BAD_REQUEST) {
-        toastification.show(
-          context: context,
-          title: const Text("Information is not valid"),
-          description: const Text("You may already have account."),
-          autoCloseDuration: const Duration(seconds: 2),
-          type: ToastificationType.error,
-        );
-      } else {
-        log(response.body);
-        log(response.statusCode.toString());
-        toastification.show(
-          context: context,
-          title: const Text("Signup Failed"),
-          autoCloseDuration: const Duration(seconds: 2),
-          type: ToastificationType.error,
-        );
-      }
-    } on HttpException catch (e) {
-      toastification.show(
-        context: context,
-        title: Text(e.message),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } on SocketException catch (e) {
-      toastification.show(
-        context: context,
-        title: Text(e.message),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } catch (e) {
-      log(e.toString());
-      toastification.show(
-        context: context,
-        title: const Text("Something went wrong #005"),
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-      );
-    } finally {
-      setState(() {
-        isAsyncLoading = false;
-      });
-    }
   }
 }
 
@@ -634,7 +552,7 @@ class _AddressSelectionWidget extends StatelessWidget {
             textFormField: DropdownButtonFormField(
               initialValue: controller.choosenThana.value,
               decoration: textFieldInputDecoration(
-                hint: "Select Thana",
+                hint: "Select Upazila",
                 prefixIcon:
                     const Icon(Icons.my_location_outlined, color: Colors.grey),
               ),

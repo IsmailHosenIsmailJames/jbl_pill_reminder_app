@@ -3,7 +3,8 @@ import "dart:developer";
 
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
-import "package:jbl_pills_reminder_app/app.dart";
+import "package:get/get.dart";
+
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_page.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
@@ -153,11 +154,9 @@ void customNavigation(Map? actionData) async {
     String? reminderRawData = receivedAction.payload?["payloadString"];
     log(reminderRawData.toString(), name: "actionData");
     if (reminderRawData != null) {
-      App.navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (context) => TakeMedicinePage(
-            currentMedicationToTake: ReminderModel.fromJson(reminderRawData),
-          ),
+      Get.to(
+        () => TakeMedicinePage(
+          currentMedicationToTake: ReminderModel.fromJson(reminderRawData),
         ),
       );
     }

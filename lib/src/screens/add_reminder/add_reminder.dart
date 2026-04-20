@@ -17,7 +17,7 @@ import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_n
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:searchfield/searchfield.dart";
@@ -67,7 +67,7 @@ class _AddReminderState extends State<AddReminder> {
 
   final formKey = GlobalKey<FormState>();
 
-  ProfilePageController profileController = Get.put(ProfilePageController());
+  final AuthController authController = Get.find<AuthController>();
 
   bool isAsyncLoading = false;
 
@@ -918,11 +918,11 @@ class _AddReminderState extends State<AddReminder> {
               });
               if (await hasInternetConnection()) {
                 Map<String, dynamic> data = reminderModel.toMap();
-                data["phone_number"] = profileController.userInfo.value!.phone;
+                data["phone_number"] = authController.userEntity.value!.mobile;
                 if (widget.editMode == true) {
                   final bool isSuccessful = await HomeController.updateReminder(
                     context,
-                    profileController.userInfo.value!.phone,
+                    authController.userEntity.value!.mobile,
                     reminderModel.id,
                     data,
                   );

@@ -42,9 +42,8 @@ class _MyPillsPageState extends State<MyPillsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MyDrawer(
-        phone: widget.phone,
-      ),
+      drawer: const MyDrawer(),
+
       appBar: AppBar(
         title: const Text("My Pills"),
       ),

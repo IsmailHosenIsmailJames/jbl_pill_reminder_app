@@ -1,9 +1,6 @@
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/my_pills/my_pills_page.dart";
@@ -11,12 +8,15 @@ import "package:jbl_pills_reminder_app/src/screens/profile_page/profile_page.dar
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:package_info_plus/package_info_plus.dart";
 
+import "package:get/get.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+
 class MyDrawer extends StatelessWidget {
-  final String phone;
-  const MyDrawer({super.key, required this.phone});
+  const MyDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
     return Drawer(
       child: ListView(
         children: [
@@ -86,7 +86,7 @@ class MyDrawer extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MyPillsPage(
-                      phone: phone,
+                      phone: authController.userEntity.value?.mobile ?? "",
                     ),
                   ));
             },
@@ -102,7 +102,7 @@ class MyDrawer extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => HistoryPage(
-                      phone: phone,
+                      phone: authController.userEntity.value?.mobile ?? "",
                     ),
                   ));
             },
@@ -143,17 +143,7 @@ class MyDrawer extends StatelessWidget {
                         icon: const Icon(Icons.logout_rounded),
                         onPressed: () async {
                           Navigator.pop(context);
-                          await LocalDbRepository().clearPreferences();
-                          await LocalDbRepository().clearReminders();
-                          await cancelAllScheduledTask();
-                          // Get.offAll(() => const LoginPage());
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                            ),
-                            (route) => true,
-                          );
+                          await authController.logout();
                         },
                       ),
                     ],

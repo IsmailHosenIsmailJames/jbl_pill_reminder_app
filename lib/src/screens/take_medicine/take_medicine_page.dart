@@ -8,7 +8,7 @@ import "package:get/get.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 import "package:toastification/toastification.dart";
 
@@ -33,8 +33,8 @@ class TakeMedicinePage extends StatefulWidget {
 }
 
 class _TakeMedicinePageState extends State<TakeMedicinePage> {
-  final ProfilePageController profilePageController =
-      Get.put(ProfilePageController());
+  final AuthController authController = Get.find<AuthController>();
+
 
   @override
   void initState() {
@@ -131,7 +131,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           );
                           try {
                             HomeController.backupReminderHistory(
-                                profilePageController.userInfo.value!.phone);
+                                authController.userEntity.value!.mobile);
                           } catch (e) {
                             log(e.toString());
                           }

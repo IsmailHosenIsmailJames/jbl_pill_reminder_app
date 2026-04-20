@@ -1,6 +1,11 @@
-String baseAPI = "http://103.168.140.134:5003/api/";
-String signUpAPI = "${baseAPI}user/signup/";
-String loginAPI = "${baseAPI}user/login/";
-String updateUserInfoAPI = "${baseAPI}user/update_user/";
-String createReminderAPI = "${baseAPI}reminders/create/";
-String getAppInfoAPI = "in_app_update/info/";
+String baseAPI = "http://103.168.140.135:6070/api/v1/";
+String signUpAPI = "${baseAPI}auth/signup";
+String loginAPI = "${baseAPI}auth/login";
+String userProfileAPI = "${baseAPI}auth/user";
+
+// Old endpoints (kept for reference or other features not yet migrated)
+String oldBaseAPI = "http://103.168.140.134:5003/api/";
+String updateUserInfoAPI = "${oldBaseAPI}user/update_user/";
+String createReminderAPI = "${oldBaseAPI}reminders/create/";
+String getAppInfoAPI = "${oldBaseAPI}in_app_update/info/";
+

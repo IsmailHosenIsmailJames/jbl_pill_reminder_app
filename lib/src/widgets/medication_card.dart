@@ -12,7 +12,7 @@ import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dar
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "package:toastification/toastification.dart";
 
 import "../core/functions/safe_substring.dart";
@@ -321,11 +321,11 @@ Card cardOfReminderForSummary(
                                     }
                                     String id = currentReminder.id;
 
-                                    ProfilePageController profile = Get.find();
+                                    final authController = Get.find<AuthController>();
                                     final bool isDeleted =
                                         await HomeController.deleteReminder(
                                             context,
-                                            profile.userInfo.value!.phone,
+                                            authController.userEntity.value!.mobile,
                                             id);
                                     if (isDeleted) {
                                       await cancelNotificationsForReminder(

@@ -1,11 +1,11 @@
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/signup/model/signup_models.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/entities/user_entity.dart";
+
+
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,22 +15,14 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final ProfilePageController profilePageController =
-      Get.put(ProfilePageController());
-
-  final localDb = LocalDbRepository();
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
-    loadUserData();
+    authController.getUserProfile();
     super.initState();
   }
 
-  Future<void> loadUserData() async {
-    String? userInfo = await localDb.getPreference("user_info");
-    profilePageController.userInfo.value =
-        userInfo != null ? UserInfoModel.fromJson(userInfo) : null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,21 +33,21 @@ class _ProfilePageState extends State<ProfilePage> {
       color: Colors.grey,
     );
     return Scaffold(
-      drawer: MyDrawer(
-        phone: profilePageController.userInfo.value!.phone,
-      ),
+      drawer: const MyDrawer(),
+
       appBar: AppBar(
         title: const Text("Profile"),
       ),
       body: Obx(
         () {
-          UserInfoModel? userInfo = profilePageController.userInfo.value;
-          if (userInfo == null) {
+          UserEntity? user = authController.userEntity.value;
+          if (user == null) {
             return const Center(
-              child: Text("No user found"),
+              child: CircularProgressIndicator(),
             );
           }
-          String userName = userInfo.name;
+          String userName = user.name ?? "User";
+
           return ListView(
             padding: const EdgeInsets.all(10),
             children: [
@@ -72,7 +64,8 @@ class _ProfilePageState extends State<ProfilePage> {
               const Gap(20),
               Center(
                 child: Text(
-                  userInfo.name,
+                  userName,
+
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -87,8 +80,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("Phone", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.phone}",
+                    ": ${user.mobile}",
                   ),
+
                 ],
               ),
               const Divider(),
@@ -99,8 +93,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("Age", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.age}",
+                    ": ${user.age ?? 'N/A'}",
                   ),
+
                 ],
               ),
               const Divider(),
@@ -111,8 +106,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("Gender", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.gender}",
+                    ": ${user.status}",
                   ),
+
                 ],
               ),
               const Divider(),
@@ -123,8 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("Division", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.division}",
+                    ": ${user.division ?? 'N/A'}",
                   ),
+
                 ],
               ),
               const Divider(),
@@ -135,8 +132,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("District", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.district}",
+                    ": ${user.district ?? 'N/A'}",
                   ),
+
                 ],
               ),
               const Divider(),
@@ -147,25 +145,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Text("Thana", style: textStyle),
                   ),
                   Text(
-                    ": ${userInfo.thana}",
+                    ": ${user.upazila ?? 'N/A'}",
                   ),
+
                 ],
               ),
               const Divider(),
               const Gap(30),
               OutlinedButton.icon(
-                onPressed: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignupPage(
-                          userInfoModel: userInfo,
-                        ),
-                      ));
-                  loadUserData();
+                onPressed: () {
+                  // Edit profile logic (can be implemented later or redirected to old signup page with adaptation)
                 },
                 icon: const Icon(Icons.edit_rounded),
                 label: const Text("Edit Profile"),
+
               ),
             ],
           );

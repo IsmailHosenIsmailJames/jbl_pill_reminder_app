@@ -20,8 +20,9 @@ import "package:table_calendar/table_calendar.dart";
 import "../../core/functions/find_date_medicine.dart";
 import "../../theme/const_values.dart";
 import "../../widgets/medication_card.dart";
-import "../profile_page/controller/profile_page_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "../take_medicine/take_medicine_page.dart";
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,11 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
       await sharedPreferences.reload();
       await requestPermissions(context);
 
+
       // Sync latest data from server after permissions granted
-      if (profilePageController.userInfo.value != null) {
+      if (authController.userEntity.value != null) {
         homeController.syncRemindersFromServer(
-            profilePageController.userInfo.value!.phone);
+            authController.userEntity.value!.mobile);
       }
+
 
       String? actionDataRaw = sharedPreferences.getString("actionData");
       int? actionDataTime = sharedPreferences.getInt("actionDataTime");
@@ -104,31 +107,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  final ProfilePageController profilePageController =
-      Get.put(ProfilePageController());
+  final AuthController authController = Get.find<AuthController>();
 
   Future<void> loadUserData() async {
-    await profilePageController.loadUser();
+    // Note: authController already loads user profile onInit or we can trigger it here
+    await authController.getUserProfile();
 
-    if (profilePageController.userInfo.value != null) {
+    if (authController.userEntity.value != null) {
       HomeController.backupReminderHistory(
-          profilePageController.userInfo.value!.phone);
+          authController.userEntity.value!.mobile);
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (profilePageController.userInfo.value == null) {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
+    return Scaffold(
+      appBar: AppBar(
 
-      return Scaffold(
-        appBar: AppBar(
           centerTitle: true,
           title: const Text("Pill Reminder"),
           actions: [
@@ -149,9 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
           ],
         ),
-        drawer: MyDrawer(
-          phone: profilePageController.userInfo.value!.phone,
-        ),
+        drawer: const MyDrawer(),
+
         body: ListView(
           padding: const EdgeInsets.all(10),
           children: [
@@ -394,8 +389,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       );
-    });
   }
+
 
   TableCalendar<dynamic> tableCalendar() {
     return TableCalendar(

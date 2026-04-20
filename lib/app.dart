@@ -1,5 +1,3 @@
-import "dart:developer";
-
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:get/get.dart";
@@ -7,16 +5,14 @@ import "package:google_fonts/google_fonts.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/controller/profile_page_controller.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
 import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
 
+import "src/features/auth/presentation/getx/auth_controller.dart";
+
 class App extends StatefulWidget {
   final bool isLoggedIn;
-
-  static final GlobalKey<NavigatorState> navigatorKey =
-      GlobalKey<NavigatorState>();
 
   const App({super.key, required this.isLoggedIn});
 
@@ -25,8 +21,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final ProfilePageController userInfoController =
-      Get.put(ProfilePageController());
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +36,7 @@ class _AppState extends State<App> {
         TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
       },
     );
-    return MaterialApp(
-      navigatorKey: App.navigatorKey,
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData.light().copyWith(
@@ -87,24 +81,26 @@ class _AppState extends State<App> {
           ),
         ),
       ),
-      onGenerateRoute: (settings) {
-        log(settings.name.toString(), name: "settings");
-        log(settings.arguments.toString(), name: "settings");
-
-        if (settings.name == Routes.rootRoute) {
-          if (widget.isLoggedIn || userInfoController.userInfo.value != null) {
-            return MaterialPageRoute(builder: (context) => const HomeScreen());
-          } else {
-            return MaterialPageRoute(builder: (context) => const LoginPage());
-          }
-        }
-
-        return MaterialPageRoute(
-          builder: (context) =>
-              RoutesNotFound(routeName: settings.name ?? "'Empty'"),
-        );
-      },
       initialRoute: Routes.rootRoute,
+      getPages: [
+        GetPage(
+          name: Routes.rootRoute,
+          page: () => Obx(() {
+            if (authController.isCheckingAuth.value) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return authController.userEntity.value != null
+                ? const HomeScreen()
+                : const LoginPage();
+          }),
+        ),
+      ],
+      unknownRoute: GetPage(
+        name: "/unknown",
+        page: () => const RoutesNotFound(routeName: "Unknown"),
+      ),
     );
   }
 }

@@ -1,0 +1,256 @@
+{
+  "info": {
+    "_postman_id": "629a80bc-879d-4bb0-911e-e63f47e20116",
+    "name": "Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26460732"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"mobile\": \"8801630542945\",\r\n    \"password\": \"123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sign Up",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "Raihan Ahmad",
+              "type": "text",
+              "uuid": "dca3b62a-554c-434c-b2c6-289b55858328"
+            },
+            {
+              "key": "profilePhoto",
+              "type": "file",
+              "uuid": "61073eea-461f-43e0-aae8-44406307daf7",
+              "src": "/C:/Users/LENOVO/Downloads/download (1).jpeg"
+            },
+            {
+              "key": "mobile",
+              "value": "8801630542945",
+              "type": "text",
+              "uuid": "7a2912b9-c792-4ade-adb2-3aaf5a38c574"
+            },
+            {
+              "key": "division",
+              "value": "Dhaka",
+              "type": "text",
+              "uuid": "ec9d3834-eac5-4e2f-beeb-9440c5aaec77"
+            },
+            {
+              "key": "district",
+              "value": "Dhaka",
+              "type": "text",
+              "uuid": "3081ec6b-8999-4b84-9a70-772340ec4d79"
+            },
+            {
+              "key": "password",
+              "value": "123456",
+              "type": "text",
+              "uuid": "6f5be451-6fde-4fa5-8703-9aa28916046b"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/signup",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get profile by token",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/user",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "user"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send OTP",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\" : \"raihanahmad999@gmail.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/otp-request",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "otp-request"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify OTP",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"otp\": 274147,\r\n    \"hash\": \"3fbedc596406b2bb710109f38b81da9cfc82f72457c0279d47ad743b61abbe2b.1774584270222\",\r\n    \"email\": \"raihanahmad999@gmail.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/verify-otp",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "verify-otp"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Forgot Password",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"password\" : \"123456\",\r\n    \"sessionToken\" : \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhaWhhbmFobWFkOTk5QGdtYWlsLmNvbSIsImlhdCI6MTc3NDU4Mzk5OCwiZXhwIjoxNzc0NTg0NTk4fQ._xp332_CKY-63YTIVNCDogLds63AMXmok6bVW2MkN3s\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/update-forgot-password",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "update-forgot-password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Password",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"oldPassword\" : \"1234567891\",\r\n    \"newPassword\": \"1234567891\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/update-password",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "auth",
+            "update-password"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
