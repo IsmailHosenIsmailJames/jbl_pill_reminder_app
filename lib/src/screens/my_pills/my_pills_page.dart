@@ -1,9 +1,9 @@
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 
 class MyPillsPage extends StatefulWidget {
@@ -15,12 +15,13 @@ class MyPillsPage extends StatefulWidget {
 }
 
 class _MyPillsPageState extends State<MyPillsPage> {
-  final HomeController homeController = Get.put(HomeController());
+
   late List<MedicineModel> allMedicine;
   @override
   void initState() {
     List<MedicineModel> temAllMedicine = [];
-    for (var reminder in homeController.listOfAllReminder) {
+    final homeCubit = context.read<HomeCubit>();
+    for (var reminder in homeCubit.state.listOfAllReminder) {
       MedicineModel currentMedicine = reminder.medicine!;
       bool isAlreadyExits = false;
       for (var medicine in temAllMedicine) {

@@ -4,12 +4,13 @@ import "dart:developer";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 import "package:toastification/toastification.dart";
 
@@ -34,8 +35,6 @@ class TakeMedicinePage extends StatefulWidget {
 }
 
 class _TakeMedicinePageState extends State<TakeMedicinePage> {
-  final AuthController authController = Get.find<AuthController>();
-
 
   @override
   void initState() {
@@ -131,8 +130,11 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             jsonEncode(reminderData),
                           );
                           try {
-                            HomeController.backupReminderHistory(
-                                authController.userEntity.value!.mobile);
+                            final authState = context.read<AuthCubit>().state;
+                            if (authState is Authenticated) {
+                              HomeCubit.backupReminderHistory(
+                                  authState.user.mobile);
+                            }
                           } catch (e) {
                             log(e.toString());
                           }

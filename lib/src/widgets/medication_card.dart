@@ -1,19 +1,18 @@
-import "dart:math";
-
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 import "package:toastification/toastification.dart";
 
 import "../core/functions/safe_substring.dart";
@@ -254,19 +253,18 @@ Card cardOfReminderForSummary(
                         padding: EdgeInsets.zero,
                       ),
                       onPressed: () async {
-                        final addMedicationController =
-                            Get.put(AddNewReminderModelController());
-                        addMedicationController.reminders.value =
-                            currentReminder;
+                        final cubit = context.read<AddReminderCubit>();
+                        cubit.updateReminder(currentReminder);
 
                         await context.pushNamed(
                           Routes.addReminderRoute,
                           extra: true,
                         );
-                        addMedicationController.reminders.value = ReminderModel(
-                            id: (Random().nextInt(100000000) + 100000000)
-                                .toString());
-                        Get.find<HomeController>().reloadLocalReminders();
+                        cubit.resetReminder();
+
+                        if (context.mounted) {
+                          context.read<HomeCubit>().reloadLocalReminders();
+                        }
                         analyzeDatabaseAndScheduleReminder();
                       },
                       icon: Icon(
@@ -319,43 +317,44 @@ Card cardOfReminderForSummary(
                                     }
                                     String id = currentReminder.id;
 
-                                    final authController =
-                                        Get.find<AuthController>();
-                                    final bool isDeleted =
-                                        await HomeController.deleteReminder(
-                                            context,
-                                            authController
-                                                .userEntity.value!.mobile,
-                                            id);
-                                    if (isDeleted) {
-                                      await cancelNotificationsForReminder(
-                                          currentReminder);
-                                      await LocalDbRepository()
-                                          .deleteReminder(id);
-                                      final HomeController homeController =
-                                          Get.find();
+                                    final authState =
+                                        context.read<AuthCubit>().state;
+                                    if (authState is Authenticated) {
+                                      final bool isDeleted =
+                                          await HomeCubit.deleteReminder(
+                                              context,
+                                              authState.user.mobile,
+                                              id);
+                                      if (isDeleted) {
+                                        await cancelNotificationsForReminder(
+                                            currentReminder);
+                                        await LocalDbRepository()
+                                            .deleteReminder(id);
 
-                                      context.pop();
+                                        if (context.mounted) {
+                                          context.pop();
+                                          await context
+                                              .read<HomeCubit>()
+                                              .reloadLocalReminders();
+                                        }
 
-                                      await homeController
-                                          .reloadLocalReminders();
-
-                                      toastification.show(
-                                        context: context,
-                                        title:
-                                            const Text("Successfully deleted"),
-                                        type: ToastificationType.success,
-                                        autoCloseDuration:
-                                            const Duration(seconds: 2),
-                                      );
-                                    } else {
-                                      toastification.show(
-                                        context: context,
-                                        title: const Text("Failed to delete"),
-                                        type: ToastificationType.error,
-                                        autoCloseDuration:
-                                            const Duration(seconds: 2),
-                                      );
+                                        toastification.show(
+                                          context: context,
+                                          title: const Text(
+                                              "Successfully deleted"),
+                                          type: ToastificationType.success,
+                                          autoCloseDuration:
+                                              const Duration(seconds: 2),
+                                        );
+                                      } else {
+                                        toastification.show(
+                                          context: context,
+                                          title: const Text("Failed to delete"),
+                                          type: ToastificationType.error,
+                                          autoCloseDuration:
+                                              const Duration(seconds: 2),
+                                        );
+                                      }
                                     }
                                   },
                                   icon: const Icon(Icons.delete),

@@ -7,8 +7,9 @@ import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:smooth_page_indicator/smooth_page_indicator.dart";
 import "package:toastification/toastification.dart";
-import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 
 import "../../../theme/colors.dart";
 import "../../../widgets/intro_pages.dart";
@@ -171,10 +172,10 @@ class _LoginPageState extends State<LoginPage> {
                                   if (formKey.currentState!.validate()) {
                                     TextInput.finishAutofillContext(
                                         shouldSave: true);
-                                    final authController =
-                                        Get.find<AuthController>();
+                                    final authCubit =
+                                        context.read<AuthCubit>();
 
-                                    final success = await authController.login(
+                                    final success = await authCubit.login(
                                       textEditingControllerPhoneNumber.text,
                                       textEditingControllerPassword.text,
                                     );
@@ -193,27 +194,27 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                   }
                                 },
-                                child: Obx(() {
-                                  final authController =
-                                      Get.find<AuthController>();
-                                  return authController.isLoading.value
-                                      ? const SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                            strokeWidth: 2,
-                                          ),
-                                        )
-                                      : const Text(
-                                          "Log in",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 1,
-                                          ),
-                                        );
-                                }),
+                                child: BlocBuilder<AuthCubit, AuthState>(
+                                  builder: (context, state) {
+                                    return state is AuthLoading
+                                        ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "Log in",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1,
+                                            ),
+                                          );
+                                  },
+                                ),
                               ),
                             ),
                             const Gap(15),

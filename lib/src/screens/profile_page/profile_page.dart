@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/domain/entities/user_entity.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 
 
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
@@ -15,11 +15,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final AuthController authController = Get.find<AuthController>();
+
 
   @override
   void initState() {
-    authController.getUserProfile();
+    context.read<AuthCubit>().getUserProfile();
     super.initState();
   }
 
@@ -38,14 +38,14 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text("Profile"),
       ),
-      body: Obx(
-        () {
-          UserEntity? user = authController.userEntity.value;
-          if (user == null) {
+      body: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          if (state is! Authenticated) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
+          final user = state.user;
           String userName = user.name ?? "User";
 
           return ListView(

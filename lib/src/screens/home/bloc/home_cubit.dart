@@ -1,51 +1,59 @@
-import "dart:convert";
-import "dart:developer";
+import 'dart:convert';
+import 'dart:developer';
 
-import "package:awesome_notifications/awesome_notifications.dart";
-import "package:flutter/material.dart";
-import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
-import "package:http/http.dart" as http;
-import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/api/apis.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:toastification/toastification.dart";
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'package:toastification/toastification.dart';
 
-class HomeController extends GetxController {
-  Rx<DateTime> selectedDay = DateTime.now().obs;
-  RxBool isLoading = false.obs;
+import 'package:jbl_pills_reminder_app/src/api/apis.dart';
+import 'package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart';
+import 'package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart';
+import 'package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart';
+import 'package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart';
+import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
+import 'package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart';
 
-  Rx<ReminderModel?> nextReminder = Rx<ReminderModel?>(null);
-  RxList<ReminderModel> listOfTodaysReminder = RxList<ReminderModel>([]);
-  RxList<ReminderModel> listOfAllReminder = RxList<ReminderModel>([]);
+class HomeCubit extends Cubit<HomeState> {
+  final LocalDbRepository _localDb;
 
-  final _localDb = LocalDbRepository();
+  HomeCubit({required LocalDbRepository localDb})
+      : _localDb = localDb,
+        super(HomeState(selectedDay: DateTime.now()));
 
-  /// Loads all locally saved reminders into [listOfAllReminder].
+  void updateSelectedDay(DateTime date) {
+    emit(state.copyWith(selectedDay: date));
+    _updateDailyReminders(date);
+  }
+
   Future<void> reloadLocalReminders() async {
     final map = await _localDb.getAllReminders();
     final reminders =
         map.values.map((e) => ReminderModel.fromJson(e)).toList();
-    listOfAllReminder.assignAll(sortRemindersBasedOnCreatedDate(reminders));
-    updateDailyReminders(selectedDay.value);
+    
+    final sortedReminders = sortRemindersBasedOnCreatedDate(reminders);
+    emit(state.copyWith(listOfAllReminder: sortedReminders));
+    
+    _updateDailyReminders(state.selectedDay);
   }
 
-  void updateDailyReminders(DateTime date) {
+  void _updateDailyReminders(DateTime date) {
     log("updateDailyReminders for $date");
-    final todaysMedication = findDateMedicine(listOfAllReminder, date);
-    listOfTodaysReminder
-        .assignAll(sortRemindersBasedOnCreatedDate(todaysMedication));
-    nextReminder.value = getNextReminder(listOfAllReminder);
+    final todaysMedication = findDateMedicine(state.listOfAllReminder, date);
+    final sortedTodays = sortRemindersBasedOnCreatedDate(todaysMedication);
+    final nextRem = getNextReminder(state.listOfAllReminder);
+
+    emit(state.copyWith(
+      listOfTodaysReminder: sortedTodays,
+      nextReminder: nextRem,
+    ));
   }
 
-  /// Fetches reminders from the server, saves them locally, then reloads the
-  /// list and reschedules notifications. No-ops when offline.
   Future<void> syncRemindersFromServer(String phoneNumber) async {
     if (!await hasInternetConnection()) return;
 
-    isLoading.value = true;
+    emit(state.copyWith(isLoading: true));
     try {
       final serverData = await _fetchAllFromServer(phoneNumber);
       for (final reminder in serverData) {
@@ -59,7 +67,7 @@ class HomeController extends GetxController {
     } catch (e) {
       log("syncRemindersFromServer error: $e");
     } finally {
-      isLoading.value = false;
+      emit(state.copyWith(isLoading: false));
     }
   }
 
@@ -138,7 +146,7 @@ class HomeController extends GetxController {
         autoCloseDuration: const Duration(seconds: 2),
         type: ToastificationType.success,
       );
-      return true; // Updated successfully
+      return true;
     } else {
       toastification.show(
         context: context,
@@ -197,7 +205,7 @@ class HomeController extends GetxController {
 
   static Future<bool> backupSingleHistory(
       Map<String, dynamic> historyData, String phone) async {
-    log("backupSingleHistory");
+        log("backupSingleHistory");
     final url = Uri.parse("${baseAPI}history/backup/");
     historyData.remove("doneBackup");
     final response = await http.post(

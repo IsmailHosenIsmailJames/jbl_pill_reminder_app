@@ -1,12 +1,14 @@
 import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:google_fonts/google_fonts.dart";
 import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
-
-import "src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+import "package:toastification/toastification.dart";
 
 class App extends StatefulWidget {
   final bool isLoggedIn;
@@ -18,8 +20,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final AuthController authController = Get.find<AuthController>();
-
   @override
   Widget build(BuildContext context) {
     FlutterNativeSplash.remove();
@@ -33,52 +33,64 @@ class _AppState extends State<App> {
         TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
       },
     );
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
-      theme: ThemeData.light().copyWith(
-        pageTransitionsTheme: pageTransitionsTheme,
-        inputDecorationTheme: InputDecorationTheme(
-          border: InputBorder.none,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade600,
+    return ToastificationWrapper(
+        child: MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(
+          lazy: false,
+          create: (_) => sl<AuthCubit>()..checkAuthStatus(),
+        ),
+        BlocProvider<HomeCubit>(
+          create: (_) => sl<HomeCubit>(),
+        ),
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.light,
+        theme: ThemeData.light().copyWith(
+          pageTransitionsTheme: pageTransitionsTheme,
+          inputDecorationTheme: InputDecorationTheme(
+            border: InputBorder.none,
+            hintStyle: TextStyle(
+              color: Colors.grey.shade600,
+            ),
           ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          brightness: Brightness.light,
-          seedColor: MyAppColors.primaryColor,
-        ),
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                borderRadius,
+          colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.light,
+            seedColor: MyAppColors.primaryColor,
+          ),
+          textTheme: GoogleFonts.poppinsTextTheme(),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  borderRadius,
+                ),
+              ),
+              side: BorderSide(
+                color: MyAppColors.primaryColor,
+              ),
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
               ),
             ),
-            side: BorderSide(
-              color: MyAppColors.primaryColor,
-            ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
           ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: MyAppColors.primaryColor,
-            foregroundColor: Colors.white,
-            shadowColor: Colors.transparent,
-            iconColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                borderRadius,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: MyAppColors.primaryColor,
+              foregroundColor: Colors.white,
+              shadowColor: Colors.transparent,
+              iconColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  borderRadius,
+                ),
               ),
             ),
           ),
         ),
+        routerConfig: AppRouter.router,
       ),
-      routerConfig: AppRouter.router,
-    );
+    ));
   }
 }

@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
-
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
@@ -27,17 +28,19 @@ class AppRouter {
         path: Routes.rootRoute,
         name: Routes.rootRoute,
         builder: (context, state) {
-          final AuthController authController = Get.find<AuthController>();
-          return Obx(() {
-            if (authController.isCheckingAuth.value) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return authController.userEntity.value != null
-                ? const HomeScreen()
-                : const LoginPage();
-          });
+          return BlocBuilder<AuthCubit, AuthState>(
+            bloc: sl<AuthCubit>(),
+            builder: (context, authState) {
+              if (authState is AuthLoading || authState is AuthInitial) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+              return authState is Authenticated
+                  ? const HomeScreen()
+                  : const LoginPage();
+            },
+          );
         },
       ),
       GoRoute(

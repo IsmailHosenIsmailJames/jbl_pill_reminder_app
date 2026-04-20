@@ -1,53 +1,40 @@
-import "dart:convert";
-import "package:flutter/material.dart";
-import "package:fluttertoast/fluttertoast.dart";
-import "package:get/get.dart";
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
-import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/domain/entities/user_entity.dart";
+import 'package:jbl_pills_reminder_app/src/navigation/app_router.dart';
+import 'package:jbl_pills_reminder_app/src/navigation/routes.dart';
+import 'package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart';
+import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart';
+import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart';
+import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart';
+import 'package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart';
 
-class AuthController extends GetxController {
+class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase loginUseCase;
   final SignUpUseCase signUpUseCase;
   final GetUserProfileUseCase getUserProfileUseCase;
   final LocalDbRepository localDbRepository;
 
-  AuthController({
+  AuthCubit({
     required this.loginUseCase,
     required this.signUpUseCase,
     required this.getUserProfileUseCase,
     required this.localDbRepository,
-  });
+  }) : super(AuthInitial());
 
-  var isLoading = false.obs;
-  var isCheckingAuth = true.obs;
-  var userEntity = Rxn<UserEntity>();
-
-
-  @override
-  void onInit() {
-    super.onInit();
-    _loadUserFromLocal();
-  }
-
-  Future<void> _loadUserFromLocal() async {
+  Future<void> checkAuthStatus() async {
     final String? userData = await localDbRepository.getPreference("user_info");
-    // Note: We might need a model to parse this, but for now we'll just check if it exists
-    // and rely on getUserProfile to refresh it.
     if (userData != null) {
       await getUserProfile();
+    } else {
+      emit(Unauthenticated());
     }
-    isCheckingAuth.value = false;
-
   }
 
   Future<bool> login(String mobile, String password) async {
-    isLoading.value = true;
+    emit(AuthLoading());
     try {
       final auth = await loginUseCase(mobile, password);
       // Save auth info
@@ -67,14 +54,13 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+      emit(Unauthenticated());
       return false;
-    } finally {
-      isLoading.value = false;
     }
   }
 
   Future<bool> signup(Map<String, dynamic> signupData) async {
-    isLoading.value = true;
+    emit(AuthLoading());
     try {
       final auth = await signUpUseCase(signupData);
       // Save auth info
@@ -94,27 +80,34 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+      emit(Unauthenticated());
       return false;
-    } finally {
-      isLoading.value = false;
     }
   }
 
   Future<void> getUserProfile() async {
+    // Only emit AuthLoading if NOT already authenticated.
+    // Emitting AuthLoading while authenticated causes the router to
+    // show the loading screen, which remounts HomeScreen, which calls
+    // getUserProfile again — an infinite loop.
+    if (state is! Authenticated) {
+      emit(AuthLoading());
+    }
     try {
       final user = await getUserProfileUseCase();
-      userEntity.value = user;
+      emit(Authenticated(user));
     } catch (e) {
-      // If unauthorized, we might want to logout
       if (e.toString().contains("401")) {
-        logout();
+        await logout();
+      } else {
+        emit(Unauthenticated());
       }
     }
   }
 
   Future<void> logout() async {
     await localDbRepository.deletePreference("user_info");
-    userEntity.value = null;
+    emit(Unauthenticated());
     AppRouter.router.go(Routes.rootRoute);
   }
 }

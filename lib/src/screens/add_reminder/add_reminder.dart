@@ -6,7 +6,7 @@ import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http_status_code/http_status_code.dart";
@@ -14,11 +14,12 @@ import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
 import "package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:searchfield/searchfield.dart";
@@ -41,34 +42,17 @@ class AddReminder extends StatefulWidget {
 class _AddReminderState extends State<AddReminder> {
   ScrollController scrollControllerScheduleTitle = ScrollController();
 
-  final HomeController homeController = Get.find();
+  late ReminderModel reminderModel;
+  late ScheduleModel scheduleModel;
 
-  final addNewReminderModelController =
-      Get.put(AddNewReminderModelController());
-  late ReminderModel reminderModel =
-      addNewReminderModelController.reminders.value;
-
-  late ScheduleModel scheduleModel =
-      reminderModel.schedule ?? ScheduleModel(startDate: DateTime.now());
-
-  late TextEditingController textEditingControllerSearchMedicine =
-      TextEditingController(text: reminderModel.medicine?.brandName);
-  late TextEditingController textEditingControllerReminderDescription =
-      TextEditingController(
-    text: reminderModel.description,
-  );
-  late TextEditingController textEditingControllerQuantity =
-      TextEditingController(
-    text: reminderModel.quantity,
-  );
-  late TextEditingController textEditingControllerMinutes =
-      TextEditingController(
-    text: reminderModel.schedule?.howManyMinutes?.toString(),
-  );
+  late TextEditingController textEditingControllerSearchMedicine;
+  late TextEditingController textEditingControllerReminderDescription;
+  late TextEditingController textEditingControllerQuantity;
+  late TextEditingController textEditingControllerMinutes;
 
   final formKey = GlobalKey<FormState>();
 
-  final AuthController authController = Get.find<AuthController>();
+
 
   bool isAsyncLoading = false;
 
@@ -76,7 +60,18 @@ class _AddReminderState extends State<AddReminder> {
 
   @override
   void initState() {
-    dev.log(addNewReminderModelController.reminders.value.id);
+    reminderModel = context.read<AddReminderCubit>().state;
+    scheduleModel = reminderModel.schedule ?? ScheduleModel(startDate: DateTime.now());
+    
+    textEditingControllerSearchMedicine =
+        TextEditingController(text: reminderModel.medicine?.brandName);
+    textEditingControllerReminderDescription =
+        TextEditingController(text: reminderModel.description);
+    textEditingControllerQuantity =
+        TextEditingController(text: reminderModel.quantity);
+    textEditingControllerMinutes =
+        TextEditingController(text: reminderModel.schedule?.howManyMinutes?.toString());
+
     loadMedicineList();
     super.initState();
   }
@@ -826,7 +821,7 @@ class _AddReminderState extends State<AddReminder> {
                           Icons.notifications,
                         ),
                         const Gap(10),
-                        Text(ReminderType.notification.name.capitalize),
+                        Text(ReminderType.notification.name.toUpperCase()),
                       ],
                     ),
                   ),
@@ -838,7 +833,7 @@ class _AddReminderState extends State<AddReminder> {
                           Icons.alarm,
                         ),
                         const Gap(10),
-                        Text(ReminderType.alarm.name.capitalize),
+                        Text(ReminderType.alarm.name.toUpperCase()),
                       ],
                     ),
                   ),
@@ -918,60 +913,66 @@ class _AddReminderState extends State<AddReminder> {
                 isAsyncLoading = true;
               });
               if (await hasInternetConnection()) {
-                Map<String, dynamic> data = reminderModel.toMap();
-                data["phone_number"] = authController.userEntity.value!.mobile;
-                if (widget.editMode == true) {
-                  final bool isSuccessful = await HomeController.updateReminder(
-                    context,
-                    authController.userEntity.value!.mobile,
-                    reminderModel.id,
-                    data,
-                  );
-                  if (isSuccessful) {
-                    await LocalDbRepository()
-                        .saveReminder(reminderModel.id, jsonEncode(data));
+                final authState = context.read<AuthCubit>().state;
+                if(authState is Authenticated) {
+                  Map<String, dynamic> data = reminderModel.toMap();
+                  final mobile = authState.user.mobile;
+                  data["phone_number"] = mobile;
+                  if (widget.editMode == true) {
+                    final bool isSuccessful = await HomeCubit.updateReminder(
+                      context,
+                      mobile,
+                      reminderModel.id,
+                      data,
+                    );
+                    if (isSuccessful) {
+                      await LocalDbRepository()
+                          .saveReminder(reminderModel.id, jsonEncode(data));
 
-                    toastification.show(
-                      context: context,
-                      title: const Text("Saved changes successfully"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.success,
-                    );
-                    homeController.listOfAllReminder.removeWhere(
-                        (element) => element.id == reminderModel.id);
-                    homeController.listOfAllReminder.add(reminderModel);
-                    context.pop();
+                      toastification.show(
+                        context: context,
+                        title: const Text("Saved changes successfully"),
+                        autoCloseDuration: const Duration(seconds: 2),
+                        type: ToastificationType.success,
+                      );
+                      
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    } else {
+                      toastification.show(
+                        context: context,
+                        title: const Text("Something went wrong #001"),
+                        autoCloseDuration: const Duration(seconds: 2),
+                        type: ToastificationType.error,
+                      );
+                    }
                   } else {
-                    toastification.show(
-                      context: context,
-                      title: const Text("Something went wrong #001"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.error,
-                    );
-                  }
-                } else {
-                  final response =
-                      await addNewReminderModelController.createReminder(data);
-                  if (response != null &&
-                      response.statusCode == StatusCode.CREATED) {
-                    await LocalDbRepository()
-                        .saveReminder(reminderModel.id, jsonEncode(data));
+                    final response =
+                        await context.read<AddReminderCubit>().createReminder(data);
+                    if (response != null &&
+                        response.statusCode == StatusCode.CREATED) {
+                      await LocalDbRepository()
+                          .saveReminder(reminderModel.id, jsonEncode(data));
 
-                    toastification.show(
-                      context: context,
-                      title: const Text("Saved Successfully"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.success,
-                    );
-                    homeController.listOfAllReminder.add(reminderModel);
-                    context.pop();
-                  } else {
-                    toastification.show(
-                      context: context,
-                      title: const Text("Something went wrong #002"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.error,
-                    );
+                      toastification.show(
+                        context: context,
+                        title: const Text("Saved Successfully"),
+                        autoCloseDuration: const Duration(seconds: 2),
+                        type: ToastificationType.success,
+                      );
+                      
+                      if (context.mounted) {
+                        context.pop();
+                      }
+                    } else {
+                      toastification.show(
+                        context: context,
+                        title: const Text("Something went wrong #002"),
+                        autoCloseDuration: const Duration(seconds: 2),
+                        type: ToastificationType.error,
+                      );
+                    }
                   }
                 }
               } else {
@@ -994,7 +995,9 @@ class _AddReminderState extends State<AddReminder> {
               );
             }
           }
-          homeController.reloadLocalReminders();
+          if (context.mounted) {
+            context.read<HomeCubit>().reloadLocalReminders();
+          }
         },
         icon: isAsyncLoading
             ? const SizedBox(

@@ -4,17 +4,17 @@ import "package:gap/gap.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:package_info_plus/package_info_plus.dart";
 
-import "package:get/get.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
     return Drawer(
       child: ListView(
         children: [
@@ -72,9 +72,10 @@ class MyDrawer extends StatelessWidget {
             title: const Text("My Pills"),
             onTap: () {
               context.pop();
+              final authState = context.read<AuthCubit>().state;
               context.pushNamed(
                 Routes.myPillsRoute,
-                extra: authController.userEntity.value?.mobile ?? "",
+                extra: authState is Authenticated ? authState.user.mobile : "",
               );
             },
           ),
@@ -84,9 +85,10 @@ class MyDrawer extends StatelessWidget {
             title: const Text("My History"),
             onTap: () {
               context.pop();
+              final authState = context.read<AuthCubit>().state;
               context.pushNamed(
                 Routes.historyRoute,
-                extra: authController.userEntity.value?.mobile ?? "",
+                extra: authState is Authenticated ? authState.user.mobile : "",
               );
             },
           ),
@@ -126,7 +128,7 @@ class MyDrawer extends StatelessWidget {
                         icon: const Icon(Icons.logout_rounded),
                         onPressed: () async {
                           context.pop();
-                          await authController.logout();
+                          await context.read<AuthCubit>().logout();
                         },
                       ),
                     ],

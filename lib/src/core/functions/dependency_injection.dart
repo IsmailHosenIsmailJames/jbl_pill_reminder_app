@@ -1,6 +1,6 @@
 import "dart:developer";
 import "package:dio/dio.dart";
-import "package:get/get.dart";
+import "package:get_it/get_it.dart";
 
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/core/network/dio_client.dart";
@@ -10,12 +10,15 @@ import "package:jbl_pills_reminder_app/src/features/auth/domain/repositories/aut
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+
+final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
   // Database
   final localDbRepository = LocalDbRepository();
-  Get.put<LocalDbRepository>(localDbRepository, permanent: true);
+  sl.registerLazySingleton<LocalDbRepository>(() => localDbRepository);
 
   // Network
   final dioClient = DioClient(localDbRepository);
@@ -37,25 +40,30 @@ Future<void> initDependencies() async {
       return handler.next(e);
     },
   ));
-  Get.put<DioClient>(dioClient, permanent: true);
-
+  sl.registerLazySingleton<DioClient>(() => dioClient);
 
   // Auth Feature - Data Sources
-  Get.lazyPut<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(dioClient.dio));
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSourceImpl(sl<DioClient>().dio));
 
   // Auth Feature - Repositories
-  Get.lazyPut<AuthRepository>(() => AuthRepositoryImpl(Get.find()));
+  sl.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(sl()));
 
   // Auth Feature - Use Cases
-  Get.lazyPut(() => LoginUseCase(Get.find()));
-  Get.lazyPut(() => SignUpUseCase(Get.find()));
-  Get.lazyPut(() => GetUserProfileUseCase(Get.find()));
+  sl.registerLazySingleton(() => LoginUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
 
-  // Auth Feature - Controller
-  Get.put(AuthController(
-    loginUseCase: Get.find(),
-    signUpUseCase: Get.find(),
-    getUserProfileUseCase: Get.find(),
-    localDbRepository: Get.find(),
-  ));
+  // Blocs / Cubits
+  sl.registerLazySingleton(() => AuthCubit(
+        loginUseCase: sl(),
+        signUpUseCase: sl(),
+        getUserProfileUseCase: sl(),
+        localDbRepository: sl(),
+      ));
+
+  sl.registerLazySingleton(() => HomeCubit(
+        localDb: sl(),
+      ));
 }
