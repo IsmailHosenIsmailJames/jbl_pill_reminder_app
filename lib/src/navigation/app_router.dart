@@ -14,7 +14,12 @@ import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/my_pills/my_pills_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/profile_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/take_medicine/take_medicine_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/forgot_password_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/verify_otp_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/reset_password_page.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/forgot_password_cubit.dart";
 import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
+
 
 class AppRouter {
   static final GlobalKey<NavigatorState> rootNavigatorKey =
@@ -95,7 +100,41 @@ class AppRouter {
           return HistoryPage(phone: phone);
         },
       ),
+      GoRoute(
+        path: Routes.forgotPasswordRoute,
+        name: Routes.forgotPasswordRoute,
+        builder: (context, state) => BlocProvider(
+          create: (context) => sl<ForgotPasswordCubit>(),
+          child: const ForgotPasswordPage(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.verifyOtpRoute,
+        name: Routes.verifyOtpRoute,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>;
+          return BlocProvider(
+            create: (context) => sl<ForgotPasswordCubit>(),
+            child: VerifyOtpPage(
+              mobile: extra["mobile"],
+              hash: extra["hash"],
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: Routes.resetPasswordRoute,
+        name: Routes.resetPasswordRoute,
+        builder: (context, state) {
+          final sessionToken = state.extra as String;
+          return BlocProvider(
+            create: (context) => sl<ForgotPasswordCubit>(),
+            child: ResetPasswordPage(sessionToken: sessionToken),
+          );
+        },
+      ),
     ],
     errorBuilder: (context, state) => const RoutesNotFound(routeName: "Unknown"),
+
   );
 }

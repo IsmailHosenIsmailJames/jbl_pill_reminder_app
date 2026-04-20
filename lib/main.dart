@@ -12,7 +12,6 @@ import "package:permission_handler/permission_handler.dart";
 import "package:workmanager/workmanager.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
 
-
 bool isUpdateChecked = false;
 
 List<String> foregroundNotification = [];
@@ -136,10 +135,8 @@ void main() async {
     constraints: Constraints(networkType: NetworkType.notRequired),
   );
 
-
   await SqliteHelper.initDB();
   await initDependencies();
-
 
   final localDb = LocalDbRepository();
   String? userInfo = await localDb.getPreference("user_info");

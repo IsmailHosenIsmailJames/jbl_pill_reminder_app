@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "629a80bc-879d-4bb0-911e-e63f47e20116",
+    "_postman_id": "af4f01ca-1102-4c15-ab40-e3ed7236813b",
     "name": "Auth",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "26460732"
+    "_exporter_id": "34711307"
   },
   "item": [
     {
@@ -45,39 +45,45 @@
           "formdata": [
             {
               "key": "name",
-              "value": "Raihan Ahmad",
+              "value": "Ismail Hossain",
               "type": "text",
-              "uuid": "dca3b62a-554c-434c-b2c6-289b55858328"
+              "uuid": "dca3b62a-554c-434c-b2c6-289b55858328",
+              "id": 0
             },
             {
               "key": "profilePhoto",
               "type": "file",
               "uuid": "61073eea-461f-43e0-aae8-44406307daf7",
+              "id": 1,
               "src": "/C:/Users/LENOVO/Downloads/download (1).jpeg"
             },
             {
               "key": "mobile",
-              "value": "8801630542945",
+              "value": "8801741095333",
               "type": "text",
-              "uuid": "7a2912b9-c792-4ade-adb2-3aaf5a38c574"
+              "uuid": "7a2912b9-c792-4ade-adb2-3aaf5a38c574",
+              "id": 2
             },
             {
               "key": "division",
               "value": "Dhaka",
               "type": "text",
-              "uuid": "ec9d3834-eac5-4e2f-beeb-9440c5aaec77"
+              "uuid": "ec9d3834-eac5-4e2f-beeb-9440c5aaec77",
+              "id": 3
             },
             {
               "key": "district",
               "value": "Dhaka",
               "type": "text",
-              "uuid": "3081ec6b-8999-4b84-9a70-772340ec4d79"
+              "uuid": "3081ec6b-8999-4b84-9a70-772340ec4d79",
+              "id": 4
             },
             {
               "key": "password",
               "value": "123456",
               "type": "text",
-              "uuid": "6f5be451-6fde-4fa5-8703-9aa28916046b"
+              "uuid": "6f5be451-6fde-4fa5-8703-9aa28916046b",
+              "id": 5
             }
           ]
         },
@@ -104,7 +110,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "{{authToken}}",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwibW9iaWxlIjoiODgwMTc0MTA5NTMzMyIsImdyb3VwIjoiYWRtaW4iLCJpYXQiOjE3NzY2NTc4NTcsImV4cCI6MTc3OTI0OTg1N30.zNFTn_XYEumddzEhkHSSQp4a93jd9nWDiB15H9DkU6g",
               "type": "string"
             }
           ]
@@ -133,7 +139,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\" : \"raihanahmad999@gmail.com\"\r\n}",
+          "raw": "{\r\n    \"mobile\" : \"8801741095333\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -162,7 +168,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"otp\": 274147,\r\n    \"hash\": \"3fbedc596406b2bb710109f38b81da9cfc82f72457c0279d47ad743b61abbe2b.1774584270222\",\r\n    \"email\": \"raihanahmad999@gmail.com\"\r\n}",
+          "raw": "{\r\n    \"otp\": 101408,\r\n    \"hash\": \"6926c1910e1a6b4da43936fef8c60ca7862691ab2b09cb93cd9cc4d13bc29516.1776672275731\",\r\n    \"mobile\": \"8801741095333\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -251,6 +257,13 @@
         }
       },
       "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://103.168.140.135:6070",
+      "type": "string"
     }
   ]
 }

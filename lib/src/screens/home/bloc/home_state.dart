@@ -1,5 +1,5 @@
-import 'package:equatable/equatable.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
+import "package:equatable/equatable.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 
 class HomeState extends Equatable {
   final DateTime selectedDay;

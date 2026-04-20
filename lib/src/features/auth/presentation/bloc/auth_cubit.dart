@@ -1,28 +1,34 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import "dart:convert";
+import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:fluttertoast/fluttertoast.dart";
 
-import 'package:jbl_pills_reminder_app/src/navigation/app_router.dart';
-import 'package:jbl_pills_reminder_app/src/navigation/routes.dart';
-import 'package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart';
-import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart';
-import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart';
-import 'package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart';
-import 'package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart';
+import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/update_password_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+
 
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase loginUseCase;
   final SignUpUseCase signUpUseCase;
   final GetUserProfileUseCase getUserProfileUseCase;
+  final UpdatePasswordUseCase updatePasswordUseCase;
   final LocalDbRepository localDbRepository;
+
 
   AuthCubit({
     required this.loginUseCase,
     required this.signUpUseCase,
     required this.getUserProfileUseCase,
+    required this.updatePasswordUseCase,
     required this.localDbRepository,
   }) : super(AuthInitial());
+
 
   Future<void> checkAuthStatus() async {
     final String? userData = await localDbRepository.getPreference("user_info");
@@ -104,6 +110,26 @@ class AuthCubit extends Cubit<AuthState> {
       }
     }
   }
+
+  Future<bool> updatePassword(String oldPassword, String newPassword) async {
+    try {
+      await updatePasswordUseCase(oldPassword, newPassword);
+      Fluttertoast.showToast(
+        msg: "Password updated successfully!",
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+      return true;
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Failed to update password: ${e.toString()}",
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return false;
+    }
+  }
+
 
   Future<void> logout() async {
     await localDbRepository.deletePreference("user_info");

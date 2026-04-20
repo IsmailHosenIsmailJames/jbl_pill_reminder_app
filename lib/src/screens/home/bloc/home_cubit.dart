@@ -1,19 +1,19 @@
-import 'dart:convert';
-import 'dart:developer';
+import "dart:convert";
+import "dart:developer";
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
-import 'package:toastification/toastification.dart';
+import "package:awesome_notifications/awesome_notifications.dart";
+import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:http/http.dart" as http;
+import "package:toastification/toastification.dart";
 
-import 'package:jbl_pills_reminder_app/src/api/apis.dart';
-import 'package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart';
-import 'package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart';
-import 'package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart';
-import 'package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart';
-import 'package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart';
-import 'package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart';
+import "package:jbl_pills_reminder_app/src/api/apis.dart";
+import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
+import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart";
+import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart";
 
 class HomeCubit extends Cubit<HomeState> {
   final LocalDbRepository _localDb;

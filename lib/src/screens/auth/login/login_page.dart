@@ -156,7 +156,17 @@ class _LoginPageState extends State<LoginPage> {
                                     AutovalidateMode.onUserInteraction,
                               ),
                             ),
-                            const Gap(25),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  context.pushNamed(Routes.forgotPasswordRoute);
+                                },
+                                child: const Text("Forgot Password?"),
+                              ),
+                            ),
+                            const Gap(15),
+
                             SizedBox(
                               width: double.infinity,
                               height: 50,

@@ -10,8 +10,14 @@ import "package:jbl_pills_reminder_app/src/features/auth/domain/repositories/aut
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/update_password_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/send_otp_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/verify_otp_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/reset_password_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/forgot_password_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+
 
 final sl = GetIt.instance;
 
@@ -54,14 +60,26 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
   sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UpdatePasswordUseCase(sl()));
+  sl.registerLazySingleton(() => SendOTPUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyOTPUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
 
   // Blocs / Cubits
   sl.registerLazySingleton(() => AuthCubit(
         loginUseCase: sl(),
         signUpUseCase: sl(),
         getUserProfileUseCase: sl(),
+        updatePasswordUseCase: sl(),
         localDbRepository: sl(),
       ));
+
+  sl.registerLazySingleton(() => ForgotPasswordCubit(
+        sendOTPUseCase: sl(),
+        verifyOTPUseCase: sl(),
+        resetPasswordUseCase: sl(),
+      ));
+
 
   sl.registerLazySingleton(() => HomeCubit(
         localDb: sl(),

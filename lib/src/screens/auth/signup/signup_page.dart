@@ -204,7 +204,7 @@ class _SignupPageState extends State<SignupPage> {
                                 builder: (context, state) {
                                   return customTextFieldDecoration(
                                     textFormField: DropdownButtonFormField<String>(
-                                      value: state.gender,
+                                      initialValue: state.gender,
                                       decoration: textFieldInputDecoration(
                                         hint: "type your gender here...",
                                         prefixIcon: const Icon(Icons.wc_outlined,
@@ -488,7 +488,7 @@ class _AddressSelectionWidget extends StatelessWidget {
           children: [
             customTextFieldDecoration(
               textFormField: DropdownButtonFormField<String>(
-                value: choosenDivision,
+                initialValue: choosenDivision,
                 decoration: textFieldInputDecoration(
                   hint: "Select Division",
                   prefixIcon: const Icon(Icons.map_outlined, color: Colors.grey),
@@ -514,7 +514,7 @@ class _AddressSelectionWidget extends StatelessWidget {
             const Gap(5),
             customTextFieldDecoration(
               textFormField: DropdownButtonFormField<String>(
-                value: choosenDistrict,
+                initialValue: choosenDistrict,
                 decoration: textFieldInputDecoration(
                   hint: "Select District",
                   prefixIcon: const Icon(Icons.location_city_outlined,
@@ -540,7 +540,7 @@ class _AddressSelectionWidget extends StatelessWidget {
             const Gap(5),
             customTextFieldDecoration(
               textFormField: DropdownButtonFormField<String>(
-                value: state.choosenThana,
+                initialValue: state.choosenThana,
                 decoration: textFieldInputDecoration(
                   hint: "Select Upazila",
                   prefixIcon:

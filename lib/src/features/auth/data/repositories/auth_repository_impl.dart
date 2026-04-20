@@ -22,4 +22,26 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> getUserProfile() async {
     return await remoteDataSource.getUserProfile();
   }
+
+  @override
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
+    await remoteDataSource.updatePassword(oldPassword, newPassword);
+  }
+
+  @override
+  Future<Map<String, dynamic>> requestOtp(String mobile) async {
+    return await remoteDataSource.requestOtp(mobile);
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyOtp(
+      String mobile, String otp, String hash) async {
+    return await remoteDataSource.verifyOtp(mobile, otp, hash);
+  }
+
+  @override
+  Future<void> resetPassword(String password, String sessionToken) async {
+    await remoteDataSource.resetPassword(password, sessionToken);
+  }
 }
+
