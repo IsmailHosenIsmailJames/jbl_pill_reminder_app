@@ -5,6 +5,7 @@ import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
+import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
@@ -103,7 +104,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          context.pop();
                         },
                         icon: const Icon(
                           Icons.arrow_back,
@@ -149,7 +150,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             log(e.toString(), name: "alarm");
                           }
 
-                          Navigator.pop(context);
+                          context.pop();
                         },
                         icon: const Icon(Icons.done),
                         label: const Text("Done"),

@@ -3,7 +3,8 @@ import "package:flutter/material.dart";
 import "package:fluttertoast/fluttertoast.dart";
 import "package:get/get.dart";
 
-
+import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/get_user_profile_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_usecase.dart";
@@ -114,6 +115,6 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await localDbRepository.deletePreference("user_info");
     userEntity.value = null;
-    Get.offAllNamed("/");
+    AppRouter.router.go(Routes.rootRoute);
   }
 }

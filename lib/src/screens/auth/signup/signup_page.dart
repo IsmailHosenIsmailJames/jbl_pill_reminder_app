@@ -2,11 +2,11 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
+import "package:go_router/go_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/controller/signip_page_controller.dart";
 
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:smooth_page_indicator/smooth_page_indicator.dart";
@@ -396,14 +396,9 @@ class _SignupPageState extends State<SignupPage> {
                                             const Duration(seconds: 2),
                                         type: ToastificationType.success,
                                       );
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomeScreen(),
-                                        ),
-                                        (route) => false,
-                                      );
+                                      if (context.mounted) {
+                                        context.goNamed(Routes.homeRoute);
+                                      }
                                     }
                                   }
                                 },
@@ -445,14 +440,7 @@ class _SignupPageState extends State<SignupPage> {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LoginPage(),
-                                        ),
-                                        (route) => false,
-                                      );
+                                      context.goNamed(Routes.loginRoute);
                                     },
                                     child: const Text(
                                       "Log in",

@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:go_router/go_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:smooth_page_indicator/smooth_page_indicator.dart";
@@ -174,13 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                                     final authController =
                                         Get.find<AuthController>();
 
-                                    String phone =
-                                        textEditingControllerPhoneNumber.text;
-                                    if (phone.startsWith("80")) {
-                                      // Correct prefix according to requested format or common BD format
-                                      // User example: 8801741095333
-                                    }
-
                                     final success = await authController.login(
                                       textEditingControllerPhoneNumber.text,
                                       textEditingControllerPassword.text,
@@ -194,14 +187,9 @@ class _LoginPageState extends State<LoginPage> {
                                             const Duration(seconds: 2),
                                         type: ToastificationType.success,
                                       );
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomeScreen(),
-                                        ),
-                                        (route) => false,
-                                      );
+                                      if (context.mounted) {
+                                        context.goNamed(Routes.homeRoute);
+                                      }
                                     }
                                   }
                                 },
@@ -236,14 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                                 const Text("Haven't signed up yet?"),
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignupPage(),
-                                      ),
-                                      (route) => false,
-                                    );
+                                    context.goNamed(Routes.signupRoute);
                                   },
                                   child: const Text(
                                     "Sign Up",

@@ -7,6 +7,7 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
+import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:http_status_code/http_status_code.dart";
 import "package:intl/intl.dart";
@@ -939,7 +940,7 @@ class _AddReminderState extends State<AddReminder> {
                     homeController.listOfAllReminder.removeWhere(
                         (element) => element.id == reminderModel.id);
                     homeController.listOfAllReminder.add(reminderModel);
-                    Navigator.pop(context);
+                    context.pop();
                   } else {
                     toastification.show(
                       context: context,
@@ -963,7 +964,7 @@ class _AddReminderState extends State<AddReminder> {
                       type: ToastificationType.success,
                     );
                     homeController.listOfAllReminder.add(reminderModel);
-                    Navigator.pop(context);
+                    context.pop();
                   } else {
                     toastification.show(
                       context: context,

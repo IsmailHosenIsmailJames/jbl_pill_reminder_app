@@ -6,10 +6,11 @@ import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
 import "package:intl/intl.dart";
+import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/main.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
@@ -21,7 +22,6 @@ import "../../core/functions/find_date_medicine.dart";
 import "../../theme/const_values.dart";
 import "../../widgets/medication_card.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
-import "../take_medicine/take_medicine_page.dart";
 
 
 class HomeScreen extends StatefulWidget {
@@ -180,10 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Get.put(AddNewReminderModelController());
                   addNewReminderModelController.reminders.value.id =
                       (math.Random().nextInt(100000000) + 100000000).toString();
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddReminder()));
+                  await context.pushNamed(Routes.addReminderRoute);
                   await homeController.reloadLocalReminders();
                   await analyzeDatabaseAndScheduleReminder();
                 },
@@ -212,14 +209,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (homeController.nextReminder.value != null) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TakeMedicinePage(
-                              currentMedicationToTake:
-                                  homeController.nextReminder.value!,
-                            ),
-                          ));
+                      context.pushNamed(
+                        Routes.takeMedicineRoute,
+                        extra: homeController.nextReminder.value!,
+                      );
                     },
                     child: cardOfReminderForSummary(
                       homeController.nextReminder.value!,

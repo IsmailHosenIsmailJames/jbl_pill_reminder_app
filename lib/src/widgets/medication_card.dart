@@ -4,11 +4,12 @@ import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:get/get.dart";
+import "package:go_router/go_router.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
 import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/controller/add_new_medication_controller.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/controller/home_controller.dart";
@@ -258,13 +259,10 @@ Card cardOfReminderForSummary(
                         addMedicationController.reminders.value =
                             currentReminder;
 
-                        await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AddReminder(
-                                editMode: true,
-                              ),
-                            ));
+                        await context.pushNamed(
+                          Routes.addReminderRoute,
+                          extra: true,
+                        );
                         addMedicationController.reminders.value = ReminderModel(
                             id: (Random().nextInt(100000000) + 100000000)
                                 .toString());
@@ -298,7 +296,7 @@ Card cardOfReminderForSummary(
                                     backgroundColor: Colors.green,
                                   ),
                                   onPressed: () {
-                                    Navigator.pop(context);
+                                    context.pop();
                                   },
                                   icon: const Icon(Icons.cancel),
                                   label: const Text("Cancel"),
@@ -321,11 +319,13 @@ Card cardOfReminderForSummary(
                                     }
                                     String id = currentReminder.id;
 
-                                    final authController = Get.find<AuthController>();
+                                    final authController =
+                                        Get.find<AuthController>();
                                     final bool isDeleted =
                                         await HomeController.deleteReminder(
                                             context,
-                                            authController.userEntity.value!.mobile,
+                                            authController
+                                                .userEntity.value!.mobile,
                                             id);
                                     if (isDeleted) {
                                       await cancelNotificationsForReminder(
@@ -335,7 +335,7 @@ Card cardOfReminderForSummary(
                                       final HomeController homeController =
                                           Get.find();
 
-                                      Navigator.pop(context);
+                                      context.pop();
 
                                       await homeController
                                           .reloadLocalReminders();

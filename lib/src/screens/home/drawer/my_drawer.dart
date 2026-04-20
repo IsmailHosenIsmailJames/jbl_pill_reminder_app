@@ -1,14 +1,12 @@
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
-import "package:jbl_pills_reminder_app/src/screens/my_pills/my_pills_page.dart";
-import "package:jbl_pills_reminder_app/src/screens/profile_page/profile_page.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:package_info_plus/package_info_plus.dart";
 
 import "package:get/get.dart";
+import "package:go_router/go_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/getx/auth_controller.dart";
 
 class MyDrawer extends StatelessWidget {
@@ -55,12 +53,8 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(FluentIcons.home_24_regular),
             title: const Text("Home"),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ));
+              context.pop();
+              context.pushNamed(Routes.homeRoute);
             },
           ),
           ListTile(
@@ -68,12 +62,8 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(FluentIcons.person_24_regular),
             title: const Text("Profile"),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ));
+              context.pop();
+              context.pushNamed(Routes.profileRoute);
             },
           ),
           ListTile(
@@ -81,14 +71,11 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(FluentIcons.pill_24_regular),
             title: const Text("My Pills"),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyPillsPage(
-                      phone: authController.userEntity.value?.mobile ?? "",
-                    ),
-                  ));
+              context.pop();
+              context.pushNamed(
+                Routes.myPillsRoute,
+                extra: authController.userEntity.value?.mobile ?? "",
+              );
             },
           ),
           ListTile(
@@ -96,15 +83,11 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(FluentIcons.history_24_regular),
             title: const Text("My History"),
             onTap: () {
-              Navigator.pop(context);
-
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HistoryPage(
-                      phone: authController.userEntity.value?.mobile ?? "",
-                    ),
-                  ));
+              context.pop();
+              context.pushNamed(
+                Routes.historyRoute,
+                extra: authController.userEntity.value?.mobile ?? "",
+              );
             },
           ),
           ListTile(
@@ -130,7 +113,7 @@ class MyDrawer extends StatelessWidget {
                         label: const Text("Cancel"),
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          Navigator.pop(context);
+                          context.pop();
                         },
                       ),
                       ElevatedButton.icon(
@@ -142,7 +125,7 @@ class MyDrawer extends StatelessWidget {
                         label: const Text("Sign Out"),
                         icon: const Icon(Icons.logout_rounded),
                         onPressed: () async {
-                          Navigator.pop(context);
+                          context.pop();
                           await authController.logout();
                         },
                       ),

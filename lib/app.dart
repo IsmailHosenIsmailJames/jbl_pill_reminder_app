@@ -2,12 +2,9 @@ import "package:flutter/material.dart";
 import "package:flutter_native_splash/flutter_native_splash.dart";
 import "package:get/get.dart";
 import "package:google_fonts/google_fonts.dart";
-import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
+import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
-import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
 
 import "src/features/auth/presentation/getx/auth_controller.dart";
 
@@ -36,7 +33,7 @@ class _AppState extends State<App> {
         TargetPlatform.windows: CupertinoPageTransitionsBuilder(),
       },
     );
-    return GetMaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData.light().copyWith(
@@ -81,26 +78,7 @@ class _AppState extends State<App> {
           ),
         ),
       ),
-      initialRoute: Routes.rootRoute,
-      getPages: [
-        GetPage(
-          name: Routes.rootRoute,
-          page: () => Obx(() {
-            if (authController.isCheckingAuth.value) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return authController.userEntity.value != null
-                ? const HomeScreen()
-                : const LoginPage();
-          }),
-        ),
-      ],
-      unknownRoute: GetPage(
-        name: "/unknown",
-        page: () => const RoutesNotFound(routeName: "Unknown"),
-      ),
+      routerConfig: AppRouter.router,
     );
   }
 }
