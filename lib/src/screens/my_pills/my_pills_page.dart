@@ -1,10 +1,14 @@
+import "package:dartx/dartx.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
-import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
+import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 
 class MyPillsPage extends StatefulWidget {
   final String phone;
@@ -15,100 +19,122 @@ class MyPillsPage extends StatefulWidget {
 }
 
 class _MyPillsPageState extends State<MyPillsPage> {
+  late List<PillScheduleEntity> uniquePills;
 
-  late List<MedicineModel> allMedicine;
   @override
   void initState() {
-    List<MedicineModel> temAllMedicine = [];
+    super.initState();
+    _extractUniquePills();
+  }
+
+  void _extractUniquePills() {
+    List<PillScheduleEntity> tempPills = [];
     final homeCubit = context.read<HomeCubit>();
-    for (var reminder in homeCubit.state.listOfAllReminder) {
-      MedicineModel currentMedicine = reminder.medicine!;
-      bool isAlreadyExits = false;
-      for (var medicine in temAllMedicine) {
-        if (medicine.brandName == currentMedicine.brandName &&
-            medicine.genericName == currentMedicine.genericName &&
-            medicine.brandName == currentMedicine.brandName &&
-            medicine.strength == currentMedicine.strength) {
-          isAlreadyExits = true;
-        }
-      }
-      if (!isAlreadyExits) {
-        temAllMedicine.add(currentMedicine);
+    for (var schedule in homeCubit.state.listOfAllReminder) {
+      bool alreadyExists = tempPills.any((p) =>
+          p.medicineName == schedule.medicineName && p.size == schedule.size);
+      if (!alreadyExists) {
+        tempPills.add(schedule);
       }
     }
-    allMedicine = temAllMedicine;
-    super.initState();
+    uniquePills = tempPills;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const MyDrawer(),
-
       appBar: AppBar(
         title: const Text("My Pills"),
       ),
       body: ListView.builder(
-        itemCount: allMedicine.length,
+        itemCount: uniquePills.length,
         itemBuilder: (context, index) {
-          MedicineModel medicine = allMedicine[index];
+          final pill = uniquePills[index];
           return Container(
-            margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.all(5),
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(7),
+              color: Colors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  FluentIcons.pill_24_regular,
+                const CircleAvatar(
+                  radius: 24,
+                  child: Icon(FluentIcons.pill_24_regular),
                 ),
-                const Gap(5),
+                const Gap(15),
                 Expanded(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (medicine.brandName.isNotEmpty)
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                      Text(
+                        pill.medicineName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (pill.size != null) ...[
+                        const Gap(4),
+                        Text(
+                          "Size: ${pill.size} mg/ml",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                      const Gap(4),
+                      Row(
+                        children: [
+                          if (pill.frequency != FrequencyType.X_DAYS)
                             Text(
-                              "Pill Name :",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade600,
-                              ),
+                              pill.frequency.name
+                                  .replaceAll("_", " ")
+                                  .toLowerCase()
+                                  .capitalize(),
                             ),
-                            const Gap(5),
+                          if (pill.frequency != FrequencyType.X_DAYS)
+                            const Gap(10),
+                          if (pill.frequency == FrequencyType.X_DAYS
+                              ? (pill.xDayValue ?? 0) > 0
+                              : (pill.frequency == FrequencyType.WEEKLY
+                                  ? (pill.weeklyValues ?? []).isNotEmpty
+                                  : (pill.frequency == FrequencyType.MONTHLY
+                                      ? (pill.monthlyDates ?? []).isNotEmpty
+                                      : (pill.yearlyDates ?? []).isNotEmpty)))
                             Expanded(
                               child: Text(
-                                medicine.brandName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                pill.frequency == FrequencyType.X_DAYS
+                                    ? "Every ${pill.xDayValue} day(s)"
+                                    : "On ${() {
+                                        if (pill.frequency ==
+                                            FrequencyType.WEEKLY) {
+                                          return pill.weeklyValues
+                                              ?.map((e) => e.name
+                                                  .toLowerCase()
+                                                  .capitalize())
+                                              .join(", ");
+                                        } else if (pill.frequency ==
+                                            FrequencyType.MONTHLY) {
+                                          return pill.monthlyDates?.join(", ");
+                                        } else if (pill.frequency ==
+                                            FrequencyType.YEARLY) {
+                                          return pill.yearlyDates
+                                              ?.map((e) =>
+                                                  DateFormat.yMMMd().format(e))
+                                              .join(", ");
+                                        }
+                                      }()}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          ],
-                        ),
-                      if (medicine.strength.isNotEmpty)
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Strength :",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const Gap(5),
-                            Expanded(child: Text(medicine.strength)),
-                          ],
-                        ),
+                        ],
+                      )
                     ],
                   ),
                 ),

@@ -3,15 +3,13 @@ import "dart:developer";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 
-import "../../screens/add_reminder/model/reminder_model.dart";
-
 Future<void> scheduleNotification({
   required int id,
   required String title,
   required String body,
   required DateTime time,
   required bool isPreReminder,
-  ReminderModel? data,
+  String? payloadData,
 }) async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {
@@ -44,9 +42,9 @@ Future<void> scheduleNotification({
           actionType: ActionType.Default,
           customSound: "resource://raw/shaking_pill_bottle",
           category: NotificationCategory.Reminder,
-          payload: {"payloadString": data?.toJson(), "isPreReminder": "true"},
+          payload: {"payloadString": payloadData, "isPreReminder": "true"},
         ),
-        actionButtons: data == null
+        actionButtons: payloadData == null
             ? null
             : [
                 NotificationActionButton(
@@ -81,7 +79,7 @@ Future<void> scheduleNotification({
           autoDismissible: false,
           criticalAlert: true,
           customSound: "resource://raw/shaking_pill_bottle",
-          payload: {"payloadString": data?.toJson(), "alarmId": id.toString()},
+          payload: {"payloadString": payloadData, "alarmId": id.toString()},
           backgroundColor: Colors.blueAccent,
         ),
         actionButtons: [
@@ -104,3 +102,4 @@ Future<void> scheduleNotification({
     }
   }
 }
+

@@ -7,6 +7,8 @@ import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 import "package:toastification/toastification.dart";
 
@@ -42,6 +44,12 @@ class _AppState extends State<App> {
         ),
         BlocProvider<HomeCubit>(
           create: (_) => sl<HomeCubit>(),
+        ),
+        BlocProvider<AddReminderCubit>(
+          create: (_) => AddReminderCubit(),
+        ),
+        BlocProvider<PillScheduleCubit>(
+          create: (_) => sl<PillScheduleCubit>(),
         ),
       ],
       child: MaterialApp.router(

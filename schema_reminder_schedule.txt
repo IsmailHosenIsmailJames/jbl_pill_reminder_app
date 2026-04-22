@@ -1,0 +1,52 @@
+{
+  userId: coerce.number(),
+  medicineName: z.string().min(2, "Name must be at least 2 characters").max(100),
+  size: z.coerce.number().optional(),
+  qty: z.coerce.number().optional(),
+  frequency: z.nativeEnum(FrequencyTypes).default(FrequencyTypes.DAILY),
+  xDayValue: z.coerce.number().optional(),
+  weeklyValues: z.array(z.nativeEnum(WeekDays)).optional(),
+  monthlyDates: z.array(z.coerce.number()).optional(),
+  yearlyDates: z.array(z.coerce.date()).optional(),
+  whenToTake: z.string().optional(),
+  takingNotes: z.string().optional(),
+  times: z.array(z.nativeEnum(Times)).optional(),
+  morningTime: z.string().default("09:00"),
+  afternoonTime: z.string().default("14:00"),
+  eveningTime: z.string().default("19:00"),
+  nightTime: z.string().default("21:00"),
+  reminderType: z.nativeEnum(ReminderType).default(ReminderType.notification),
+  notes: z.string().optional(),
+  endDate: z.coerce.date(),
+  status: z.enum(["ACTIVE", "INACTIVE"]).default("ACTIVE")
+}
+
+enum FrequencyTypes {
+  DAILY
+  X_DAYS
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum WeekDays {
+  Saturday
+  Sunday
+  Monday
+  TuesDay
+  WednesDay
+  ThursDay
+  Friday
+}
+
+enum Times {
+  Morning
+  Afternoon
+  Evening
+  Night
+}
+
+enum ReminderType {
+  notification
+  alarm
+}

@@ -1,12 +1,10 @@
 import "package:alarm/alarm.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 
 Future<void> scheduleAlarm({
   required int id,
   required String title,
   required String description,
   required DateTime time,
-  required ReminderModel? data,
 }) async {
   Alarm.set(
     alarmSettings: AlarmSettings(
@@ -24,3 +22,4 @@ Future<void> scheduleAlarm({
     ),
   );
 }
+

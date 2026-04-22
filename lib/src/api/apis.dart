@@ -6,6 +6,8 @@ String updatePasswordAPI = "${baseAPI}auth/update-password";
 String otpRequestAPI = "${baseAPI}auth/otp-request";
 String verifyOtpAPI = "${baseAPI}auth/verify-otp";
 String updateForgotPasswordAPI = "${baseAPI}auth/update-forgot-password";
+String pillSchedulesAPI = "${baseAPI}pill-schedules";
+
 
 
 // Old endpoints (kept for reference or other features not yet migrated)

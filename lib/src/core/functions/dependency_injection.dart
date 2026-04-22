@@ -16,8 +16,15 @@ import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/verify_
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/reset_password_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/forgot_password_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/data/datasources/pill_schedule_remote_data_source.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/data/repositories/pill_schedule_repository_impl.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/repositories/pill_schedule_repository.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/create_pill_schedule_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/delete_pill_schedule_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/get_all_pill_schedules_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/update_pill_schedule_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
-
 
 final sl = GetIt.instance;
 
@@ -31,17 +38,21 @@ Future<void> initDependencies() async {
   dioClient.dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) {
       log("--> ${options.method} ${options.uri}", name: "Dio");
+      log("Method: ${options.method}", name: "Dio");
       log("Headers: ${options.headers}", name: "Dio");
       log("Body: ${options.data}", name: "Dio");
       return handler.next(options);
     },
     onResponse: (response, handler) {
-      log("<-- ${response.statusCode} ${response.requestOptions.uri}", name: "Dio");
+      log("<-- ${response.statusCode} ${response.requestOptions.uri}",
+          name: "Dio");
+      log("Method: ${response.requestOptions.method}", name: "Dio");
       log("Response: ${response.data}", name: "Dio");
       return handler.next(response);
     },
     onError: (e, handler) {
-      log("<-- ERROR ${e.response?.statusCode} ${e.requestOptions.uri}", name: "Dio");
+      log("<-- ERROR ${e.response?.statusCode} ${e.requestOptions.uri}",
+          name: "Dio");
       log("Message: ${e.message}", name: "Dio");
       return handler.next(e);
     },
@@ -53,8 +64,7 @@ Future<void> initDependencies() async {
       () => AuthRemoteDataSourceImpl(sl<DioClient>().dio));
 
   // Auth Feature - Repositories
-  sl.registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryImpl(sl()));
+  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
 
   // Auth Feature - Use Cases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -64,6 +74,16 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => SendOTPUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOTPUseCase(sl()));
   sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
+
+  // Pill Schedule Feature
+  sl.registerLazySingleton<PillScheduleRemoteDataSource>(
+      () => PillScheduleRemoteDataSourceImpl(sl<DioClient>().dio));
+  sl.registerLazySingleton<PillScheduleRepository>(
+      () => PillScheduleRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => CreatePillScheduleUseCase(sl()));
+  sl.registerLazySingleton(() => GetAllPillSchedulesUseCase(sl()));
+  sl.registerLazySingleton(() => UpdatePillScheduleUseCase(sl()));
+  sl.registerLazySingleton(() => DeletePillScheduleUseCase(sl()));
 
   // Blocs / Cubits
   sl.registerLazySingleton(() => AuthCubit(
@@ -80,8 +100,15 @@ Future<void> initDependencies() async {
         resetPasswordUseCase: sl(),
       ));
 
-
   sl.registerLazySingleton(() => HomeCubit(
         localDb: sl(),
+        getAllUseCase: sl(),
+      ));
+
+  sl.registerFactory(() => PillScheduleCubit(
+        createUseCase: sl(),
+        getAllUseCase: sl(),
+        updateUseCase: sl(),
+        deleteUseCase: sl(),
       ));
 }

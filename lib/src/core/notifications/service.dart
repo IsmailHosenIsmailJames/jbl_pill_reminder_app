@@ -3,9 +3,10 @@ import "dart:developer";
 
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -153,10 +154,24 @@ void customNavigation(Map? actionData) async {
     String? reminderRawData = receivedAction.payload?["payloadString"];
     log(reminderRawData.toString(), name: "actionData");
     if (reminderRawData != null) {
-      AppRouter.router.push(
-        Routes.takeMedicineRoute,
-        extra: ReminderModel.fromJson(reminderRawData),
-      );
+      try {
+        final payloadMap = Map<String, dynamic>.from(jsonDecode(reminderRawData));
+        // Create a minimal entity from the notification payload for the take medicine screen
+        final entity = PillScheduleEntity(
+          id: payloadMap["id"],
+          userId: 0,
+          medicineName: payloadMap["medicineName"] ?? "Unknown",
+          frequency: FrequencyType.DAILY,
+          endDate: DateTime.now().add(const Duration(days: 30)),
+        );
+        AppRouter.router.push(
+          Routes.takeMedicineRoute,
+          extra: entity,
+        );
+      } catch (e) {
+        log("Error parsing notification payload: $e", name: "customNavigation");
+      }
     }
   }
 }
+

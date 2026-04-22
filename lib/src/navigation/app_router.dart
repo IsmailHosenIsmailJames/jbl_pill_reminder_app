@@ -6,7 +6,7 @@ import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
@@ -67,8 +67,8 @@ class AppRouter {
         path: Routes.takeMedicineRoute,
         name: Routes.takeMedicineRoute,
         builder: (context, state) {
-          final reminder = state.extra as ReminderModel;
-          return TakeMedicinePage(currentMedicationToTake: reminder);
+          final schedule = state.extra as PillScheduleEntity;
+          return TakeMedicinePage(currentMedicationToTake: schedule);
         },
       ),
       GoRoute(

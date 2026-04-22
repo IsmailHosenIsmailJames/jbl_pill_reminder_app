@@ -6,7 +6,8 @@ import "package:gap/gap.dart";
 import "package:http/http.dart";
 import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/api/apis.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/data/models/pill_schedule_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 
 class HistoryPage extends StatefulWidget {
@@ -36,7 +37,7 @@ class _HistoryPageState extends State<HistoryPage> {
               final response = snapshot.data!;
               if (response.statusCode == 200) {
                 List decoded = jsonDecode(response.body);
-                Map<DateTime, ReminderModel> data = arrangeAndSortData(decoded);
+                Map<DateTime, PillScheduleEntity> data = arrangeAndSortData(decoded);
                 return ListView.builder(
                   padding: const EdgeInsets.all(10),
                   itemCount: data.length,
@@ -98,15 +99,20 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Map<DateTime, ReminderModel> arrangeAndSortData(List rawData) {
-    Map<DateTime, ReminderModel> sortedData = {};
+  Map<DateTime, PillScheduleEntity> arrangeAndSortData(List rawData) {
+    Map<DateTime, PillScheduleEntity> sortedData = {};
 
     for (int i = 0; i < rawData.length; i++) {
-      String date = rawData[i]["created_at"];
-      DateTime dateTime = DateTime.parse(date);
-      Map<String, dynamic> data = Map<String, dynamic>.from(rawData[i]["data"]);
-      sortedData.addAll({dateTime: ReminderModel.fromMap(data)});
+      try {
+        String date = rawData[i]["created_at"];
+        DateTime dateTime = DateTime.parse(date);
+        Map<String, dynamic> data = Map<String, dynamic>.from(rawData[i]["data"]);
+        sortedData.addAll({dateTime: PillScheduleModel.fromJson(data)});
+      } catch (e) {
+        log("Error parsing history entry: $e");
+      }
     }
     return sortedData;
   }
 }
+

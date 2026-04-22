@@ -1,19 +1,18 @@
+import "dart:convert";
 import "dart:developer";
 
 import "package:alarm/alarm.dart";
 import "package:awesome_notifications/awesome_notifications.dart";
-import "package:dartx/dartx.dart";
 import "package:flutter/material.dart";
 import "package:jbl_pills_reminder_app/src/core/database/sqlite_helper.dart";
 import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/core/notifications/schedule_alarm.dart";
-import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/data/models/pill_schedule_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 
 import "../functions/find_date_medicine.dart";
 import "../notifications/schedule_notification.dart";
-import "../../screens/add_reminder/model/reminder_model.dart";
-import "../../screens/add_reminder/model/schedule_model.dart";
 
 /// Large offset to separate pre-reminder IDs from main notification IDs,
 /// preventing collisions when schedules have sequential base IDs.
@@ -31,106 +30,99 @@ Future<void> analyzeDatabaseAndScheduleReminder({bool reloadDB = false}) async {
 
   final localDb = LocalDbRepository();
 
-  final reminderNotificationShown =
-      await localDb.getPreference("reminderNotificationShown");
-  final notificationShown = await localDb.getPreference("notificationShown");
-  final alarmShown = await localDb.getPreference("alarmShown");
-
-  log(
-    [
-      foregroundNotification.toString(),
-      reminderNotificationShown.toString(),
-      notificationShown.toString(),
-      alarmShown.toString(),
-    ].toString(),
-    name: "onRepeatEvent -> analyzeDatabaseForeground",
-  );
-
   Map<String, String> reminderDataMap = await localDb.getAllReminders();
-  List<ReminderModel> allReminder = [];
+  List<PillScheduleEntity> allSchedules = [];
   for (var element in reminderDataMap.values) {
     try {
-      allReminder.add(ReminderModel.fromJson(element));
+      final map = Map<String, dynamic>.from(jsonDecode(element));
+      allSchedules.add(PillScheduleModel.fromJson(map));
     } catch (e) {
-      log("Error parsing reminder: $e");
+      log("Error parsing schedule: $e");
     }
   }
-  allReminder = sortRemindersBasedOnCreatedDate(allReminder);
-  List<ReminderModel> todaysReminder = findMedicineForSelectedDay(
-      allReminder, DateTime.now().subtract(const Duration(minutes: 5)));
-  log("analyzeDatabaseForeground -> ${todaysReminder.length} reminders for today");
+
+  List<PillScheduleEntity> todaysSchedules = findMedicineForSelectedDay(
+      allSchedules, DateTime.now().subtract(const Duration(minutes: 5)));
+  log("analyzeDatabaseForeground -> ${todaysSchedules.length} schedules for today");
 
   final DateTime now = DateTime.now();
 
-  for (ReminderModel reminderModel in todaysReminder) {
-    MedicineModel? medicine = reminderModel.medicine;
-    if (medicine == null) continue;
-    String medicineName = medicine.brandName;
-    if (medicineName.isEmpty) medicineName = medicine.genericName;
+  for (PillScheduleEntity schedule in todaysSchedules) {
+    String medicineName = schedule.medicineName;
+    List<ScheduleTimeSlot> timeSlots = schedule.times ?? [];
 
-    List medicineScheduleTimes = reminderModel.schedule?.times ?? [];
+    for (int i = 0; i < timeSlots.length; i++) {
+      final slot = timeSlots[i];
+      String timeStr = "";
+      switch (slot) {
+        case ScheduleTimeSlot.Morning:
+          timeStr = schedule.morningTime;
+          break;
+        case ScheduleTimeSlot.Afternoon:
+          timeStr = schedule.afternoonTime;
+          break;
+        case ScheduleTimeSlot.Evening:
+          timeStr = schedule.eveningTime;
+          break;
+        case ScheduleTimeSlot.Night:
+          timeStr = schedule.nightTime;
+          break;
+      }
 
-    for (TimeModel scheduleTime in medicineScheduleTimes) {
-      log("Schedule Medicine : -> ${scheduleTime.toJson()}");
+      if (timeStr.isEmpty) continue;
 
-      DateTime timeToShow = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        scheduleTime.hour,
-        scheduleTime.minute,
-      );
+      final parts = timeStr.split(":");
+      final hour = int.tryParse(parts[0]) ?? 0;
+      final minute = int.tryParse(parts.length > 1 ? parts[1] : "0") ?? 0;
+
+      DateTime timeToShow = DateTime(now.year, now.month, now.day, hour, minute);
 
       // Skip if the scheduled time has already passed
       if (timeToShow.isBefore(now)) {
-        log("Skipping past schedule: ${scheduleTime.toJson()}");
+        log("Skipping past schedule: ${slot.name} at $timeStr");
         continue;
       }
 
-      final String formattedTime = formatTimeOfDay(
-          TimeOfDay(hour: scheduleTime.hour, minute: scheduleTime.minute));
+      final String formattedTime = formatTimeOfDay(TimeOfDay(hour: hour, minute: minute));
+
+      // Use a deterministic ID based on schedule id and slot index
+      int notificationId = (schedule.id?.hashCode ?? 0).abs() % 90000 + i;
 
       // Schedule alarm or notification for the main reminder
-      if (reminderModel.reminderType == ReminderType.alarm) {
-        int id = scheduleTime.id.toIntOrNull() ?? 0;
-        AlarmSettings? alarmSettings = await Alarm.getAlarm(id);
+      if (schedule.reminderType == ReminderType.alarm) {
+        AlarmSettings? alarmSettings = await Alarm.getAlarm(notificationId);
         if (!(alarmSettings != null &&
-            alarmSettings.dateTime.hour == scheduleTime.hour &&
-            alarmSettings.dateTime.minute == scheduleTime.minute)) {
+            alarmSettings.dateTime.hour == hour &&
+            alarmSettings.dateTime.minute == minute)) {
           await scheduleAlarm(
-            id: id,
+            id: notificationId,
             title: "At $formattedTime, Take '$medicineName' Medicine .",
             description: "Don't Miss your scheduled medicine. Take it now.",
             time: timeToShow,
-            data: reminderModel,
           );
         } else {
-          log("Already $id scheduled for alarm");
+          log("Already $notificationId scheduled for alarm");
         }
       } else {
-        log(scheduleTime.id, name: "Notification ->");
+        log("$notificationId", name: "Notification ->");
         await scheduleNotification(
           title: "At $formattedTime, Take '$medicineName' Medicine .",
           body: "Don't Miss your scheduled medicine. Take it now.",
           time: timeToShow,
-          data: reminderModel,
           isPreReminder: false,
-          id: scheduleTime.id.toIntOrNull() ?? 0,
+          id: notificationId,
+          payloadData: jsonEncode({"medicineName": medicineName, "id": schedule.id}),
         );
       }
 
       // Schedule a pre-reminder 15 minutes before
-      // Use a large offset to avoid ID collisions with the main notification
-      final DateTime preReminderTime =
-          timeToShow.subtract(const Duration(minutes: 15));
+      final DateTime preReminderTime = timeToShow.subtract(const Duration(minutes: 15));
 
       if (preReminderTime.isAfter(now)) {
         await scheduleNotification(
-          id: (scheduleTime.id.toIntOrNull() ?? 0) + _preReminderIdOffset,
-          title:
-              "Reminder: You have Medicine '$medicineName' at $formattedTime",
-          body:
-              "Don't Miss your upcoming medicine. Get ready for take medicine.",
+          id: notificationId + _preReminderIdOffset,
+          title: "Reminder: You have Medicine '$medicineName' at $formattedTime",
+          body: "Don't Miss your upcoming medicine. Get ready for take medicine.",
           time: preReminderTime,
           isPreReminder: true,
         );
@@ -158,17 +150,14 @@ Future<void> cancelAllScheduledTask() async {
   await AwesomeNotifications().cancelAll();
 }
 
-/// Cancels all scheduled notifications and alarms for a specific reminder.
-/// This covers:
-///   - The main alarm (alarm package) or main notification (awesome_notifications)
-///   - The pre-reminder notification (main id + [_preReminderIdOffset])
-Future<void> cancelNotificationsForReminder(ReminderModel reminder) async {
-  final times = reminder.schedule?.times ?? [];
-  for (final scheduleTime in times) {
-    final int id = int.tryParse(scheduleTime.id) ?? 0;
+/// Cancels all scheduled notifications and alarms for a specific schedule.
+Future<void> cancelNotificationsForSchedule(PillScheduleEntity schedule) async {
+  final times = schedule.times ?? [];
+  for (int i = 0; i < times.length; i++) {
+    final int id = (schedule.id?.hashCode ?? 0).abs() % 90000 + i;
     final int preReminderId = id + _preReminderIdOffset;
 
-    if (reminder.reminderType == ReminderType.alarm) {
+    if (schedule.reminderType == ReminderType.alarm) {
       await Alarm.stop(id);
     }
     // Always cancel awesome_notifications entries (main + pre-reminder)
@@ -176,3 +165,4 @@ Future<void> cancelNotificationsForReminder(ReminderModel reminder) async {
     await AwesomeNotifications().cancel(preReminderId);
   }
 }
+

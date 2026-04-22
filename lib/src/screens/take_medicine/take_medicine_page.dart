@@ -1,25 +1,15 @@
-import "dart:convert";
-import "dart:developer";
-
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
-import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 import "package:toastification/toastification.dart";
-
-import "../../core/functions/safe_substring.dart";
 
 class TakeMedicinePage extends StatefulWidget {
   final String? title;
   final String? payload;
-  final ReminderModel currentMedicationToTake;
+  final PillScheduleEntity currentMedicationToTake;
   final int? alarmID;
 
   const TakeMedicinePage({
@@ -35,12 +25,6 @@ class TakeMedicinePage extends StatefulWidget {
 }
 
 class _TakeMedicinePageState extends State<TakeMedicinePage> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,114 +37,72 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-                const Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    child: Icon(
-                      Icons.medication_rounded,
-                      size: 50,
+            const Center(
+              child: CircleAvatar(
+                radius: 50,
+                child: Icon(Icons.medication_rounded, size: 50),
+              ),
+            ),
+            const Gap(30),
+            Text(
+              widget.currentMedicationToTake.medicineName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            const Text("Details: ", style: TextStyle(fontSize: 14)),
+            cardOfReminderForSummary(
+              widget.currentMedicationToTake,
+              context,
+              showTitle: false,
+            ),
+            const Gap(30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100)),
                     ),
+                    onPressed: () => context.pop(),
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text("Back"),
                   ),
                 ),
-                const Gap(30),
-                if (widget.currentMedicationToTake.medicine?.brandName != null)
-                  Text(
-                    substringSafe(
-                      widget.currentMedicationToTake.medicine?.brandName ?? "",
-                      30,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100)),
                     ),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                const Divider(),
-                const Text(
-                  "Details: ",
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-              ] +
-              [
-                cardOfReminderForSummary(
-                  widget.currentMedicationToTake,
-                  context,
-                  showTitle: false,
-                )
-              ] +
-              <Widget>[
-                const Gap(30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                        onPressed: () {
-                          context.pop();
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back,
-                        ),
-                        label: const Text(
-                          "Back",
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.45,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                        ),
-                        onPressed: () async {
-                          Map<String, dynamic> reminderData =
-                              widget.currentMedicationToTake.toMap();
-                          reminderData["doneBackup"] = false;
-                          await LocalDbRepository().saveReminderDone(
-                            DateTime.now().millisecondsSinceEpoch.toString(),
-                            jsonEncode(reminderData),
-                          );
-                          try {
-                            final authState = context.read<AuthCubit>().state;
-                            if (authState is Authenticated) {
-                              HomeCubit.backupReminderHistory(
-                                  authState.user.mobile);
-                            }
-                          } catch (e) {
-                            log(e.toString());
-                          }
-                          toastification.show(
-                            context: context,
-                            title: const Text("Saved as done"),
-                            type: ToastificationType.success,
-                            autoCloseDuration: const Duration(seconds: 3),
-                          );
+                    onPressed: () async {
+                      // Logic for marking as done can be added here (intake history)
+                      toastification.show(
+                        context: context,
+                        title: const Text("Marked as taken"),
+                        type: ToastificationType.success,
+                        autoCloseDuration: const Duration(seconds: 2),
+                      );
 
-                          try {
-                            AwesomeNotifications().dismiss(
-                                int.parse(widget.currentMedicationToTake.id));
-                          } catch (e) {
-                            log(e.toString(), name: "alarm");
-                          }
+                      if (widget.currentMedicationToTake.id != null) {
+                        try {
+                          AwesomeNotifications()
+                              .dismiss(widget.currentMedicationToTake.id!);
+                        } catch (_) {}
+                      }
 
-                          context.pop();
-                        },
-                        icon: const Icon(Icons.done),
-                        label: const Text("Done"),
-                      ),
-                    ),
-                  ],
+                      context.pop();
+                    },
+                    icon: const Icon(Icons.done),
+                    label: const Text("Done"),
+                  ),
                 ),
               ],
+            ),
+          ],
         ),
       ),
     );

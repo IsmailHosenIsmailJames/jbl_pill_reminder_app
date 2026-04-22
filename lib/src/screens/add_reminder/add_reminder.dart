@@ -1,34 +1,27 @@
 import "dart:convert";
-import "dart:developer" as dev;
-import "dart:math";
+import "dart:developer";
 
-import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:gap/gap.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:http_status_code/http_status_code.dart";
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
-import "package:jbl_pills_reminder_app/src/resources/medicine_list.dart";
-import "package:jbl_pills_reminder_app/src/resources/medicine_schedule_title_name.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_state.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/schedule_model.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
 import "package:jbl_pills_reminder_app/src/widgets/get_titles.dart";
 import "package:jbl_pills_reminder_app/src/widgets/textfieldinput_decoration.dart";
 import "package:searchfield/searchfield.dart";
 import "package:toastification/toastification.dart";
 
-import "../../resources/frequency.dart";
-import "../../resources/week_days.dart";
 import "../../theme/colors.dart";
-import "../../theme/const_values.dart";
 
 class AddReminder extends StatefulWidget {
   final bool? editMode;
@@ -40,89 +33,127 @@ class AddReminder extends StatefulWidget {
 }
 
 class _AddReminderState extends State<AddReminder> {
-  ScrollController scrollControllerScheduleTitle = ScrollController();
-
-  late ReminderModel reminderModel;
-  late ScheduleModel scheduleModel;
-
   late TextEditingController textEditingControllerSearchMedicine;
-  late TextEditingController textEditingControllerReminderDescription;
+  late TextEditingController textEditingControllerNotes;
   late TextEditingController textEditingControllerQuantity;
-  late TextEditingController textEditingControllerMinutes;
+  late TextEditingController textEditingControllerSize;
+
+  // Local State for the draft
+  String medicineName = "";
+  double? qty;
+  double? size;
+  FrequencyType frequency = FrequencyType.DAILY;
+  int? xDayValue;
+  List<WeekDay> weeklyValues = [];
+  List<int> monthlyDates = [];
+  List<DateTime> yearlyDates = [];
+  String whenToTake = "";
+  String takingNotes = "";
+  String notes = "";
+  List<ScheduleTimeSlot> selectedSlots = [];
+  String morningTime = "09:00";
+  String afternoonTime = "14:00";
+  String eveningTime = "19:00";
+  String nightTime = "21:00";
+  ReminderType reminderType = ReminderType.notification;
+  DateTime endDate = DateTime.now().add(const Duration(days: 30));
+  String status = "ACTIVE";
 
   final formKey = GlobalKey<FormState>();
-
-
-
-  bool isAsyncLoading = false;
-
   List<Map<String, dynamic>> medicineData = [];
 
   @override
   void initState() {
-    reminderModel = context.read<AddReminderCubit>().state;
-    scheduleModel = reminderModel.schedule ?? ScheduleModel(startDate: DateTime.now());
-    
+    super.initState();
+    final draft = context.read<AddReminderCubit>().state;
+    if (draft != null) {
+      medicineName = draft.medicineName;
+      qty = draft.qty;
+      size = draft.size;
+      frequency = draft.frequency;
+      xDayValue = draft.xDayValue;
+      weeklyValues = List.from(draft.weeklyValues ?? []);
+      monthlyDates = List.from(draft.monthlyDates ?? []);
+      yearlyDates = List.from(draft.yearlyDates ?? []);
+      whenToTake = draft.whenToTake ?? "";
+      takingNotes = draft.takingNotes ?? "";
+      notes = draft.notes ?? "";
+      selectedSlots = List.from(draft.times ?? []);
+      morningTime = draft.morningTime;
+      afternoonTime = draft.afternoonTime;
+      eveningTime = draft.eveningTime;
+      nightTime = draft.nightTime;
+      reminderType = draft.reminderType;
+      endDate = draft.endDate;
+      status = draft.status;
+    }
+
     textEditingControllerSearchMedicine =
-        TextEditingController(text: reminderModel.medicine?.brandName);
-    textEditingControllerReminderDescription =
-        TextEditingController(text: reminderModel.description);
+        TextEditingController(text: medicineName);
+    textEditingControllerNotes = TextEditingController(text: takingNotes);
     textEditingControllerQuantity =
-        TextEditingController(text: reminderModel.quantity);
-    textEditingControllerMinutes =
-        TextEditingController(text: reminderModel.schedule?.howManyMinutes?.toString());
+        TextEditingController(text: qty?.toString());
+    textEditingControllerSize = TextEditingController(text: size?.toString());
 
     loadMedicineList();
-    super.initState();
   }
 
   Future<void> loadMedicineList() async {
     String medicineJsonData =
         await rootBundle.loadString("assets/resources/medicine_list.json");
-    dev.log("1");
-    List<Map> temMedicineData = List<Map>.from(jsonDecode(medicineJsonData));
-    dev.log("2");
-
-    for (int i = 0; i < temMedicineData.length; i++) {
-      Map<String, dynamic> element =
-          Map<String, dynamic>.from(temMedicineData[i]);
+    List<dynamic> temMedicineData = jsonDecode(medicineJsonData);
+    for (var element in temMedicineData) {
       medicineData.add({
-        "brandName": element["BN"], // brandName = BN
-        "genericName": element["GN"], // genericName = GN
-        "strength": element["S"], // strength = S
-        "dosageDescription": element["DD"], // dosageDescription = DD
+        "brandName": element["BN"],
+        "genericName": element["GN"],
+        "strength": element["S"],
+        "dosageDescription": element["DD"],
       });
     }
-    dev.log("3");
-
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Reminder"),
-      ),
-      body: SafeArea(
-        child: Form(
-          key: formKey,
-          child: ListView(
-            padding: const EdgeInsets.only(
-              bottom: 100,
-              top: 10,
-              left: 10,
-              right: 10,
+    return BlocListener<PillScheduleCubit, PillScheduleState>(
+      listener: (context, state) {
+        if (state is PillScheduleOperationSuccess) {
+          toastification.show(
+            context: context,
+            title: Text(state.message),
+            type: ToastificationType.success,
+            autoCloseDuration: const Duration(seconds: 2),
+          );
+          context.read<HomeCubit>().reloadLocalReminders();
+          context.pop();
+        } else if (state is PillScheduleError) {
+          toastification.show(
+            context: context,
+            title: Text(state.message),
+            type: ToastificationType.error,
+            autoCloseDuration: const Duration(seconds: 3),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+            title: Text(
+                widget.editMode == true ? "Edit Reminder" : "Add Reminder")),
+        body: SafeArea(
+          child: Form(
+            key: formKey,
+            child: ListView(
+              padding: const EdgeInsets.all(10),
+              children: [
+                _buildMedicineInfoCard(),
+                const Gap(15),
+                _buildScheduleCard(),
+                const Gap(15),
+                _buildExtraDetailsCard(),
+                const Gap(25),
+                _buildSubmitButton(),
+              ],
             ),
-            children: [
-              _buildMedicineInfoCard(),
-              const Gap(15),
-              _buildScheduleCard(),
-              const Gap(15),
-              _buildExtraDetailsCard(),
-              const Gap(25),
-              _buildSubmitButton(),
-            ],
           ),
         ),
       ),
@@ -132,7 +163,6 @@ class _AddReminderState extends State<AddReminder> {
   Widget _buildMedicineInfoCard() {
     return Card(
       elevation: 4,
-      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -140,81 +170,70 @@ class _AddReminderState extends State<AddReminder> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Medicine Details",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: MyAppColors.primaryColor)),
+                    color: MyAppColors.primaryColor,
+                    fontSize: 18)),
             const Gap(20),
             getTitlesForFields(title: "Medicine name", isFieldRequired: true),
             const Gap(5),
             customTextFieldDecoration(
-              textFormField: SearchField<MedicineModel>(
+              textFormField: SearchField<String>(
                 onSuggestionTap: (p0) {
-                  textEditingControllerSearchMedicine.text =
-                      "${p0.item?.brandName ?? ''} (${p0.item?.genericName ?? ''}) - ${p0.item?.dosageDescription ?? ''}";
+                  setState(() {
+                    medicineName = p0.item!;
+                    textEditingControllerSearchMedicine.text = medicineName;
+                  });
                 },
                 controller: textEditingControllerSearchMedicine,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please type a medicine name";
-                  } else {
-                    return null;
-                  }
-                },
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                suggestions: medicineData.map(
-                  (e) {
-                    final MedicineModel item = MedicineModel.fromMap(e);
-                    return SearchFieldListItem<MedicineModel>(
-                      item.toJson(),
-                      item: item,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Text(item.brandName),
-                              const Gap(5),
-                              Text(
-                                "(${item.genericName}) - ${item.dosageDescription}",
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ).toList(),
+                validator: (value) => value == null || value.isEmpty
+                    ? "Please enter medicine name"
+                    : null,
+                suggestions: medicineData
+                    .map((e) => SearchFieldListItem<String>(e["brandName"],
+                        item: e["brandName"]))
+                    .toList(),
               ),
             ),
             const Gap(15),
-            const Gap(10),
-            getTitlesForFields(
-              title: "Quantity",
-              isFieldRequired: true,
-            ),
-            const Gap(5),
-            customTextFieldDecoration(
-              textFormField: TextFormField(
-                controller: textEditingControllerQuantity,
-                decoration: textFieldInputDecoration(
-                  hint: "type quantity here...",
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getTitlesForFields(title: "Qty"),
+                      const Gap(5),
+                      customTextFieldDecoration(
+                        textFormField: TextFormField(
+                          controller: textEditingControllerQuantity,
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => qty = double.tryParse(v),
+                          decoration: textFieldInputDecoration(hint: "1.0"),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter some text";
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  reminderModel.quantity = value;
-                },
-                onTapOutside: (event) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                },
-              ),
+                const Gap(10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getTitlesForFields(title: "Size (mg/ml)"),
+                      const Gap(5),
+                      customTextFieldDecoration(
+                        textFormField: TextFormField(
+                          controller: textEditingControllerSize,
+                          keyboardType: TextInputType.number,
+                          onChanged: (v) => size = double.tryParse(v),
+                          decoration: textFieldInputDecoration(hint: "500"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -225,7 +244,6 @@ class _AddReminderState extends State<AddReminder> {
   Widget _buildScheduleCard() {
     return Card(
       elevation: 4,
-      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -233,556 +251,171 @@ class _AddReminderState extends State<AddReminder> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Schedule & Frequency",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: MyAppColors.primaryColor)),
+                    color: MyAppColors.primaryColor,
+                    fontSize: 18)),
             const Gap(20),
-            getTitlesForFields(
-              title: "Frequency",
-              isFieldRequired: true,
-            ),
-            const Gap(5),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  frequencyTypeList.length,
-                  (index) {
-                    bool isSelected = scheduleModel.frequency?.type ==
-                        frequencyTypeList[index];
-                    return Container(
-                      height: 30,
-                      padding: const EdgeInsets.only(right: 5),
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isSelected
-                              ? MyAppColors.primaryColor
-                              : MyAppColors.shadedMutedColor,
-                          foregroundColor: isSelected
-                              ? Colors.white
-                              : MyAppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            scheduleModel.frequency =
-                                scheduleModel.frequency?.copyWith(
-                                      type: frequencyTypeList[index],
-                                    ) ??
-                                    Frequency(
-                                      type: frequencyTypeList[index],
-                                    );
-                          });
-                        },
-                        icon: isSelected
-                            ? const Icon(
-                                Icons.done,
-                                size: 18,
-                              )
-                            : null,
-                        label: Text(
-                          frequencyTypeList[index],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const Gap(10),
-            if (scheduleModel.frequency?.type == frequencyTypeList[1])
-              customTextFieldDecoration(
-                textFormField: TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter some text";
-                    }
-                    if (int.tryParse(value) == null) {
-                      return "Please enter a valid number";
-                    }
-                    return null;
-                  },
-                  controller: TextEditingController(
-                      text: scheduleModel.frequency?.everyXDays?.toString() ??
-                          ""),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onChanged: (value) {
-                    scheduleModel.frequency?.everyXDays = int.tryParse(value);
-                  },
-                  decoration: const InputDecoration(
-                    hintText: "type how many days the gap is...",
-                  ),
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
-              ),
-            if (scheduleModel.frequency?.type == frequencyTypeList[2])
-              getTitlesForFields(
-                title: "Select Week Days",
-                icon: FluentIcons.select_all_on_24_regular,
-              ),
-            if (scheduleModel.frequency?.type == frequencyTypeList[3])
-              getTitlesForFields(
-                title: "Select Days in a Month",
-                icon: FluentIcons.select_all_on_24_regular,
-              ),
-            if (scheduleModel.frequency?.type == frequencyTypeList[4])
-              getTitlesForFields(
-                title: "Add Dates of a Year",
-                icon: FluentIcons.calendar_24_regular,
-              ),
-            const Gap(5),
-            if (scheduleModel.frequency?.type == frequencyTypeList[2])
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(
-                    weekDaysList.length,
-                    (index) {
-                      List<String> selectedWeekDays =
-                          scheduleModel.frequency?.weekly?.days ?? [];
-                      bool isSelected =
-                          selectedWeekDays.contains(weekDaysList[index]);
-                      return Container(
-                        height: 30,
-                        padding: const EdgeInsets.only(right: 5),
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isSelected
-                                ? MyAppColors.primaryColor
-                                : MyAppColors.shadedMutedColor,
-                            foregroundColor: isSelected
-                                ? Colors.white
-                                : MyAppColors.primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedWeekDays.remove(weekDaysList[index]);
-                              } else {
-                                selectedWeekDays.add(weekDaysList[index]);
-                              }
-                              scheduleModel.frequency?.weekly = scheduleModel
-                                      .frequency?.weekly
-                                      ?.copyWith(days: selectedWeekDays) ??
-                                  Weekly(days: selectedWeekDays);
-                            });
-                          },
-                          icon: isSelected
-                              ? const Icon(
-                                  Icons.done,
-                                  size: 18,
-                                )
-                              : null,
-                          label: Text(
-                            weekDaysList[index],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            if (scheduleModel.frequency?.type == frequencyTypeList[3])
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(
-                    31,
-                    (index) {
-                      List<int> selectedDaysInMonth =
-                          scheduleModel.frequency?.monthly?.dates ?? [];
-                      bool isSelected = selectedDaysInMonth.contains(index + 1);
-                      return Container(
-                        height: 30,
-                        padding: const EdgeInsets.only(right: 5),
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isSelected
-                                ? MyAppColors.primaryColor
-                                : MyAppColors.shadedMutedColor,
-                            foregroundColor: isSelected
-                                ? Colors.white
-                                : MyAppColors.primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedDaysInMonth.remove(index + 1);
-                              } else {
-                                selectedDaysInMonth.add(index + 1);
-                              }
-                              scheduleModel.frequency?.monthly = scheduleModel
-                                      .frequency?.monthly
-                                      ?.copyWith(dates: selectedDaysInMonth) ??
-                                  Monthly(dates: selectedDaysInMonth);
-                            });
-                          },
-                          icon: isSelected
-                              ? const Icon(
-                                  Icons.done,
-                                  size: 18,
-                                )
-                              : null,
-                          label: Text(
-                            (index + 1).toString(),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            if (scheduleModel.frequency?.type == frequencyTypeList[4])
-              Container(
-                margin: const EdgeInsets.only(
-                    left: 15, top: 5, bottom: 5, right: 5),
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: MyAppColors.shadedMutedColor,
-                  borderRadius: BorderRadius.circular(borderRadius),
-                ),
-                child: Column(
-                  children: <Widget>[
-                        if ((scheduleModel.frequency?.yearly?.dates ?? [])
-                            .isEmpty)
-                          const Row(
-                            children: [
-                              Icon(
-                                Icons.radio_button_checked,
-                                size: 12,
-                              ),
-                              Gap(10),
-                              Text(
-                                "No dates selected",
-                              ),
-                            ],
-                          ),
-                      ] +
-                      List<Widget>.generate(
-                        scheduleModel.frequency?.yearly?.dates?.length ?? 0,
-                        (index) => Row(
-                          children: [
-                            const Icon(
-                              Icons.radio_button_checked,
-                              size: 12,
-                            ),
-                            const Gap(10),
-                            Text(
-                              DateFormat.MMMEd().format(scheduleModel
-                                  .frequency!.yearly!.dates![index]),
-                            ),
-                          ],
-                        ),
-                      ) +
-                      <Widget>[
-                        const Gap(10),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 30,
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              showDatePicker(
-                                context: context,
-                                firstDate: DateTime(DateTime.now().year),
-                                lastDate: DateTime(DateTime.now().year, 12, 31),
-                                initialDate: DateTime.now(),
-                              ).then((value) {
-                                setState(() {
-                                  if (value != null) {
-                                    List<DateTime> dates = scheduleModel
-                                            .frequency?.yearly?.dates ??
-                                        [];
-                                    dates.add(value);
-                                    scheduleModel.frequency?.yearly =
-                                        scheduleModel.frequency?.yearly
-                                                ?.copyWith(dates: dates) ??
-                                            Yearly(dates: dates);
-                                  }
-                                });
-                              });
-                            },
-                            label: const Text("Add Date"),
-                            icon: const Icon(
-                              FluentIcons.add_24_regular,
-                              size: 18,
-                            ),
-                          ),
-                        )
-                      ],
-                ),
-              ),
+            _buildFrequencySelection(),
             const Gap(15),
-            getTitlesForFields(
-              title: "When to take",
-              isFieldRequired: true,
-            ),
+            _buildSpecificFrequencyDetails(),
+            const Gap(20),
+            getTitlesForFields(title: "Time Slots", isFieldRequired: true),
             const Gap(5),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  whenTakeMedicineList.length,
-                  (index) {
-                    bool isSelected =
-                        scheduleModel.whenToTake == whenTakeMedicineList[index];
-                    return Container(
-                      height: 30,
-                      padding: const EdgeInsets.only(right: 5),
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isSelected
-                              ? MyAppColors.primaryColor
-                              : MyAppColors.shadedMutedColor,
-                          foregroundColor: isSelected
-                              ? Colors.white
-                              : MyAppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            scheduleModel.whenToTake =
-                                whenTakeMedicineList[index];
-                          });
-                        },
-                        icon: isSelected
-                            ? const Icon(
-                                Icons.done,
-                                size: 18,
-                              )
-                            : null,
-                        label: Text(
-                          whenTakeMedicineList[index],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            if (scheduleModel.whenToTake == whenTakeMedicineList[0] ||
-                scheduleModel.whenToTake == whenTakeMedicineList[1])
-              const Gap(10),
-            if (scheduleModel.whenToTake == whenTakeMedicineList[0] ||
-                scheduleModel.whenToTake == whenTakeMedicineList[1])
-              getTitlesForFields(
-                title:
-                    "How many minutes ${scheduleModel.whenToTake == whenTakeMedicineList[1] ? "before" : "after"} food?",
-                isFieldRequired: true,
-              ),
-            const Gap(5),
-            if (scheduleModel.whenToTake == whenTakeMedicineList[0] ||
-                scheduleModel.whenToTake == whenTakeMedicineList[1])
-              customTextFieldDecoration(
-                textFormField: TextFormField(
-                  controller: textEditingControllerMinutes,
-                  decoration: textFieldInputDecoration(
-                    hint: "type minutes here...",
-                  ),
-                  validator: (value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        int.tryParse(value) == null) {
-                      return "Please enter valid minutes";
-                    } else {
-                      return null;
-                    }
-                  },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onTapOutside: (event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                ),
-              ),
+            _buildTimeSlotSelection(),
             const Gap(15),
-            getTitlesForFields(
-              title: "Time",
-              isFieldRequired: true,
-            ),
+            getTitlesForFields(title: "Ending Date", isFieldRequired: true),
             const Gap(5),
-            SingleChildScrollView(
-              controller: scrollControllerScheduleTitle,
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  medicineScheduleTimeName.length,
-                  (index) {
-                    String key = medicineScheduleTimeName.keys.toList()[index];
-                    Map<String, int> value =
-                        medicineScheduleTimeName.values.toList()[index];
-                    bool isSelected = false;
-                    int len = scheduleModel.times?.length ?? 0;
-
-                    for (int i = 0; i < len; i++) {
-                      if (scheduleModel.times![i].name == key) {
-                        isSelected = true;
-                        break;
-                      }
-                    }
-                    return Container(
-                      height: 30,
-                      padding: const EdgeInsets.only(right: 5),
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isSelected
-                              ? MyAppColors.primaryColor
-                              : MyAppColors.shadedMutedColor,
-                          foregroundColor: isSelected
-                              ? Colors.white
-                              : MyAppColors.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          TimeOfDay avg = TimeOfDay(
-                            hour: ((value["start_time"] ?? 0) +
-                                    (value["end_time"] ?? 0)) ~/
-                                2,
-                            minute: 0,
-                          );
-
-                          if (!isSelected) {
-                            scheduleModel.times ??= [];
-                            scheduleModel.times!.add(
-                              TimeModel(
-                                id: Random().nextInt(100000).toString(),
-                                name: key,
-                                hour: avg.hour,
-                                minute: avg.minute,
-                              ),
-                            );
-                          } else {
-                            scheduleModel.times
-                                ?.removeWhere((element) => element.name == key);
-                          }
-                          setState(() {});
-                        },
-                        icon: isSelected
-                            ? const Icon(
-                                Icons.done,
-                                size: 18,
-                              )
-                            : null,
-                        label: Text(
-                          key,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const Gap(5),
-            Column(
-              children: List.generate(
-                scheduleModel.times?.length ?? 0,
-                (index) {
-                  TimeModel currentTime = scheduleModel.times![index];
-                  final timeOfDay = TimeOfDay(
-                      hour: currentTime.hour, minute: currentTime.minute);
-                  return Row(
-                    children: [
-                      Text("${currentTime.name}: "),
-                      const Gap(5),
-                      Text(
-                        timeOfDay.format(context),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Gap(10),
-                      SizedBox(
-                        height: 30,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                            ),
-                          ),
-                          onPressed: () {
-                            showTimePicker(
-                              context: context,
-                              initialTime: timeOfDay,
-                            ).then(
-                              (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    scheduleModel.times?[index] = TimeModel(
-                                      id: Random().nextInt(100000).toString(),
-                                      name: currentTime.name,
-                                      hour: value.hour,
-                                      minute: value.minute,
-                                    );
-                                  });
-                                }
-                              },
-                            );
-                          },
-                          child: const Text(
-                            "Change",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            const Gap(15),
-            getTitlesForFields(
-              title: "Ending date of reminder",
-            ),
-            const Gap(5),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2030),
-                  ).then((value) {
-                    setState(() {
-                      scheduleModel.endDate = value;
-                    });
-                  });
-                },
-                icon: const Icon(
-                  FluentIcons.calendar_24_regular,
-                  size: 18,
-                ),
-                label: Text(
-                  scheduleModel.endDate == null
-                      ? "Pick a Date"
-                      : DateFormat.yMMMEd().format(scheduleModel.endDate!),
-                ),
-              ),
-            ),
+            _buildDatePicker(),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildFrequencySelection() {
+    return Wrap(
+      spacing: 8,
+      children: FrequencyType.values.map((f) {
+        bool isSelected = frequency == f;
+        return ChoiceChip(
+          label: Text(f.name.replaceAll("_", " ")),
+          selected: isSelected,
+          onSelected: (val) {
+            if (val) setState(() => frequency = f);
+          },
+          selectedColor: MyAppColors.primaryColor,
+          labelStyle:
+              TextStyle(color: isSelected ? Colors.white : Colors.black),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildSpecificFrequencyDetails() {
+    if (frequency == FrequencyType.X_DAYS) {
+      return TextFormField(
+        keyboardType: TextInputType.number,
+        decoration: textFieldInputDecoration(hint: "Every 'X' days").copyWith(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+        ),
+        onChanged: (v) => xDayValue = int.tryParse(v),
+      );
+    }
+    if (frequency == FrequencyType.WEEKLY) {
+      return Wrap(
+        spacing: 5,
+        children: WeekDay.values.map((w) {
+          bool isSel = weeklyValues.contains(w);
+          return FilterChip(
+            label: Text(w.name.substring(0, 3)),
+            selected: isSel,
+            onSelected: (val) {
+              setState(() {
+                if (val) {
+                  weeklyValues.add(w);
+                } else {
+                  weeklyValues.remove(w);
+                }
+              });
+            },
+          );
+        }).toList(),
+      );
+    }
+    if (frequency == FrequencyType.MONTHLY) {
+      return Wrap(
+        spacing: 5,
+        children: List.generate(31, (i) {
+          int day = i + 1;
+          bool isSel = monthlyDates.contains(day);
+          return ChoiceChip(
+            label: Text("$day"),
+            selected: isSel,
+            onSelected: (val) {
+              setState(() {
+                if (val) {
+                  monthlyDates.add(day);
+                } else {
+                  monthlyDates.remove(day);
+                }
+              });
+            },
+          );
+        }),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildTimeSlotSelection() {
+    return Column(
+      children: ScheduleTimeSlot.values.map((slot) {
+        bool isSel = selectedSlots.contains(slot);
+        String time = "";
+        if (slot == ScheduleTimeSlot.Morning) time = morningTime;
+        if (slot == ScheduleTimeSlot.Afternoon) time = afternoonTime;
+        if (slot == ScheduleTimeSlot.Evening) time = eveningTime;
+        if (slot == ScheduleTimeSlot.Night) time = nightTime;
+
+        var timeParts = time.split(":");
+        int? hour = int.tryParse(timeParts[0]);
+        int? minute = int.tryParse(timeParts[1]);
+
+        return CheckboxListTile(
+          title: Text(slot.name),
+          subtitle: Text(
+              "Time: ${TimeOfDay(hour: hour ?? DateTime.now().hour, minute: minute ?? DateTime.now().minute).format(context)}"),
+          value: isSel,
+          onChanged: (val) async {
+            if (val == true) {
+              final picked = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay(
+                      hour: hour ?? DateTime.now().hour,
+                      minute: minute ?? DateTime.now().minute));
+              if (picked != null) {
+                setState(() {
+                  selectedSlots.add(slot);
+                  final formatted =
+                      "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}";
+                  if (slot == ScheduleTimeSlot.Morning) morningTime = formatted;
+                  if (slot == ScheduleTimeSlot.Afternoon) {
+                    afternoonTime = formatted;
+                  }
+                  if (slot == ScheduleTimeSlot.Evening) eveningTime = formatted;
+                  if (slot == ScheduleTimeSlot.Night) nightTime = formatted;
+                });
+              }
+            } else {
+              setState(() => selectedSlots.remove(slot));
+            }
+          },
+          activeColor: MyAppColors.primaryColor,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return OutlinedButton.icon(
+      onPressed: () async {
+        final d = await showDatePicker(
+            context: context,
+            firstDate: DateTime.now(),
+            lastDate: DateTime(2030));
+        if (d != null) setState(() => endDate = d);
+      },
+      icon: const Icon(Icons.calendar_today),
+      label: Text(DateFormat.yMMMd().format(endDate)),
+    );
+  }
+
   Widget _buildExtraDetailsCard() {
     return Card(
       elevation: 4,
-      shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -790,77 +423,43 @@ class _AddReminderState extends State<AddReminder> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Additional Info",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: MyAppColors.primaryColor)),
-            const Gap(20),
-            getTitlesForFields(
-              title: "Reminder type",
-              isFieldRequired: true,
-            ),
-            const Gap(5),
+                    color: MyAppColors.primaryColor,
+                    fontSize: 18)),
+            const Gap(15),
             customTextFieldDecoration(
-              textFormField: DropdownButtonFormField(
-                decoration: textFieldInputDecoration(
-                  hint: "Select reminder type",
-                ),
-                initialValue: reminderModel.reminderType,
-                validator: (value) {
-                  if (value == null) {
-                    return "Please select reminder type";
-                  }
-                  return null;
-                },
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                items: [
-                  DropdownMenuItem(
-                    value: ReminderType.notification,
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.notifications,
-                        ),
-                        const Gap(10),
-                        Text(ReminderType.notification.name.toUpperCase()),
-                      ],
-                    ),
-                  ),
-                  DropdownMenuItem(
-                    value: ReminderType.alarm,
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.alarm,
-                        ),
-                        const Gap(10),
-                        Text(ReminderType.alarm.name.toUpperCase()),
-                      ],
-                    ),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    reminderModel.reminderType = value;
-                  });
-                },
+              textFormField: DropdownButtonFormField<ReminderType>(
+                initialValue: reminderType,
+                items: ReminderType.values
+                    .map((r) => DropdownMenuItem(
+                        value: r, child: Text(r.name.toUpperCase())))
+                    .toList(),
+                onChanged: (v) => setState(() => reminderType = v!),
               ),
             ),
             const Gap(15),
-            getTitlesForFields(
-              title: "Notes",
+            customTextFieldDecoration(
+              textFormField: DropdownButtonFormField<String>(
+                value: whenToTake.isEmpty ? null : whenToTake,
+                hint: const Text("When to take?"),
+                items: ["Before Meal", "After Meal", "With Meal", "Empty Stomach"]
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (v) => setState(() => whenToTake = v ?? ""),
+              ),
             ),
-            const Gap(5),
+            const Gap(15),
             customTextFieldDecoration(
               textFormField: TextFormField(
-                controller: textEditingControllerReminderDescription,
-                decoration: textFieldInputDecoration(
-                  hint: "type reminder description here...",
-                ),
-                maxLines: 15,
-                minLines: 1,
-                onTapOutside: (event) {
-                  FocusManager.instance.primaryFocus?.unfocus();
+                controller: textEditingControllerNotes,
+                maxLines: 3,
+                onChanged: (v) {
+                  takingNotes = v;
+                  notes = v; // Setting both to keep it simple
                 },
+                decoration: textFieldInputDecoration(
+                    hint: "Notes about taking this medicine..."),
               ),
             ),
           ],
@@ -870,183 +469,80 @@ class _AddReminderState extends State<AddReminder> {
   }
 
   Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: MyAppColors.primaryColor,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return BlocBuilder<PillScheduleCubit, PillScheduleState>(
+      builder: (context, state) {
+        bool isLoading = state is PillScheduleLoading;
+        return SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: MyAppColors.primaryColor,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
+            onPressed: isLoading ? null : _submit,
+            child: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : Text(
+                    widget.editMode == true ? "SAVE CHANGES" : "ADD REMINDER",
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
           ),
-        ),
-        onPressed: () async {
-          if (formKey.currentState!.validate()) {
-            Map<String, dynamic>? selectedMedicine;
-            for (var element in medicineData) {
-              if (element["name"] == textEditingControllerSearchMedicine.text) {
-                selectedMedicine = element;
-              }
-            }
-            MedicineModel? medicineModel;
-            if (selectedMedicine != null) {
-              medicineModel = MedicineModel.fromMap(selectedMedicine);
-            }
-            reminderModel = reminderModel.copyWith(
-              description: textEditingControllerReminderDescription.text,
-              medicine: MedicineModel(
-                brandName: medicineModel?.brandName ??
-                    textEditingControllerSearchMedicine.text,
-                genericName: medicineModel?.genericName ?? "",
-                strength: medicineModel?.strength ?? "",
-                dosageDescription: medicineModel?.dosageDescription ?? "",
-              ),
-              schedule: scheduleModel.copyWith(
-                howManyMinutes: int.tryParse(textEditingControllerMinutes.text),
-              ),
-              quantity: textEditingControllerQuantity.text,
-            );
-            String? error = checkValidityOfReminder(reminderModel);
-            if (error == null) {
-              setState(() {
-                isAsyncLoading = true;
-              });
-              if (await hasInternetConnection()) {
-                final authState = context.read<AuthCubit>().state;
-                if(authState is Authenticated) {
-                  Map<String, dynamic> data = reminderModel.toMap();
-                  final mobile = authState.user.mobile;
-                  data["phone_number"] = mobile;
-                  if (widget.editMode == true) {
-                    final bool isSuccessful = await HomeCubit.updateReminder(
-                      context,
-                      mobile,
-                      reminderModel.id,
-                      data,
-                    );
-                    if (isSuccessful) {
-                      await LocalDbRepository()
-                          .saveReminder(reminderModel.id, jsonEncode(data));
-
-                      toastification.show(
-                        context: context,
-                        title: const Text("Saved changes successfully"),
-                        autoCloseDuration: const Duration(seconds: 2),
-                        type: ToastificationType.success,
-                      );
-                      
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                    } else {
-                      toastification.show(
-                        context: context,
-                        title: const Text("Something went wrong #001"),
-                        autoCloseDuration: const Duration(seconds: 2),
-                        type: ToastificationType.error,
-                      );
-                    }
-                  } else {
-                    final response =
-                        await context.read<AddReminderCubit>().createReminder(data);
-                    if (response != null &&
-                        response.statusCode == StatusCode.CREATED) {
-                      await LocalDbRepository()
-                          .saveReminder(reminderModel.id, jsonEncode(data));
-
-                      toastification.show(
-                        context: context,
-                        title: const Text("Saved Successfully"),
-                        autoCloseDuration: const Duration(seconds: 2),
-                        type: ToastificationType.success,
-                      );
-                      
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                    } else {
-                      toastification.show(
-                        context: context,
-                        title: const Text("Something went wrong #002"),
-                        autoCloseDuration: const Duration(seconds: 2),
-                        type: ToastificationType.error,
-                      );
-                    }
-                  }
-                }
-              } else {
-                toastification.show(
-                  context: context,
-                  title: const Text("No Internet Connection"),
-                  autoCloseDuration: const Duration(seconds: 2),
-                  type: ToastificationType.error,
-                );
-              }
-              setState(() {
-                isAsyncLoading = false;
-              });
-            } else {
-              toastification.show(
-                context: context,
-                title: Text(error),
-                autoCloseDuration: const Duration(seconds: 2),
-                type: ToastificationType.error,
-              );
-            }
-          }
-          if (context.mounted) {
-            context.read<HomeCubit>().reloadLocalReminders();
-          }
-        },
-        icon: isAsyncLoading
-            ? const SizedBox(
-                height: 30,
-                width: 30,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.done),
-        label: Text(
-          (widget.editMode ?? false) ? "Save Changes" : "Add Reminder",
-          style: const TextStyle(
-              fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  String? checkValidityOfReminder(ReminderModel reminderModel) {
-    // check frequency of medicine
-    if (textEditingControllerSearchMedicine.text.trim().isEmpty) {
-      return "Please enter medicine name";
-    }
-    final frequency = reminderModel.schedule?.frequency;
-    if (frequency != null &&
-        frequency.type != null &&
-        (frequency.type == frequencyTypeList[0] ||
-            (frequency.type == frequencyTypeList[1] &&
-                frequency.everyXDays != null) ||
-            (frequency.type == frequencyTypeList[2] &&
-                frequency.weekly != null) ||
-            (frequency.type == frequencyTypeList[3] &&
-                frequency.monthly != null) ||
-            (frequency.type == frequencyTypeList[4] &&
-                frequency.yearly != null))) {
-      dev.log("Pass frequency:${frequency.toJson()}");
-    } else {
-      return "Please add frequency of medicine";
-    }
+  void _submit() {
+    if (formKey.currentState!.validate()) {
+      if (selectedSlots.isEmpty) {
+        toastification.show(
+            context: context,
+            title: const Text("Select at least one time slot"),
+            type: ToastificationType.warning);
+        return;
+      }
 
-    // check alarms
+      final authState = context.read<AuthCubit>().state;
+      if (authState is! Authenticated) {
+        toastification.show(
+            context: context,
+            title: const Text("User not authenticated"),
+            type: ToastificationType.error);
+        return;
+      }
 
-    if (reminderModel.schedule?.times?.isNotEmpty == true) {
-      dev.log("Added ${reminderModel.schedule?.times?.length}");
-    } else {
-      return "Please add Alarm Time";
+      final draft = context.read<AddReminderCubit>().state;
+
+      final entity = PillScheduleEntity(
+        id: draft?.id,
+        userId: authState.user.id, // Using user ID from auth cubit
+        medicineName: textEditingControllerSearchMedicine.text,
+        qty: qty,
+        size: size,
+        frequency: frequency,
+        xDayValue: xDayValue,
+        weeklyValues: weeklyValues,
+        monthlyDates: monthlyDates,
+        yearlyDates: yearlyDates,
+        whenToTake: whenToTake,
+        takingNotes: takingNotes,
+        notes: notes,
+        times: selectedSlots,
+        morningTime: morningTime,
+        afternoonTime: afternoonTime,
+        eveningTime: eveningTime,
+        nightTime: nightTime,
+        reminderType: reminderType,
+        endDate: endDate,
+        status: status,
+      );
+
+      if (widget.editMode == true && entity.id != null) {
+        context.read<PillScheduleCubit>().updateSchedule(entity.id!, entity);
+      } else {
+        context.read<PillScheduleCubit>().createSchedule(entity);
+      }
     }
-
-    return null;
   }
 }

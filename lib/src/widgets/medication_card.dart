@@ -1,61 +1,46 @@
+import "package:dartx/dartx.dart";
 import "package:fluentui_system_icons/fluentui_system_icons.dart";
 import "package:flutter/material.dart";
 import "package:gap/gap.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:go_router/go_router.dart";
 import "package:intl/intl.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/core/database/local_db_repository.dart";
-import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/has_internet_connection.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
-import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
-import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
-import "package:toastification/toastification.dart";
+import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 
-import "../core/functions/safe_substring.dart";
-import "../resources/frequency.dart";
 import "../theme/colors.dart";
 import "../theme/const_values.dart";
 
 Card cardOfReminderForSummary(
-  ReminderModel currentReminder,
+  PillScheduleEntity currentSchedule,
   BuildContext context, {
   bool isSelectedToday = false,
   bool showTitle = true,
   bool isEditable = false,
   Color? color,
 }) {
-  DateTime? startDate = currentReminder.schedule!.startDate;
-  DateTime? endDate = currentReminder.schedule?.endDate;
-
-  String? frequencyType = currentReminder.schedule?.frequency?.type;
+  DateTime endDate = currentSchedule.endDate;
+  FrequencyType frequencyType = currentSchedule.frequency;
 
   String listOfFrequencyDay = "";
-  if (frequencyType == frequencyTypeList[1]) {
-    int? distance = currentReminder.schedule?.frequency?.everyXDays;
-    listOfFrequencyDay += (distance ?? "").toString();
-  } else if (frequencyType == frequencyTypeList[2]) {
-    List<String> listOfDay =
-        (currentReminder.schedule?.frequency?.weekly?.days) ?? [];
+  if (frequencyType == FrequencyType.X_DAYS) {
+    listOfFrequencyDay += (currentSchedule.xDayValue ?? "").toString();
+  } else if (frequencyType == FrequencyType.WEEKLY) {
     listOfFrequencyDay +=
-        listOfDay.toString().replaceAll("[", "").replaceAll("]", "");
-  } else if (frequencyType == frequencyTypeList[3]) {
-    List<int> listOfDay =
-        (currentReminder.schedule?.frequency?.monthly?.dates) ?? [];
-    listOfFrequencyDay +=
-        listOfDay.toString().replaceAll("[", "").replaceAll("]", "");
-  } else if (frequencyType == frequencyTypeList[4]) {
-    List<DateTime> listOfDay =
-        (currentReminder.schedule?.frequency?.yearly?.dates) ?? [];
-    for (var element in listOfDay) {
-      listOfFrequencyDay += "${DateFormat.yMMMd().format(element)},";
+        (currentSchedule.weeklyValues ?? []).map((e) => e.name).join(", ");
+  } else if (frequencyType == FrequencyType.MONTHLY) {
+    listOfFrequencyDay += (currentSchedule.monthlyDates ?? []).join(", ");
+  } else if (frequencyType == FrequencyType.YEARLY) {
+    for (var element in currentSchedule.yearlyDates ?? []) {
+      listOfFrequencyDay += "${DateFormat.yMMMd().format(element)}, ";
     }
   }
 
-  final alarm = currentReminder.schedule?.times ?? [];
+  final alarmSlots = currentSchedule.times ?? [];
 
   return Card(
     color: color,
@@ -75,308 +60,181 @@ Card cardOfReminderForSummary(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (showTitle)
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  const Icon(
-                    FluentIcons.pill_24_regular,
-                  ),
-                  const Gap(10),
-                  Text(
-                    substringSafe(
-                        currentReminder.medicine?.brandName ?? "", 35),
+            Row(
+              children: [
+                const Icon(FluentIcons.pill_24_regular),
+                const Gap(10),
+                Expanded(
+                  child: Text(
+                    currentSchedule.medicineName,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const Gap(5),
-                  if (currentReminder.medicine?.genericName != null)
-                    Text(
-                      "(${currentReminder.medicine?.genericName ?? ""}",
+                ),
+                if (currentSchedule.size != null)
+                  Text(" (${currentSchedule.size} mg/ml)"),
+              ],
+            ),
+          const Gap(7),
+          Row(
+            children: [
+              const Icon(FluentIcons.arrow_repeat_all_24_regular),
+              const Gap(10),
+              if (frequencyType != FrequencyType.X_DAYS)
+                Text(
+                  frequencyType.name
+                      .replaceAll("_", " ")
+                      .toLowerCase()
+                      .capitalize(),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              if (frequencyType != FrequencyType.X_DAYS) const Gap(10),
+              if (listOfFrequencyDay.isNotEmpty)
+                Expanded(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: MyAppColors.shadedMutedColor,
                     ),
-                  if (currentReminder.medicine?.brandName != null)
+                    child: Text(
+                      frequencyType == FrequencyType.X_DAYS
+                          ? "Every $listOfFrequencyDay day(s)"
+                          : "On $listOfFrequencyDay",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const Gap(5),
+          if (currentSchedule.qty != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 35.0),
+              child: Text(
+                "Quantity: ${currentSchedule.qty}",
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          if (currentSchedule.whenToTake != null ||
+              currentSchedule.takingNotes != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 35.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (currentSchedule.whenToTake != null)
                     Text(
-                      " ${currentReminder.medicine?.brandName ?? ""})",
+                      "When to take: ${currentSchedule.whenToTake}",
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                  if (currentSchedule.takingNotes != null)
+                    Text(
+                      "Notes: ${currentSchedule.takingNotes}",
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
                 ],
               ),
             ),
           const Gap(7),
           Row(
-            children: [
-              const Icon(
-                FluentIcons.arrow_repeat_all_24_regular,
-              ),
-              const Gap(10),
-              Text(
-                frequencyType ?? "",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Gap(10),
-              if (listOfFrequencyDay.isNotEmpty)
-                Container(
-                  width: frequencyType == frequencyTypeList[1]
-                      ? MediaQuery.of(context).size.width * 0.48
-                      : MediaQuery.of(context).size.width * 0.58,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: MyAppColors.shadedMutedColor,
-                  ),
-                  alignment: Alignment.center,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(
-                      left: 10,
-                      right: 10,
-                    ),
-                    child: Text(
-                      frequencyType == frequencyTypeList[1]
-                          ? "every $listOfFrequencyDay days"
-                          : "on $listOfFrequencyDay",
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.only(left: 35.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if (currentReminder.quantity != null)
-                      const Text("Quantity: "),
-                    if (currentReminder.quantity != null)
-                      Text(
-                        "${currentReminder.quantity} ",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const Gap(5),
-          Container(
-            padding: const EdgeInsets.only(left: 35.0),
-            child: Text(
-              "${currentReminder.schedule?.howManyMinutes ?? ""} ${currentReminder.schedule?.howManyMinutes == null ? "" : "minutes "}${currentReminder.schedule?.whenToTake ?? ""}",
-            ),
-          ),
-          const Gap(7),
-          Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                FluentIcons.clock_alarm_24_regular,
-              ),
+              const Icon(FluentIcons.clock_alarm_24_regular),
               const Gap(10),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(
-                  alarm.length,
-                  (index) {
-                    return Row(
-                      children: [
-                        Text(alarm[index].name),
-                        const Gap(5),
-                        Text(
-                          TimeOfDay(
-                                  hour: alarm[index].hour,
-                                  minute: alarm[index].minute)
-                              .format(context),
-                        ),
-                        const Gap(5),
-                      ],
-                    );
-                  },
+              Expanded(
+                child: Wrap(
+                  spacing: 10,
+                  runSpacing: 5,
+                  children: alarmSlots.map((slot) {
+                    String timeStr = "";
+                    switch (slot) {
+                      case ScheduleTimeSlot.Morning:
+                        timeStr = currentSchedule.morningTime;
+                        break;
+                      case ScheduleTimeSlot.Afternoon:
+                        timeStr = currentSchedule.afternoonTime;
+                        break;
+                      case ScheduleTimeSlot.Evening:
+                        timeStr = currentSchedule.eveningTime;
+                        break;
+                      case ScheduleTimeSlot.Night:
+                        timeStr = currentSchedule.nightTime;
+                        break;
+                    }
+                    return Text("${slot.name}: $timeStr");
+                  }).toList(),
                 ),
               ),
             ],
           ),
-          if ((currentReminder.description ?? "").isNotEmpty) const Gap(7),
-          if ((currentReminder.description ?? "").isNotEmpty)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  FluentIcons.notepad_24_regular,
-                ),
-                const Gap(10),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: Text(
-                    currentReminder.description ?? "",
-                  ),
-                ),
-              ],
-            ),
           const Gap(7),
           Row(
             children: [
-              const Icon(
-                FluentIcons.calendar_24_regular,
-              ),
+              const Icon(FluentIcons.calendar_24_regular),
               const Gap(10),
-              Text(DateFormat.yMMMd().format(startDate)),
-              const Gap(5),
-              const Text("to"),
-              const Gap(5),
-              endDate == null
-                  ? const Text("On going")
-                  : Text(DateFormat.yMMMd().format(endDate)),
+              const Text("Ends on: "),
+              Text(DateFormat.yMMMd().format(endDate)),
             ],
           ),
-          const Gap(7),
           if (isEditable)
-            SafeArea(
-              child: SizedBox(
-                height: 30,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      style: IconButton.styleFrom(
-                        backgroundColor: MyAppColors.shadedMutedColor,
-                        padding: EdgeInsets.zero,
-                      ),
-                      onPressed: () async {
-                        final cubit = context.read<AddReminderCubit>();
-                        cubit.updateReminder(currentReminder);
-
-                        await context.pushNamed(
-                          Routes.addReminderRoute,
-                          extra: true,
-                        );
-                        cubit.resetReminder();
-
-                        if (context.mounted) {
-                          context.read<HomeCubit>().reloadLocalReminders();
-                        }
-                        analyzeDatabaseAndScheduleReminder();
-                      },
-                      icon: Icon(
-                        FluentIcons.edit_24_regular,
-                        size: 18,
-                        color: MyAppColors.primaryColor,
-                      ),
-                    ),
-                    const Gap(5),
-                    IconButton(
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.shade100,
-                        padding: EdgeInsets.zero,
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              insetPadding: const EdgeInsets.all(10),
-                              title: const Text("Are you sure?"),
-                              content: const Text(
-                                  "Once you delete, you can't recover it again."),
-                              actions: [
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                  ),
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                  icon: const Icon(Icons.cancel),
-                                  label: const Text("Cancel"),
-                                ),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                    if (await hasInternetConnection() ==
-                                        false) {
-                                      toastification.show(
-                                        context: context,
-                                        title: const Text("No internet"),
-                                        autoCloseDuration:
-                                            const Duration(seconds: 2),
-                                        type: ToastificationType.error,
-                                      );
-                                      return;
-                                    }
-                                    String id = currentReminder.id;
-
-                                    final authState =
-                                        context.read<AuthCubit>().state;
-                                    if (authState is Authenticated) {
-                                      final bool isDeleted =
-                                          await HomeCubit.deleteReminder(
-                                              context,
-                                              authState.user.mobile,
-                                              id);
-                                      if (isDeleted) {
-                                        await cancelNotificationsForReminder(
-                                            currentReminder);
-                                        await LocalDbRepository()
-                                            .deleteReminder(id);
-
-                                        if (context.mounted) {
-                                          context.pop();
-                                          await context
-                                              .read<HomeCubit>()
-                                              .reloadLocalReminders();
-                                        }
-
-                                        toastification.show(
-                                          context: context,
-                                          title: const Text(
-                                              "Successfully deleted"),
-                                          type: ToastificationType.success,
-                                          autoCloseDuration:
-                                              const Duration(seconds: 2),
-                                        );
-                                      } else {
-                                        toastification.show(
-                                          context: context,
-                                          title: const Text("Failed to delete"),
-                                          type: ToastificationType.error,
-                                          autoCloseDuration:
-                                              const Duration(seconds: 2),
-                                        );
-                                      }
-                                    }
-                                  },
-                                  icon: const Icon(Icons.delete),
-                                  label: const Text("Delete"),
-                                )
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(
-                        FluentIcons.delete_24_regular,
-                        size: 18,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    context
+                        .read<AddReminderCubit>()
+                        .updateReminder(currentSchedule);
+                    context.pushNamed(
+                      Routes.addReminderRoute,
+                      extra: true,
+                    );
+                  },
+                  icon: Icon(FluentIcons.edit_24_regular,
+                      color: MyAppColors.primaryColor),
                 ),
-              ),
+                IconButton(
+                  onPressed: () => _showDeleteDialog(context, currentSchedule),
+                  icon: const Icon(FluentIcons.delete_24_regular,
+                      color: Colors.red),
+                ),
+              ],
             ),
         ],
       ),
+    ),
+  );
+}
+
+void _showDeleteDialog(BuildContext context, PillScheduleEntity schedule) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Delete Reminder?"),
+      content: const Text("Are you sure you want to delete this schedule?"),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel")),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () {
+            if (schedule.id != null) {
+              context.read<PillScheduleCubit>().deleteSchedule(schedule.id!);
+            }
+            Navigator.pop(context);
+            context.read<HomeCubit>().reloadLocalReminders();
+          },
+          child: const Text("Delete", style: TextStyle(color: Colors.white)),
+        ),
+      ],
     ),
   );
 }

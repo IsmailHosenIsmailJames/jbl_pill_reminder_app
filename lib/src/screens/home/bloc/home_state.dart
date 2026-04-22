@@ -1,12 +1,12 @@
 import "package:equatable/equatable.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 
 class HomeState extends Equatable {
   final DateTime selectedDay;
   final bool isLoading;
-  final ReminderModel? nextReminder;
-  final List<ReminderModel> listOfTodaysReminder;
-  final List<ReminderModel> listOfAllReminder;
+  final PillScheduleEntity? nextReminder;
+  final List<PillScheduleEntity> listOfTodaysReminder;
+  final List<PillScheduleEntity> listOfAllReminder;
 
   const HomeState({
     required this.selectedDay,
@@ -19,9 +19,9 @@ class HomeState extends Equatable {
   HomeState copyWith({
     DateTime? selectedDay,
     bool? isLoading,
-    ReminderModel? nextReminder,
-    List<ReminderModel>? listOfTodaysReminder,
-    List<ReminderModel>? listOfAllReminder,
+    PillScheduleEntity? nextReminder,
+    List<PillScheduleEntity>? listOfTodaysReminder,
+    List<PillScheduleEntity>? listOfAllReminder,
   }) {
     return HomeState(
       selectedDay: selectedDay ?? this.selectedDay,
@@ -41,3 +41,4 @@ class HomeState extends Equatable {
         listOfAllReminder,
       ];
 }
+

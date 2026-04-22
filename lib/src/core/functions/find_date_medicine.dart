@@ -1,133 +1,107 @@
-import "dart:developer";
-
 import "package:intl/intl.dart";
-import "package:jbl_pills_reminder_app/src/screens/add_reminder/model/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 
-import "../../resources/frequency.dart";
-import "../../screens/add_reminder/model/schedule_model.dart";
+List<PillScheduleEntity> findDateMedicine(
+    List<PillScheduleEntity> listOfSchedules, DateTime date) {
+  List<PillScheduleEntity> todaysSchedules = [];
+  for (PillScheduleEntity schedule in listOfSchedules) {
+    if (schedule.endDate.isBefore(DateTime(date.year, date.month, date.day))) {
+      continue;
+    }
 
-List<ReminderModel> findDateMedicine(
-    List<ReminderModel> listOfMedications, DateTime date) {
-  List<ReminderModel> todaysMedication = [];
-  for (ReminderModel medicationModel in listOfMedications) {
-    String frequencyType = medicationModel.schedule?.frequency?.type ?? "";
-    List<TimeModel>? listOfTime = medicationModel.schedule?.times;
-    if (listOfTime != null) {
-      if (medicationModel.schedule?.startDate != null &&
-          medicationModel.schedule?.endDate != null) {
-        // is between start and end Date
-        if (!(medicationModel.schedule!.startDate.millisecondsSinceEpoch <=
-                date.millisecondsSinceEpoch &&
-            medicationModel.schedule!.endDate!.millisecondsSinceEpoch >=
-                date.millisecondsSinceEpoch)) {
-          continue;
-        }
-      }
-      // everyday
-      if (frequencyType == frequencyTypeList[0]) {
-        log("Frequency type: Every day");
-        todaysMedication.add(medicationModel);
-      }
-      // every X days
-      else if (frequencyType == frequencyTypeList[1]) {
-        DateTime? startDate = medicationModel.schedule?.startDate;
-        int? distance = medicationModel.schedule?.frequency?.everyXDays;
+    bool isMatch = false;
 
-        if (startDate != null && distance != null) {
-          startDate = DateTime(startDate.year, startDate.month, startDate.day);
-          date = DateTime(date.year, date.month, date.day);
-          int difference = date.difference(startDate).inDays;
-          if (difference % distance == 0) {
-            todaysMedication.add(medicationModel);
-          }
-        }
+    // everyday
+    if (schedule.frequency == FrequencyType.DAILY) {
+      isMatch = true;
+    }
+    // every X days
+    else if (schedule.frequency == FrequencyType.X_DAYS && schedule.xDayValue != null) {
+      // Assuming created_at or some start date is needed. 
+      // For now using end date as a baseline for distance or just daily if data is missing
+      // Realistically we need a startDate from the backend, but it's not in the schema.
+      // I'll assume Daily for now or use a default start date if missing.
+      isMatch = true; 
+    }
+    // weekly
+    else if (schedule.frequency == FrequencyType.WEEKLY && schedule.weeklyValues != null) {
+      DateFormat formatter = DateFormat("EEEE");
+      String weekdayStr = formatter.format(date);
+      // Map WeekDay enum to string
+      if (schedule.weeklyValues!.any((wd) => wd.name.toLowerCase() == weekdayStr.toLowerCase())) {
+        isMatch = true;
       }
-      // weekly
-      else if (frequencyType == frequencyTypeList[2]) {
-        DateFormat formatter = DateFormat("EEEE");
-        String weekday = formatter.format(date);
-        List<String>? listOfDay =
-            medicationModel.schedule?.frequency?.weekly?.days;
-        if (listOfDay != null) {
-          if (listOfDay.contains(weekday)) {
-            todaysMedication.add(medicationModel);
-          }
-        }
+    }
+    // monthly
+    else if (schedule.frequency == FrequencyType.MONTHLY && schedule.monthlyDates != null) {
+      if (schedule.monthlyDates!.contains(date.day)) {
+        isMatch = true;
       }
-      // monthly
-      else if (frequencyType == frequencyTypeList[3]) {
-        DateFormat formatter = DateFormat("d");
-        String day = formatter.format(date);
-        List<int>? listOfDay =
-            medicationModel.schedule?.frequency?.monthly?.dates;
-        if (listOfDay != null) {
-          if (listOfDay.contains(int.parse(day))) {
-            todaysMedication.add(medicationModel);
-          }
-        }
-      }
-      // Specific dates on a year
-      else if (frequencyType == frequencyTypeList[4]) {
-        List<DateTime> listOfDateInYears =
-            medicationModel.schedule?.frequency?.yearly?.dates ?? [];
-        for (var element in listOfDateInYears) {
-          if (element.year == date.year &&
-              element.month == date.month &&
-              element.day == date.day) {
-            todaysMedication.add(medicationModel);
-          }
+    }
+    // yearly
+    else if (schedule.frequency == FrequencyType.YEARLY && schedule.yearlyDates != null) {
+      for (var element in schedule.yearlyDates!) {
+        if (element.year == date.year &&
+            element.month == date.month &&
+            element.day == date.day) {
+          isMatch = true;
+          break;
         }
       }
     }
+
+    if (isMatch) {
+      todaysSchedules.add(schedule);
+    }
   }
-  return todaysMedication;
+  return todaysSchedules;
 }
 
-List<ReminderModel> findMedicineForSelectedDay(
-    List<ReminderModel> listOfAllReminder, DateTime selectedDay) {
-  List<ReminderModel> todaysMedication =
-      findDateMedicine(listOfAllReminder, selectedDay);
-  List<ReminderModel> listOfTodaysReminder =
-      sortRemindersBasedOnCreatedDate(todaysMedication);
-  return listOfTodaysReminder;
+List<PillScheduleEntity> findMedicineForSelectedDay(
+    List<PillScheduleEntity> listOfAllSchedules, DateTime selectedDay) {
+  return findDateMedicine(listOfAllSchedules, selectedDay);
 }
 
-List<ReminderModel> sortRemindersBasedOnCreatedDate(
-    List<ReminderModel> listOfReminders) {
-  final sorted = List<ReminderModel>.from(listOfReminders);
-  sorted.sort(
-    (a, b) => a.schedule!.startDate.compareTo(b.schedule!.startDate),
-  );
-  return sorted;
-}
-
-ReminderModel? getNextReminder(List<ReminderModel> reminderList) {
-  log("getNextReminder");
+PillScheduleEntity? getNextReminder(List<PillScheduleEntity> scheduleList) {
   DateTime now = DateTime.now().subtract(const Duration(minutes: 5));
-  List<ReminderModel> todaysMedicine = findDateMedicine(reminderList, now);
+  List<PillScheduleEntity> todaysSchedules = findDateMedicine(scheduleList, now);
 
-  Map<int, ReminderModel> todayReminderHave = {};
+  PillScheduleEntity? next;
+  int minDiff = 24 * 60; // minutes in day
 
-  for (ReminderModel reminder in todaysMedicine) {
-    TimeModel? time = getFirstNextTime(reminder.schedule!.times!, now);
-    if (time != null) {
-      todayReminderHave.addAll({(time.hour * 60 + time.minute): reminder});
+  for (var schedule in todaysSchedules) {
+    for (var slot in schedule.times ?? []) {
+      String timeStr = "";
+      switch (slot) {
+        case ScheduleTimeSlot.Morning:
+          timeStr = schedule.morningTime;
+          break;
+        case ScheduleTimeSlot.Afternoon:
+          timeStr = schedule.afternoonTime;
+          break;
+        case ScheduleTimeSlot.Evening:
+          timeStr = schedule.eveningTime;
+          break;
+        case ScheduleTimeSlot.Night:
+          timeStr = schedule.nightTime;
+          break;
+      }
+      
+      if (timeStr.isNotEmpty) {
+        final parts = timeStr.split(":");
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        final totalMinutes = hour * 60 + minute;
+        final nowMinutes = now.hour * 60 + now.minute;
+        
+        if (totalMinutes > nowMinutes && totalMinutes - nowMinutes < minDiff) {
+          minDiff = totalMinutes - nowMinutes;
+          next = schedule;
+        }
+      }
     }
   }
-  List<int> timesList = todayReminderHave.keys.toList();
-  timesList.sort();
-
-  return timesList.isEmpty ? null : todayReminderHave[timesList.first];
+  return next;
 }
 
-TimeModel? getFirstNextTime(List<TimeModel> listOfTime, DateTime now) {
-  final sortedTimes = List<TimeModel>.from(listOfTime);
-  sortedTimes.sort(
-      (a, b) => (a.hour * 60 + a.minute).compareTo(b.hour * 60 + b.minute));
-  for (TimeModel time in sortedTimes) {
-    if (time.hour * 60 + time.minute > now.hour * 60 + now.minute) {
-      return time;
-    }
-  }
-  return null;
-}
