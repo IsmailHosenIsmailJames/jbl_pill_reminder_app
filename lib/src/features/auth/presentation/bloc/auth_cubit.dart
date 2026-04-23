@@ -11,6 +11,7 @@ import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/login_u
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/signup_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/domain/usecases/update_password_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/fcm_service.dart";
 
 
 class AuthCubit extends Cubit<AuthState> {
@@ -53,6 +54,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       // Fetch profile after login
       await getUserProfile();
+      FCMService.getTokenAndRegister();
       return true;
     } catch (e) {
       Fluttertoast.showToast(
@@ -79,6 +81,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       // Fetch profile after signup
       await getUserProfile();
+      FCMService.getTokenAndRegister();
       return true;
     } catch (e) {
       Fluttertoast.showToast(

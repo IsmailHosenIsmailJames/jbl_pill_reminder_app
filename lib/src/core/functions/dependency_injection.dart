@@ -24,6 +24,9 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecase
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/get_all_pill_schedules_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/update_pill_schedule_usecase.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/fcm/data/datasources/fcm_remote_data_source.dart";
+import "package:jbl_pills_reminder_app/src/features/fcm/data/repositories/fcm_repository_impl.dart";
+import "package:jbl_pills_reminder_app/src/features/fcm/domain/usecases/register_fcm_token_usecase.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 
 final sl = GetIt.instance;
@@ -84,6 +87,13 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetAllPillSchedulesUseCase(sl()));
   sl.registerLazySingleton(() => UpdatePillScheduleUseCase(sl()));
   sl.registerLazySingleton(() => DeletePillScheduleUseCase(sl()));
+
+  // FCM Feature
+  sl.registerLazySingleton<FCMRemoteDataSource>(
+      () => FCMRemoteDataSourceImpl(dio: sl<DioClient>().dio));
+  sl.registerLazySingleton<FCMRepository>(
+      () => FCMRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton(() => RegisterFCMTokenUseCase(repository: sl()));
 
   // Blocs / Cubits
   sl.registerLazySingleton(() => AuthCubit(

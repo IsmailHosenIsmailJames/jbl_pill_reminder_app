@@ -1,0 +1,102 @@
+{
+  "info": {
+    "_postman_id": "0aca07b8-fe5e-48a4-b340-c92ccbdadfcc",
+    "name": "FCM",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26460732"
+  },
+  "item": [
+    {
+      "name": "Register Device",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"token\":\"dBPccgx32nfR2qV4bXOCsa:APA91bHT0YX12XKWLyPDWe4qW-yqSo_5XVO_j9AP53e7ANJ1ugsXXeSmmlXFNyWxWGGaIgazGsy2jlJgp5VPw7m7zixQdoVmSClb0H5EwQbM0CGXf6xIkA8\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/fcm/register-device",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "fcm",
+            "register-device"
+          ],
+          "query": [
+            {
+              "key": "search",
+              "value": "raihan",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Check - Push Notification",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{authToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\" :\"Pill Reminder\",\r\n    \"body\" : \"Youw should take your pill on-time\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/fcm/send-push-notification",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "fcm",
+            "send-push-notification"
+          ],
+          "query": [
+            {
+              "key": "search",
+              "value": "raihan",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

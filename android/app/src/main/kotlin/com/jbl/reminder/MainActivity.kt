@@ -1,4 +1,4 @@
-package com.jbl.pill_reminder
+package com.jbl.reminder
 
 import io.flutter.embedding.android.FlutterActivity
 

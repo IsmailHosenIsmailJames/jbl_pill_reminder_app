@@ -11,6 +11,8 @@ import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:permission_handler/permission_handler.dart";
 import "package:workmanager/workmanager.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
+import "package:firebase_core/firebase_core.dart";
+import "package:jbl_pills_reminder_app/src/core/notifications/fcm_service.dart";
 
 bool isUpdateChecked = false;
 
@@ -103,6 +105,12 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
+  // Initialize FCM
+  await FCMService.initialize();
+
   // Initialize notification channels ONCE with all channels
   await AwesomeNotificationsService.initAllChannels();
 
@@ -141,6 +149,11 @@ void main() async {
   final localDb = LocalDbRepository();
   String? userInfo = await localDb.getPreference("user_info");
   bool isLoggedIn = userInfo != null;
+
+  if (isLoggedIn) {
+    // Register FCM token if already logged in
+    FCMService.getTokenAndRegister();
+  }
 
   runApp(App(isLoggedIn: isLoggedIn));
 }
