@@ -43,9 +43,25 @@ class PillScheduleRemoteDataSourceImpl implements PillScheduleRemoteDataSource {
   Future<List<PillScheduleModel>> getAllPillSchedules() async {
     try {
       final response = await dio.get(pillSchedulesAPI);
-      // Assuming response.data is a list based on "Get Multi" in Postman
-      final List data = response.data["data"] ?? response.data;
-      return data.map((e) => PillScheduleModel.fromJson(e)).toList();
+      final rawData = response.data;
+
+      List dataList;
+      if (rawData is Map) {
+        final data = rawData["data"];
+        if (data is Map && data["data"] is List) {
+          dataList = data["data"];
+        } else if (data is List) {
+          dataList = data;
+        } else {
+          dataList = [];
+        }
+      } else if (rawData is List) {
+        dataList = rawData;
+      } else {
+        dataList = [];
+      }
+
+      return dataList.map((e) => PillScheduleModel.fromJson(e)).toList();
     } catch (e) {
       rethrow;
     }
@@ -55,7 +71,21 @@ class PillScheduleRemoteDataSourceImpl implements PillScheduleRemoteDataSource {
   Future<PillScheduleModel> getPillScheduleById(int id) async {
     try {
       final response = await dio.get("$pillSchedulesAPI/$id");
-      return PillScheduleModel.fromJson(response.data["data"] ?? response.data);
+      final rawData = response.data;
+
+      dynamic itemData;
+      if (rawData is Map) {
+        final data = rawData["data"];
+        if (data is Map && data["data"] != null) {
+          itemData = data["data"];
+        } else {
+          itemData = data ?? rawData;
+        }
+      } else {
+        itemData = rawData;
+      }
+
+      return PillScheduleModel.fromJson(itemData);
     } catch (e) {
       rethrow;
     }

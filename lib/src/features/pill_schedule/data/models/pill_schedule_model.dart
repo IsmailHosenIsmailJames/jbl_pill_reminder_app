@@ -57,18 +57,21 @@ class PillScheduleModel extends PillScheduleEntity {
   factory PillScheduleModel.fromJson(Map<String, dynamic> json) {
     return PillScheduleModel(
       id: json["id"],
-      userId: json["userId"],
-      medicineName: json["medicineName"],
+      userId: json["userId"] ?? 0,
+      medicineName: json["medicineName"] ?? "",
       size: json["size"]?.toString().toDouble(),
       qty: json["qty"]?.toString().toDouble(),
-      frequency: FrequencyType.values.byName(json["frequency"]),
+      frequency: json["frequency"] != null
+          ? FrequencyType.values.byName(json["frequency"])
+          : FrequencyType.DAILY,
       xDayValue: json["xDayValue"],
       weeklyValues: (json["weeklyValues"] as List?)
           ?.map((e) => WeekDay.values.byName(e))
           .toList(),
       monthlyDates: (json["monthlyDates"] as List?)?.cast<int>(),
       yearlyDates: (json["yearlyDates"] as List?)
-          ?.map((e) => DateFormat("MM-dd-yyyy").parse(e))
+          ?.map((e) => DateTime.tryParse(e.toString()) ??
+              DateFormat("MM-dd-yyyy").parse(e.toString()))
           .toList(),
       whenToTake: json["whenToTake"],
       takingNotes: json["takingNotes"],
@@ -83,7 +86,8 @@ class PillScheduleModel extends PillScheduleEntity {
           ? ReminderType.values.byName(json["reminderType"])
           : ReminderType.notification,
       notes: json["notes"],
-      endDate: DateFormat("MM-dd-yyyy").parse(json["endDate"]),
+      endDate: DateTime.tryParse(json["endDate"].toString()) ??
+          DateFormat("MM-dd-yyyy").parse(json["endDate"].toString()),
       status: json["status"] ?? "ACTIVE",
     );
   }
@@ -100,7 +104,7 @@ class PillScheduleModel extends PillScheduleEntity {
       "weeklyValues": weeklyValues?.map((e) => e.name).toList() ?? [],
       "monthlyDates": monthlyDates ?? [],
       "yearlyDates":
-          yearlyDates?.map((e) => DateFormat("MM-dd-yyyy").format(e)).toList() ??
+          yearlyDates?.map((e) => e.toIso8601String()).toList() ??
               [],
       "whenToTake": whenToTake ?? "",
       "takingNotes": takingNotes ?? "",
@@ -111,7 +115,7 @@ class PillScheduleModel extends PillScheduleEntity {
       "nightTime": nightTime,
       "reminderType": reminderType.name,
       "notes": notes ?? "",
-      "endDate": DateFormat("MM-dd-yyyy").format(endDate),
+      "endDate": endDate.toIso8601String(),
       "status": status,
     };
   }
