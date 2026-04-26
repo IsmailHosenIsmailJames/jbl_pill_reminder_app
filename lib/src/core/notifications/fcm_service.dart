@@ -1,7 +1,11 @@
+import "dart:convert";
 import "dart:developer";
 import "package:firebase_messaging/firebase_messaging.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
-import "../../features/fcm/domain/usecases/register_fcm_token_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/fcm/domain/usecases/register_fcm_token_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/data/models/reminder_model.dart";
+import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
 
 class FCMService {
@@ -30,8 +34,21 @@ class FCMService {
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     await _localNotificationsPlugin.initialize(
-      settings: initializationSettings,
-    );
+        settings: initializationSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          try {
+            final reminderMap = Map<String, dynamic>.from(
+                jsonDecode(response.data["reminder"] ?? "{}"));
+            final reminder = ReminderModel.fromJson(reminderMap);
+            AppRouter.router.pushNamed(
+              Routes.takeMedicineRoute,
+              extra: reminder,
+            );
+          } catch (e) {
+            log("Error parsing reminder from local notification: $e",
+                name: "FCMService");
+          }
+        });
 
     // 3. Configure foreground notification presentation
     await _firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -46,6 +63,10 @@ class FCMService {
     // 5. Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       log("Got a message whilst in the foreground!", name: "FCMService");
+      log(
+        "FCM Message: ${JsonEncoder.withIndent("  ").convert(message.data)}",
+        name: "FCMService",
+      );
       if (message.notification != null) {
         _showLocalNotification(message);
       }
@@ -54,7 +75,7 @@ class FCMService {
     // 6. Handle notification click (when app is in background/terminated)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       log("Notification clicked!", name: "FCMService");
-      // TODO: Handle navigation based on message data if needed
+      _handleNotificationClick(message);
     });
 
     // 7. Check if app was opened from a terminated state via a notification
@@ -63,6 +84,23 @@ class FCMService {
     if (initialMessage != null) {
       log("App opened from terminated state via notification",
           name: "FCMService");
+      _handleNotificationClick(initialMessage);
+    }
+  }
+
+  static void _handleNotificationClick(RemoteMessage message) {
+    String? reminderJson = message.data["reminder"];
+    if (reminderJson != null) {
+      try {
+        final reminderMap = Map<String, dynamic>.from(jsonDecode(reminderJson));
+        final reminder = ReminderModel.fromJson(reminderMap);
+        AppRouter.router.pushNamed(
+          Routes.takeMedicineRoute,
+          extra: reminder,
+        );
+      } catch (e) {
+        log("Error parsing reminder from FCM: $e", name: "FCMService");
+      }
     }
   }
 
@@ -95,6 +133,7 @@ class FCMService {
       title: message.notification?.title,
       body: message.notification?.body,
       notificationDetails: platformChannelSpecifics,
+      payload: message.data["reminder"],
     );
   }
 }

@@ -7,6 +7,7 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entitie
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/data/models/reminder_model.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -151,11 +152,30 @@ void customNavigation(Map? actionData) async {
   if (actionData != null) {
     ReceivedAction receivedAction =
         ReceivedAction().fromMap(Map<String, dynamic>.from(actionData));
+
+    // Check for reminder in payload
+    String? reminderJson = receivedAction.payload?["reminder"];
+    if (reminderJson != null) {
+      try {
+        final reminderMap = Map<String, dynamic>.from(jsonDecode(reminderJson));
+        final reminder = ReminderModel.fromJson(reminderMap);
+        AppRouter.router.pushNamed(
+          Routes.takeMedicineRoute,
+          extra: reminder,
+        );
+        return;
+      } catch (e) {
+        log("Error parsing reminder from notification: $e",
+            name: "customNavigation");
+      }
+    }
+
     String? reminderRawData = receivedAction.payload?["payloadString"];
     log(reminderRawData.toString(), name: "actionData");
     if (reminderRawData != null) {
       try {
-        final payloadMap = Map<String, dynamic>.from(jsonDecode(reminderRawData));
+        final payloadMap =
+            Map<String, dynamic>.from(jsonDecode(reminderRawData));
         // Create a minimal entity from the notification payload for the take medicine screen
         final entity = PillScheduleEntity(
           id: payloadMap["id"],
@@ -164,7 +184,7 @@ void customNavigation(Map? actionData) async {
           frequency: FrequencyType.DAILY,
           endDate: DateTime.now().add(const Duration(days: 30)),
         );
-        AppRouter.router.push(
+        AppRouter.router.pushNamed(
           Routes.takeMedicineRoute,
           extra: entity,
         );
@@ -174,4 +194,3 @@ void customNavigation(Map? actionData) async {
     }
   }
 }
-

@@ -1,0 +1,60 @@
+{
+    "reminder": {
+        "id": 1110,
+        "userId": 2,
+        "scheduleId": 59,
+        "date": "2026-04-26T00:00:00.000Z",
+        "time": "12:35",
+        "isRead": false,
+        "action": "pending",
+        "status": "PENDING",
+        "createdAt": "2026-04-26T06:34:11.968Z",
+        "updatedAt": "2026-04-26T06:34:11.968Z",
+        "user": {
+            "id": 2,
+            "mobile": "8801741095333",
+            "name": "Ismail Hossain",
+            "age": null,
+            "division": "Dhaka",
+            "district": "Dhaka",
+            "upazila": null,
+            "profilePhoto": "",
+            "password": "$2b$10$ckZ6.kejJvcx0/wrCKSRcu95L2uZTCR3PC22TQqupmv2K6i.oWSPC",
+            "status": "ACTIVE",
+            "createdAt": "2026-04-20T04:04:17.832Z",
+            "updatedAt": "2026-04-20T08:49:18.213Z"
+        },
+        "PillSchedule": {
+            "id": 59,
+            "userId": 2,
+            "medicineName": "Adbon",
+            "size": 500,
+            "qty": "2",
+            "frequency": "DAILY",
+            "xDayValue": 0,
+            "weeklyValues": [
+                "Sunday",
+                "Friday",
+                "TuesDay"
+            ],
+            "monthlyDates": [],
+            "yearlyDates": [],
+            "whenToTake": "After Meal",
+            "takingNotes": "a example note",
+            "times": [
+                "Afternoon",
+                "Morning"
+            ],
+            "morningTime": "12:35",
+            "afternoonTime": "14: 36",
+            "eveningTime": "19: 00",
+            "nightTime": "21: 00",
+            "reminderType": "notification",
+            "notes": "a example note",
+            "endDate": "2026-04-28T00:00:00.000Z",
+            "status": "ACTIVE",
+            "createdAt": "2026-04-26T05:32:12.124Z",
+            "updatedAt": "2026-04-26T06:34:11.955Z"
+        }
+    }
+}

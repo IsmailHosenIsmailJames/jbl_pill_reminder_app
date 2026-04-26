@@ -1,5 +1,4 @@
 import "dart:convert";
-import "dart:developer";
 
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -443,7 +442,12 @@ class _AddReminderState extends State<AddReminder> {
               textFormField: DropdownButtonFormField<String>(
                 value: whenToTake.isEmpty ? null : whenToTake,
                 hint: const Text("When to take?"),
-                items: ["Before Meal", "After Meal", "With Meal", "Empty Stomach"]
+                items: [
+                  "Before Meal",
+                  "After Meal",
+                  "With Meal",
+                  "Empty Stomach"
+                ]
                     .map((s) => DropdownMenuItem(value: s, child: Text(s)))
                     .toList(),
                 onChanged: (v) => setState(() => whenToTake = v ?? ""),

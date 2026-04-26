@@ -61,7 +61,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n        \"endDate\" : \"05-15-2026\"\r\n}",
+          "raw": "{\r\n    \"status\" : \"'PENDING' | 'SENT' | 'TAKEN' | 'STOPPED'\"\r\n}",
           "options": {
             "raw": {
               "language": "json"

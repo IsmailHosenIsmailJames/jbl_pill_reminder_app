@@ -64,18 +64,21 @@ Card cardOfReminderForSummary(
               children: [
                 const Icon(FluentIcons.pill_24_regular),
                 const Gap(10),
-                Expanded(
-                  child: Text(
-                    currentSchedule.medicineName,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentSchedule.medicineName,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    if (currentSchedule.size != null)
+                      Text("${currentSchedule.size} mg/ml"),
+                  ],
                 ),
-                if (currentSchedule.size != null)
-                  Text(" (${currentSchedule.size} mg/ml)"),
               ],
             ),
           const Gap(7),
@@ -153,22 +156,35 @@ Card cardOfReminderForSummary(
                   spacing: 10,
                   runSpacing: 5,
                   children: alarmSlots.map((slot) {
-                    String timeStr = "";
+                    int hour = 0, minute = 0;
                     switch (slot) {
                       case ScheduleTimeSlot.Morning:
-                        timeStr = currentSchedule.morningTime;
+                        hour = int.parse(
+                            currentSchedule.morningTime.split(":")[0]);
+                        minute = int.parse(
+                            currentSchedule.morningTime.split(":")[1]);
                         break;
                       case ScheduleTimeSlot.Afternoon:
-                        timeStr = currentSchedule.afternoonTime;
+                        hour = int.parse(
+                            currentSchedule.afternoonTime.split(":")[0]);
+                        minute = int.parse(
+                            currentSchedule.afternoonTime.split(":")[1]);
                         break;
                       case ScheduleTimeSlot.Evening:
-                        timeStr = currentSchedule.eveningTime;
+                        hour = int.parse(
+                            currentSchedule.eveningTime.split(":")[0]);
+                        minute = int.parse(
+                            currentSchedule.eveningTime.split(":")[1]);
                         break;
                       case ScheduleTimeSlot.Night:
-                        timeStr = currentSchedule.nightTime;
+                        hour =
+                            int.parse(currentSchedule.nightTime.split(":")[0]);
+                        minute =
+                            int.parse(currentSchedule.nightTime.split(":")[1]);
                         break;
                     }
-                    return Text("${slot.name}: $timeStr");
+                    return Text(
+                        "${slot.name}: ${TimeOfDay(hour: hour, minute: minute).format(context)}");
                   }).toList(),
                 ),
               ),

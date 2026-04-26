@@ -18,6 +18,7 @@ import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/forgot_p
 import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/verify_otp_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/reset_password_page.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/forgot_password_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
 import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
 
 
@@ -67,8 +68,13 @@ class AppRouter {
         path: Routes.takeMedicineRoute,
         name: Routes.takeMedicineRoute,
         builder: (context, state) {
-          final schedule = state.extra as PillScheduleEntity;
-          return TakeMedicinePage(currentMedicationToTake: schedule);
+          if (state.extra is ReminderEntity) {
+            return TakeMedicinePage(reminder: state.extra as ReminderEntity);
+          } else if (state.extra is PillScheduleEntity) {
+            return TakeMedicinePage(
+                currentMedicationToTake: state.extra as PillScheduleEntity);
+          }
+          return const TakeMedicinePage();
         },
       ),
       GoRoute(

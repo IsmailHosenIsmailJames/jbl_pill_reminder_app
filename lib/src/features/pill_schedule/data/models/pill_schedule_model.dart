@@ -125,7 +125,7 @@ class PillScheduleModel extends PillScheduleEntity {
       "nightTime": nightTime,
       "reminderType": reminderType.name,
       "notes": notes ?? "",
-      "endDate": endDate.toUtc().toIso8601String(),
+      "endDate": DateFormat("yyyy-MM-dd").format(endDate),
       "status": status,
       if (createdAt != null) "createdAt": createdAt!.toUtc().toIso8601String(),
       if (updatedAt != null) "updatedAt": updatedAt!.toUtc().toIso8601String(),
