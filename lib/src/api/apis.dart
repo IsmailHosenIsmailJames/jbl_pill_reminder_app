@@ -7,6 +7,7 @@ String otpRequestAPI = "${baseAPI}auth/otp-request";
 String verifyOtpAPI = "${baseAPI}auth/verify-otp";
 String updateForgotPasswordAPI = "${baseAPI}auth/update-forgot-password";
 String pillSchedulesAPI = "${baseAPI}pill-schedules";
+String remindersAPI = "${baseAPI}reminders";
 String registerFCMTokenAPI = "${baseAPI}fcm/register-device";
 String sendPushNotificationAPI = "${baseAPI}fcm/send-push-notification";
 

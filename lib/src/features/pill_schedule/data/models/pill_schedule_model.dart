@@ -26,6 +26,8 @@ class PillScheduleModel extends PillScheduleEntity {
     super.notes,
     required super.endDate,
     super.status,
+    super.createdAt,
+    super.updatedAt,
   });
 
   factory PillScheduleModel.fromEntity(PillScheduleEntity entity) {
@@ -51,6 +53,8 @@ class PillScheduleModel extends PillScheduleEntity {
       notes: entity.notes,
       endDate: entity.endDate,
       status: entity.status,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
     );
   }
 
@@ -70,7 +74,8 @@ class PillScheduleModel extends PillScheduleEntity {
           .toList(),
       monthlyDates: (json["monthlyDates"] as List?)?.cast<int>(),
       yearlyDates: (json["yearlyDates"] as List?)
-          ?.map((e) => DateTime.tryParse(e.toString()) ??
+          ?.map((e) =>
+              DateTime.tryParse(e.toString()) ??
               DateFormat("MM-dd-yyyy").parse(e.toString()))
           .toList(),
       whenToTake: json["whenToTake"],
@@ -89,6 +94,12 @@ class PillScheduleModel extends PillScheduleEntity {
       endDate: DateTime.tryParse(json["endDate"].toString()) ??
           DateFormat("MM-dd-yyyy").parse(json["endDate"].toString()),
       status: json["status"] ?? "ACTIVE",
+      createdAt: json["createdAt"] != null
+          ? DateTime.tryParse(json["createdAt"].toString())
+          : null,
+      updatedAt: json["updatedAt"] != null
+          ? DateTime.tryParse(json["updatedAt"].toString())
+          : null,
     );
   }
 
@@ -104,8 +115,7 @@ class PillScheduleModel extends PillScheduleEntity {
       "weeklyValues": weeklyValues?.map((e) => e.name).toList() ?? [],
       "monthlyDates": monthlyDates ?? [],
       "yearlyDates":
-          yearlyDates?.map((e) => e.toIso8601String()).toList() ??
-              [],
+          yearlyDates?.map((e) => e.toUtc().toIso8601String()).toList() ?? [],
       "whenToTake": whenToTake ?? "",
       "takingNotes": takingNotes ?? "",
       "times": times?.map((e) => e.name).toList() ?? [],
@@ -115,8 +125,10 @@ class PillScheduleModel extends PillScheduleEntity {
       "nightTime": nightTime,
       "reminderType": reminderType.name,
       "notes": notes ?? "",
-      "endDate": endDate.toIso8601String(),
+      "endDate": endDate.toUtc().toIso8601String(),
       "status": status,
+      if (createdAt != null) "createdAt": createdAt!.toUtc().toIso8601String(),
+      if (updatedAt != null) "updatedAt": updatedAt!.toUtc().toIso8601String(),
     };
   }
 }

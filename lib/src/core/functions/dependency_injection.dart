@@ -27,6 +27,11 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/b
 import "package:jbl_pills_reminder_app/src/features/fcm/data/datasources/fcm_remote_data_source.dart";
 import "package:jbl_pills_reminder_app/src/features/fcm/data/repositories/fcm_repository_impl.dart";
 import "package:jbl_pills_reminder_app/src/features/fcm/domain/usecases/register_fcm_token_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/data/datasources/reminder_remote_data_source.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/data/repositories/reminder_repository_impl.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/repositories/reminder_repository.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/usecases/reminder_usecases.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/presentation/bloc/reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 
 final sl = GetIt.instance;
@@ -95,6 +100,17 @@ Future<void> initDependencies() async {
       () => FCMRepositoryImpl(remoteDataSource: sl()));
   sl.registerLazySingleton(() => RegisterFCMTokenUseCase(repository: sl()));
 
+  // Reminder Feature
+  sl.registerLazySingleton<ReminderRemoteDataSource>(
+      () => ReminderRemoteDataSourceImpl(sl<DioClient>().dio));
+  sl.registerLazySingleton<ReminderRepository>(
+      () => ReminderRepositoryImpl(sl()));
+  sl.registerLazySingleton(() => CreateReminderUseCase(sl()));
+  sl.registerLazySingleton(() => GetAllRemindersUseCase(sl()));
+  sl.registerLazySingleton(() => GetReminderByIdUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateReminderUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteReminderUseCase(sl()));
+
   // Blocs / Cubits
   sl.registerLazySingleton(() => AuthCubit(
         loginUseCase: sl(),
@@ -120,5 +136,13 @@ Future<void> initDependencies() async {
         getAllUseCase: sl(),
         updateUseCase: sl(),
         deleteUseCase: sl(),
+      ));
+
+  sl.registerFactory(() => ReminderCubit(
+        createReminderUseCase: sl(),
+        getAllRemindersUseCase: sl(),
+        getReminderByIdUseCase: sl(),
+        updateReminderUseCase: sl(),
+        deleteReminderUseCase: sl(),
       ));
 }

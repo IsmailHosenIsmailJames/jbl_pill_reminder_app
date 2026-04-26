@@ -23,6 +23,8 @@ class PillScheduleEntity extends Equatable {
   final String? notes;
   final DateTime endDate;
   final String status;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const PillScheduleEntity({
     this.id,
@@ -46,6 +48,8 @@ class PillScheduleEntity extends Equatable {
     this.notes,
     required this.endDate,
     this.status = "ACTIVE",
+    this.createdAt,
+    this.updatedAt,
   });
 
   @override
@@ -71,5 +75,7 @@ class PillScheduleEntity extends Equatable {
         notes,
         endDate,
         status,
+        createdAt,
+        updatedAt,
       ];
 }

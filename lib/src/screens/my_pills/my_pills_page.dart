@@ -8,7 +8,6 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entitie
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
-import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 
 class MyPillsPage extends StatefulWidget {
   final String phone;
