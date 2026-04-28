@@ -5,6 +5,7 @@ import "package:gap/gap.dart";
 import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
+import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 import "package:toastification/toastification.dart";
 
@@ -54,6 +55,14 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
     }
   }
 
+  void _handleBack() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed(Routes.rootRoute);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -61,7 +70,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
         child: BlocListener<ReminderCubit, ReminderState>(
             listener: (context, state) {
               if (state is ReminderOperationSuccess) {
-                context.pop();
+                _handleBack();
               } else if (state is ReminderError) {
                 toastification.show(
                   context: context,
@@ -71,91 +80,103 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                 );
               }
             },
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text(widget.title ?? "Take Medicine"),
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const Center(
-                      child: CircleAvatar(
-                        radius: 50,
-                        child: Icon(Icons.medication_rounded, size: 50),
+            child: PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) {
+                if (didPop) return;
+                _handleBack();
+              },
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.title ?? "Take Medicine"),
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: _handleBack,
+                  ),
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      const Center(
+                        child: CircleAvatar(
+                          radius: 50,
+                          child: Icon(Icons.medication_rounded, size: 50),
+                        ),
                       ),
-                    ),
-                    const Gap(30),
-                    Text(
-                      schedule.medicineName,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(),
-                    const Text("Details: ", style: TextStyle(fontSize: 14)),
-                    cardOfReminderForSummary(
-                      schedule,
-                      context,
-                      showTitle: false,
-                    ),
-                    const Gap(30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          child: OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100)),
+                      const Gap(30),
+                      Text(
+                        schedule.medicineName,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const Divider(),
+                      const Text("Details: ", style: TextStyle(fontSize: 14)),
+                      cardOfReminderForSummary(
+                        schedule,
+                        context,
+                        showTitle: false,
+                      ),
+                      const Gap(30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100)),
+                              ),
+                              onPressed: _handleBack,
+                              icon: const Icon(Icons.arrow_back),
+                              label: const Text("Back"),
                             ),
-                            onPressed: () => context.pop(),
-                            icon: const Icon(Icons.arrow_back),
-                            label: const Text("Back"),
                           ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.45,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100)),
-                            ),
-                            onPressed: () async {
-                              if (widget.reminder != null) {
-                                context.read<ReminderCubit>().updateReminder(
-                                  widget.reminder!.id,
-                                  {"status": "TAKEN"},
-                                );
-                              } else {
-                                // Logic for marking as done can be added here (intake history)
-                                toastification.show(
-                                  context: context,
-                                  title: const Text("Marked as taken"),
-                                  type: ToastificationType.success,
-                                  autoCloseDuration: const Duration(seconds: 2),
-                                );
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.45,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(100)),
+                              ),
+                              onPressed: () async {
+                                if (widget.reminder != null) {
+                                  context.read<ReminderCubit>().updateReminder(
+                                    widget.reminder!.id,
+                                    {"status": "TAKEN"},
+                                  );
+                                } else {
+                                  // Logic for marking as done can be added here (intake history)
+                                  toastification.show(
+                                    context: context,
+                                    title: const Text("Marked as taken"),
+                                    type: ToastificationType.success,
+                                    autoCloseDuration:
+                                        const Duration(seconds: 2),
+                                  );
 
-                                if (widget.currentMedicationToTake?.id !=
-                                    null) {
-                                  try {
-                                    AwesomeNotifications().dismiss(
-                                        widget.currentMedicationToTake!.id!);
-                                  } catch (_) {}
+                                  if (widget.currentMedicationToTake?.id !=
+                                      null) {
+                                    try {
+                                      AwesomeNotifications().dismiss(
+                                          widget.currentMedicationToTake!.id!);
+                                    } catch (_) {}
+                                  }
+
+                                  _handleBack();
                                 }
-
-                                context.pop();
-                              }
-                            },
-                            icon: const Icon(Icons.done),
-                            label: const Text("Done"),
+                              },
+                              icon: const Icon(Icons.done),
+                              label: const Text("Done"),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )));

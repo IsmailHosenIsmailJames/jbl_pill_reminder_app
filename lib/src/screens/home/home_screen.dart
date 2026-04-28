@@ -40,7 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
       homeCubit.reloadLocalReminders();
       await loadUserData(authCubit);
 
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
       await sharedPreferences.reload();
       if (mounted) {
         await requestPermissions(context);
@@ -59,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
       await sharedPreferences.clear();
-      
+
       every1Stream().listen((event) async {
         sharedPreferences = await SharedPreferences.getInstance();
         await sharedPreferences.reload();
@@ -87,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Stream<int> every30Stream() {
-    return Stream<int>.periodic(const Duration(seconds: 30), (computationCount) {
+    return Stream<int>.periodic(const Duration(seconds: 30),
+        (computationCount) {
       return computationCount;
     });
   }
@@ -247,9 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Text(
             "No upcoming reminder for today. Relax! \u{1F60A}",
             style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey),
+                fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ),
