@@ -1,4 +1,3 @@
-
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:gap/gap.dart";
@@ -47,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final mobile = (authCubit.state as Authenticated).user.mobile;
         homeCubit.syncRemindersFromServer(mobile);
       }
-
     });
 
     every30Stream().listen((event) {
@@ -64,7 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return computationCount;
     });
   }
-
 
   Future<void> loadUserData(AuthCubit authCubit) async {
     await authCubit.getUserProfile();
@@ -169,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildTodaysReminders(context, state),
               const Gap(15),
               Text(
-                "All Reminders",
+                "All Schedules",
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: MyAppColors.primaryColor,

@@ -137,7 +137,7 @@ class _AddReminderState extends State<AddReminder> {
       child: Scaffold(
         appBar: AppBar(
             title: Text(
-                widget.editMode == true ? "Edit Reminder" : "Add Reminder")),
+                widget.editMode == true ? "Edit Schedule" : "Add Schedule")),
         body: SafeArea(
           child: Form(
             key: formKey,
