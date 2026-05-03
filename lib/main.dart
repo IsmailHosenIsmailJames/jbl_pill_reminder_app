@@ -75,7 +75,7 @@ Future<bool> requestPermissions(BuildContext context) async {
                   child: const Text("Grant Permissions"),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
             ],
           ),
         ),
