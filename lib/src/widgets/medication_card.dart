@@ -61,8 +61,7 @@ Card cardOfReminder(
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (schedule.size != null)
-                      Text("${schedule.size} mg/ml"),
+                    if (schedule.size != null) Text("${schedule.size} mg/ml"),
                   ],
                 ),
               ],
@@ -72,10 +71,21 @@ Card cardOfReminder(
             children: [
               const Icon(FluentIcons.clock_alarm_24_regular),
               const Gap(10),
-              Text(
-                "Scheduled for: ${reminder.time}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              Builder(
+                builder: (context) {
+                  final timeParts = reminder.time.split(":");
+                  if (timeParts.length != 2) {
+                    return const Text("Scheduled for: Invalid time");
+                  }
+                  int hour = int.parse(timeParts[0]);
+                  int minute = int.parse(timeParts[1]);
+
+                  return Text(
+                    "Scheduled for: ${TimeOfDay(hour: hour, minute: minute).format(context)}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  );
+                },
+              )
             ],
           ),
           const Gap(5),
@@ -93,9 +103,11 @@ Card cardOfReminder(
             Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 35),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
+                  color: reminder.status == "TAKEN" ||
+                          reminder.status == "COMPLETED"
                       ? Colors.green.withValues(alpha: 0.2)
                       : reminder.status == "STOPPED"
                           ? Colors.red.withValues(alpha: 0.2)
@@ -105,7 +117,8 @@ Card cardOfReminder(
                 child: Text(
                   "Status: ${reminder.status}",
                   style: TextStyle(
-                    color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
+                    color: reminder.status == "TAKEN" ||
+                            reminder.status == "COMPLETED"
                         ? Colors.green
                         : reminder.status == "STOPPED"
                             ? Colors.red
