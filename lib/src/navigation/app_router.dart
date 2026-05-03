@@ -4,6 +4,7 @@ import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/presentation/bloc/reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/add_reminder.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
@@ -20,7 +21,6 @@ import "package:jbl_pills_reminder_app/src/screens/auth/forgot_password/reset_pa
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/forgot_password_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
 import "package:jbl_pills_reminder_app/src/widgets/routes_not_found.dart";
-
 
 class AppRouter {
   static final GlobalKey<NavigatorState> rootNavigatorKey =
@@ -68,13 +68,20 @@ class AppRouter {
         path: Routes.takeMedicineRoute,
         name: Routes.takeMedicineRoute,
         builder: (context, state) {
+          ReminderEntity? reminder;
+          PillScheduleEntity? schedule;
           if (state.extra is ReminderEntity) {
-            return TakeMedicinePage(reminder: state.extra as ReminderEntity);
+            reminder = state.extra as ReminderEntity;
           } else if (state.extra is PillScheduleEntity) {
-            return TakeMedicinePage(
-                currentMedicationToTake: state.extra as PillScheduleEntity);
+            schedule = state.extra as PillScheduleEntity;
           }
-          return const TakeMedicinePage();
+          return BlocProvider(
+            create: (context) => sl<ReminderCubit>(),
+            child: TakeMedicinePage(
+              reminder: reminder,
+              currentMedicationToTake: schedule,
+            ),
+          );
         },
       ),
       GoRoute(
@@ -140,7 +147,7 @@ class AppRouter {
         },
       ),
     ],
-    errorBuilder: (context, state) => const RoutesNotFound(routeName: "Unknown"),
-
+    errorBuilder: (context, state) =>
+        const RoutesNotFound(routeName: "Unknown"),
   );
 }
