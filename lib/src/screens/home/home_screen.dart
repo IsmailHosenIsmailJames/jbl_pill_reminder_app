@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
             extra: state.nextReminder!,
           );
         },
-        child: cardOfReminderForSummary(
+        child: cardOfReminder(
           state.nextReminder!,
           context,
           isSelectedToday: true,

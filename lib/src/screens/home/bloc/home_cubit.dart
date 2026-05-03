@@ -3,14 +3,18 @@ import "dart:developer";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/get_all_pill_schedules_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/usecases/reminder_usecases.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart";
 
 class HomeCubit extends Cubit<HomeState> {
   final GetAllPillSchedulesUseCase _getAllUseCase;
+  final GetAllRemindersUseCase _getAllRemindersUseCase;
 
   HomeCubit({
     required GetAllPillSchedulesUseCase getAllUseCase,
+    required GetAllRemindersUseCase getAllRemindersUseCase,
   })  : _getAllUseCase = getAllUseCase,
+        _getAllRemindersUseCase = getAllRemindersUseCase,
         super(HomeState(selectedDay: DateTime.now()));
 
   void updateSelectedDay(DateTime date) {
@@ -19,27 +23,32 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> reloadLocalReminders() async {
-    // With the new API, we fetch from the server or local source via use case.
-    // Assuming the use case handles the abstraction.
     emit(state.copyWith(isLoading: true));
-    // try {
-    final schedules = await _getAllUseCase();
-    emit(state.copyWith(listOfAllReminder: schedules, isLoading: false));
-    _updateDailyReminders(state.selectedDay);
-    // } catch (e) {
-    //   log("reloadLocalReminders error: $e");
-    //   emit(state.copyWith(isLoading: false));
-    // }
+    try {
+      final schedules = await _getAllUseCase();
+      final nextReminders = await _getAllRemindersUseCase(
+        status: "PENDING",
+        isNextReminders: true,
+      );
+
+      emit(state.copyWith(
+        listOfAllReminder: schedules,
+        nextReminder: nextReminders.isNotEmpty ? nextReminders.first : null,
+        isLoading: false,
+      ));
+      _updateDailyReminders(state.selectedDay);
+    } catch (e) {
+      log("reloadLocalReminders error: $e");
+      emit(state.copyWith(isLoading: false));
+    }
   }
 
   void _updateDailyReminders(DateTime date) {
     log("updateDailyReminders for $date");
     final todaysMedication = findDateMedicine(state.listOfAllReminder, date);
-    final nextRem = getNextReminder(state.listOfAllReminder);
 
     emit(state.copyWith(
       listOfTodaysReminder: todaysMedication,
-      nextReminder: nextRem,
     ));
   }
 

@@ -140,14 +140,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const Divider(),
               const Gap(30),
-              OutlinedButton.icon(
-                onPressed: () {
-                  // Edit profile logic
-                },
-                icon: const Icon(Icons.edit_rounded),
-                label: const Text("Edit Profile"),
-              ),
-              const Gap(10),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange.shade800,

@@ -8,12 +8,115 @@ import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 
 import "../theme/colors.dart";
 import "../theme/const_values.dart";
+
+Card cardOfReminder(
+  ReminderEntity reminder,
+  BuildContext context, {
+  bool isSelectedToday = false,
+  bool showTitle = true,
+  Color? color,
+}) {
+  final schedule = reminder.pillSchedule;
+  if (schedule == null) {
+    return const Card(child: Text("No schedule details"));
+  }
+
+  return Card(
+    color: color,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(
+          borderRadius,
+        ),
+        side: BorderSide(
+          color: isSelectedToday
+              ? MyAppColors.primaryColor.withValues(alpha: 0.5)
+              : MyAppColors.shadedMutedColor,
+        )),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (showTitle)
+            Row(
+              children: [
+                const Icon(FluentIcons.pill_24_regular),
+                const Gap(10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      schedule.medicineName,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (schedule.size != null)
+                      Text("${schedule.size} mg/ml"),
+                  ],
+                ),
+              ],
+            ),
+          const Gap(7),
+          Row(
+            children: [
+              const Icon(FluentIcons.clock_alarm_24_regular),
+              const Gap(10),
+              Text(
+                "Scheduled for: ${reminder.time}",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const Gap(5),
+          Row(
+            children: [
+              const Icon(FluentIcons.calendar_24_regular),
+              const Gap(10),
+              Text(
+                "Date: ${DateFormat.yMMMMd().format(reminder.date)}",
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ],
+          ),
+          if (reminder.status != "PENDING")
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 35),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
+                      ? Colors.green.withValues(alpha: 0.2)
+                      : Colors.orange.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "Status: ${reminder.status}",
+                  style: TextStyle(
+                    color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
+                        ? Colors.green
+                        : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
 
 Card cardOfReminderForSummary(
   PillScheduleEntity currentSchedule,

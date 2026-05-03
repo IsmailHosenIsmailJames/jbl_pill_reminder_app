@@ -1,10 +1,11 @@
 import "package:equatable/equatable.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
 
 class HomeState extends Equatable {
   final DateTime selectedDay;
   final bool isLoading;
-  final PillScheduleEntity? nextReminder;
+  final ReminderEntity? nextReminder;
   final List<PillScheduleEntity> listOfTodaysReminder;
   final List<PillScheduleEntity> listOfAllReminder;
 
@@ -19,7 +20,7 @@ class HomeState extends Equatable {
   HomeState copyWith({
     DateTime? selectedDay,
     bool? isLoading,
-    PillScheduleEntity? nextReminder,
+    ReminderEntity? nextReminder,
     List<PillScheduleEntity>? listOfTodaysReminder,
     List<PillScheduleEntity>? listOfAllReminder,
   }) {

@@ -33,6 +33,7 @@ import "package:jbl_pills_reminder_app/src/features/reminder/domain/repositories
 import "package:jbl_pills_reminder_app/src/features/reminder/domain/usecases/reminder_usecases.dart";
 import "package:jbl_pills_reminder_app/src/features/reminder/presentation/bloc/reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
+import "package:jbl_pills_reminder_app/src/screens/history/bloc/history_cubit.dart";
 
 final sl = GetIt.instance;
 
@@ -128,6 +129,7 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton(() => HomeCubit(
         getAllUseCase: sl(),
+        getAllRemindersUseCase: sl(),
       ));
 
   sl.registerFactory(() => PillScheduleCubit(
@@ -143,5 +145,9 @@ Future<void> initDependencies() async {
         getReminderByIdUseCase: sl(),
         updateReminderUseCase: sl(),
         deleteReminderUseCase: sl(),
+      ));
+
+  sl.registerFactory(() => HistoryCubit(
+        getAllRemindersUseCase: sl(),
       ));
 }
