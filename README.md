@@ -6,43 +6,29 @@ on track with their prescriptions.
 
 ## Description
 
-This application allows users to add medications, set up complex schedules (e.g., specific times,
-days of the week), and receive notifications and alarms for each dose. It aims to be a reliable
-companion for individuals managing multiple medications or complex treatment plans. The app utilizes
-background services to ensure reminders are delivered even when the app is not actively running.
+This application allows users to add medications, set up schedules, and receive notifications for each dose. Notifications are managed via Firebase Cloud Messaging (FCM) to ensure reliability and battery efficiency.
 
 ## Key Features
 
-* **Medication Management:** Add and manage a list of medications, including names and potentially
-  other details.
-* **Flexible Scheduling:** Set up reminders for different times of the day, specific days of the
-  week, or recurring schedules.
+* **Medication Management:** Add and manage a list of medications, including names and dosages.
+* **Flexible Scheduling:** Set up reminders for different times of the day and recurring schedules.
 * **Notification System:**
-    * Receive pre-reminders (e.g., 15 minutes before the scheduled time).
-    * Receive exact-time notifications or alarms for taking medication.
-    * Actionable notifications allowing users to mark doses as taken or interact with the reminder.
-* **Calendar View:** Visualize medication schedules on a calendar.
-* **Background Reliability:** Utilizes foreground services and background tasks (`WorkManager`) to
-  ensure reminders are timely and accurate.
-* **Local Data Storage:** Uses Hive for efficient local storage of reminder and user data.
-* **User Authentication:** (Assumed based on seen files) Features for user login and signup.
-* **History Tracking:** (Assumed) Keeps a log of taken medications.
+    * Receive timely notifications managed via FCM.
+    * Actionable notifications allowing users to mark doses as taken.
+* **Calendar View:** Visualize medication schedules on an interactive calendar.
+* **History Tracking:** Keeps a log of taken medications.
+* **Cloud Sync:** Synchronize reminders and history with the server.
 
 ## Tech Stack & Key Dependencies
 
 * **Flutter:** For cross-platform (iOS & Android) mobile app development.
-* **GetX:** For state management, navigation, and dependency injection.
-* **Hive:** For fast and efficient local NoSQL database storage.
-* **awesome_notifications:** For creating rich and customizable local notifications.
-* **flutter_foreground_task:** For running tasks in a foreground service, crucial for reliable
-  reminders.
-* **workmanager:** For scheduling and running background tasks periodically.
-* **alarm:** For setting device alarms.
-* **table_calendar:** For displaying an interactive calendar.
-* **dio / http:** For network requests (e.g., for user authentication or data backup if
-  implemented).
-* **intl:** For date/time formatting and internationalization.
-* **permission_handler:** For requesting necessary device permissions.
+* **Flutter Bloc:** For robust and predictable state management.
+* **Sqflite:** For efficient local relational database storage.
+* **Firebase Cloud Messaging (FCM):** For reliable, server-triggered notifications.
+* **GoRouter:** For declarative and flexible navigation.
+* **Table Calendar:** For displaying an interactive medication calendar.
+* **Dio:** For network requests and API interactions.
+* **Get It:** For dependency injection.
 
 ## Setup and Installation
 
@@ -61,29 +47,11 @@ background services to ensure reminders are delivered even when the app is not a
    ```
    Ensure you have a connected device or a running emulator/simulator.
 
-## Background Services
+## Notification System
 
-The application relies on two main mechanisms for background operations:
+The application utilizes Firebase Cloud Messaging (FCM) for all reminders. This approach ensures that:
+- Notifications are delivered even if the app is in the background or terminated.
+- Battery consumption is minimized by avoiding persistent local background services.
+- Reminders stay in sync across different devices if applicable.
 
-* **FlutterForegroundTask:** A foreground service is used to continuously monitor upcoming reminders
-  and update its notification, providing persistent information to the user. This is critical for
-  time-sensitive alerts.
-* **WorkManager:** Periodic background tasks are scheduled to analyze the reminder database, set
-  alarms, and queue notifications, ensuring that even if the app is killed, future reminders are
-  still processed.
-
-JBL Pill Reminder is your personal medication assistant, designed to help you manage your health with confidence and ease. Never worry about forgetting a dose again with our reliable and
-user-friendly app.
-
-Key Features:
-
- * Effortless Medication Management: Easily add and organize all your medications in one place.
- * Flexible & Custom Reminders: Set up reminders for any schedule. Whether it's multiple times a day, specific days of the week, or a custom recurring pattern, we've got you covered.
- * Smart Notifications: Receive timely alerts for your medication. Get a pre-reminder before the dose is due, and an alarm at the exact time, so you're always prepared.
- * Interactive Calendar: Visualize your medication schedule with our clear and intuitive calendar view. See your upcoming doses at a glance and stay organized.
- * Reliable Background Operation: Our app works tirelessly in the background to ensure you get your reminders on time, every time, even if the app is closed.
- * Track Your Progress: Keep a history of your taken medications to monitor your adherence and share it with your doctor.
- * Secure & Private: Your data is stored securely on your device, ensuring your medical information remains private.
-
-With JBL Pill Reminder, you can take control of your medication schedule and focus on what matters most - your health. Download now and experience the peace of mind that comes with having a
-reliable pill reminder in your pocket.
+JBL Pill Reminder is your personal medication assistant, designed to help you manage your health with confidence and ease. Never worry about forgetting a dose again with our reliable and user-friendly app.

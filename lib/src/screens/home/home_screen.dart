@@ -1,5 +1,3 @@
-import "dart:convert";
-import "dart:developer";
 
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -11,8 +9,6 @@ import "package:table_calendar/table_calendar.dart";
 
 import "package:jbl_pills_reminder_app/main.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
-import "package:jbl_pills_reminder_app/src/core/background/callback_dispacher.dart";
-import "package:jbl_pills_reminder_app/src/core/notifications/service.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/drawer/my_drawer.dart";
 import "package:jbl_pills_reminder_app/src/theme/colors.dart";
 import "package:jbl_pills_reminder_app/src/theme/const_values.dart";
@@ -52,31 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
         homeCubit.syncRemindersFromServer(mobile);
       }
 
-      String? actionDataRaw = sharedPreferences.getString("actionData");
-      int? actionDataTime = sharedPreferences.getInt("actionDataTime");
-      if (actionDataRaw != null && actionDataTime != null) {
-        if (DateTime.now().millisecondsSinceEpoch - actionDataTime < 50000) {
-          customNavigation(jsonDecode(actionDataRaw));
-        }
-      }
-      await sharedPreferences.clear();
-
-      every1Stream().listen((event) async {
-        sharedPreferences = await SharedPreferences.getInstance();
-        await sharedPreferences.reload();
-        String? actionDataRaw = sharedPreferences.getString("actionData");
-        int? actionDataTime = sharedPreferences.getInt("actionDataTime");
-        if (actionDataRaw != null && actionDataTime != null) {
-          int timeDiff = DateTime.now().millisecondsSinceEpoch - actionDataTime;
-          log(timeDiff.toString(), name: "timeDiff");
-
-          if (timeDiff.abs() < 50000) {
-            customNavigation(jsonDecode(actionDataRaw));
-            await sharedPreferences.remove("actionData");
-            await sharedPreferences.remove("actionDataTime");
-          }
-        }
-      });
     });
 
     every30Stream().listen((event) {
@@ -94,11 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Stream<int> every1Stream() {
-    return Stream<int>.periodic(const Duration(seconds: 1), (computationCount) {
-      return computationCount;
-    });
-  }
 
   Future<void> loadUserData(AuthCubit authCubit) async {
     await authCubit.getUserProfile();
@@ -167,7 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (context.mounted) {
                       await context.read<HomeCubit>().reloadLocalReminders();
                     }
-                    await analyzeDatabaseAndScheduleReminder();
                   },
                   icon: const Icon(Icons.add),
                   label: const Text(

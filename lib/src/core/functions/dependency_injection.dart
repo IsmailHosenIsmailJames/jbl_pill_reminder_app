@@ -127,7 +127,6 @@ Future<void> initDependencies() async {
       ));
 
   sl.registerLazySingleton(() => HomeCubit(
-        localDb: sl(),
         getAllUseCase: sl(),
       ));
 

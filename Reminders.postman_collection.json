@@ -61,7 +61,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"status\" : \"'PENDING' | 'SENT' | 'TAKEN' | 'STOPPED'\"\r\n}",
+          "raw": "{\r\n        \"endDate\" : \"05-15-2026\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -105,7 +105,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/api/v1/reminders",
+          "raw": "{{baseUrl}}/api/v1/reminders?status=PENDING&isNextReminders=true",
           "host": [
             "{{baseUrl}}"
           ],
@@ -113,6 +113,27 @@
             "api",
             "v1",
             "reminders"
+          ],
+          "query": [
+            {
+              "key": "date",
+              "value": "04-25-2026",
+              "disabled": true
+            },
+            {
+              "key": "time",
+              "value": "",
+              "type": "text",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "PENDING"
+            },
+            {
+              "key": "isNextReminders",
+              "value": "true"
+            }
           ]
         }
       },
