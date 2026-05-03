@@ -153,14 +153,31 @@ class _HomeScreenState extends State<HomeScreen> {
               const Gap(5),
               _buildNextReminder(context, state),
               const Gap(15),
-              Text(
-                isSameDay(state.selectedDay, DateTime.now())
-                    ? "Today's Reminder"
-                    : "Reminder on ${DateFormat.yMMMMd().format(state.selectedDay)}",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: MyAppColors.primaryColor,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isSameDay(state.selectedDay, DateTime.now())
+                        ? "Today's Reminder"
+                        : "Reminder on ${DateFormat.yMMMMd().format(state.selectedDay)}",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: MyAppColors.primaryColor,
+                        ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      final authState = context.read<AuthCubit>().state;
+                      context.pushNamed(
+                        Routes.historyRoute,
+                        extra: authState is Authenticated
+                            ? authState.user.mobile
+                            : "",
+                      );
+                    },
+                    child: const Text("See All"),
+                  ),
+                ],
               ),
               const Gap(5),
               _buildTodaysReminders(context, state),
@@ -225,8 +242,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: List.generate(
           state.listOfTodaysReminder.length,
           (index) {
-            return cardOfReminderForSummary(
-              state.listOfTodaysReminder[index],
+            final reminder = state.listOfTodaysReminder[index];
+            return cardOfReminder(
+              reminder,
               context,
               isSelectedToday: true,
               color: Colors.blue.withValues(alpha: 0.2),

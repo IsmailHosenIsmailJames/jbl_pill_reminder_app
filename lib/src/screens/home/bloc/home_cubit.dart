@@ -1,10 +1,11 @@
 import "dart:developer";
-
 import "package:flutter_bloc/flutter_bloc.dart";
-import "package:jbl_pills_reminder_app/src/core/functions/find_date_medicine.dart";
+import "package:intl/intl.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/usecases/get_all_pill_schedules_usecase.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
 import "package:jbl_pills_reminder_app/src/features/reminder/domain/usecases/reminder_usecases.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart";
+import "package:table_calendar/table_calendar.dart";
 
 class HomeCubit extends Cubit<HomeState> {
   final GetAllPillSchedulesUseCase _getAllUseCase;
@@ -17,39 +18,49 @@ class HomeCubit extends Cubit<HomeState> {
         _getAllRemindersUseCase = getAllRemindersUseCase,
         super(HomeState(selectedDay: DateTime.now()));
 
-  void updateSelectedDay(DateTime date) {
+  Future<void> updateSelectedDay(DateTime date) async {
     emit(state.copyWith(selectedDay: date));
-    _updateDailyReminders(date);
+    await _updateDailyReminders(date);
   }
 
   Future<void> reloadLocalReminders() async {
     emit(state.copyWith(isLoading: true));
     try {
       final schedules = await _getAllUseCase();
-      final nextReminders = await _getAllRemindersUseCase(
-        status: "PENDING",
-        isNextReminders: true,
-      );
-
+      
       emit(state.copyWith(
         listOfAllReminder: schedules,
-        nextReminder: nextReminders.isNotEmpty ? nextReminders.first : null,
-        isLoading: false,
       ));
-      _updateDailyReminders(state.selectedDay);
+      await _updateDailyReminders(state.selectedDay);
+      emit(state.copyWith(isLoading: false));
     } catch (e) {
       log("reloadLocalReminders error: $e");
       emit(state.copyWith(isLoading: false));
     }
   }
 
-  void _updateDailyReminders(DateTime date) {
+  Future<void> _updateDailyReminders(DateTime date) async {
     log("updateDailyReminders for $date");
-    final todaysMedication = findDateMedicine(state.listOfAllReminder, date);
+    try {
+      final dateString = DateFormat("MM-dd-yyyy").format(date);
+      final reminders = await _getAllRemindersUseCase(
+        date: dateString,
+        status: "PENDING",
+      );
 
-    emit(state.copyWith(
-      listOfTodaysReminder: todaysMedication,
-    ));
+      // Derive next reminder from today's list if it's the current day
+      ReminderEntity? nextRem = state.nextReminder;
+      if (isSameDay(date, DateTime.now())) {
+        nextRem = reminders.isNotEmpty ? reminders.first : null;
+      }
+
+      emit(state.copyWith(
+        listOfTodaysReminder: reminders,
+        nextReminder: nextRem,
+      ));
+    } catch (e) {
+      log("Error fetching daily reminders: $e");
+    }
   }
 
   Future<void> syncRemindersFromServer(String phoneNumber) async {

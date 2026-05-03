@@ -1,4 +1,5 @@
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:fluttertoast/fluttertoast.dart";
 import "../../domain/usecases/reminder_usecases.dart";
 import "reminder_state.dart";
 
@@ -52,6 +53,8 @@ class ReminderCubit extends Cubit<ReminderState> {
     emit(ReminderLoading());
     try {
       await updateReminderUseCase(id, data);
+      Fluttertoast.showToast(msg: "Successful!");
+
       emit(const ReminderOperationSuccess("Reminder updated successfully"));
       await getReminders();
     } catch (e) {

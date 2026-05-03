@@ -97,7 +97,9 @@ Card cardOfReminder(
                 decoration: BoxDecoration(
                   color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
                       ? Colors.green.withValues(alpha: 0.2)
-                      : Colors.orange.withValues(alpha: 0.2),
+                      : reminder.status == "STOPPED"
+                          ? Colors.red.withValues(alpha: 0.2)
+                          : Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -105,7 +107,9 @@ Card cardOfReminder(
                   style: TextStyle(
                     color: reminder.status == "TAKEN" || reminder.status == "COMPLETED"
                         ? Colors.green
-                        : Colors.orange,
+                        : reminder.status == "STOPPED"
+                            ? Colors.red
+                            : Colors.orange,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                   ),

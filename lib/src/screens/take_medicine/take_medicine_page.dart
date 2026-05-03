@@ -55,7 +55,6 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
   }
 
   void _handleBack() {
-    Fluttertoast.showToast(msg: "Successfully saved as taken!");
     if (context.canPop()) {
       context.pop();
     } else {
@@ -125,12 +124,23 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                         width: MediaQuery.of(context).size.width * 0.45,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.orange.shade800,
+                            side: BorderSide(color: Colors.orange.shade800),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(100)),
                           ),
-                          onPressed: _handleBack,
-                          icon: const Icon(Icons.arrow_back),
-                          label: const Text("Back"),
+                          onPressed: () async {
+                            if (widget.reminder != null) {
+                              context.read<ReminderCubit>().updateReminder(
+                                widget.reminder!.id,
+                                {"status": "STOPPED"},
+                              );
+                            } else {
+                              _handleBack();
+                            }
+                          },
+                          icon: const Icon(Icons.stop_circle_rounded),
+                          label: const Text("Stop"),
                         ),
                       ),
                       SizedBox(

@@ -15,9 +15,9 @@ class ReminderRepositoryImpl implements ReminderRepository {
 
   @override
   Future<List<ReminderEntity>> getAllReminders(
-      {String? status, bool? isNextReminders}) async {
+      {String? status, bool? isNextReminders, String? date}) async {
     return await remoteDataSource.getAllReminders(
-        status: status, isNextReminders: isNextReminders);
+        status: status, isNextReminders: isNextReminders, date: date);
   }
 
   @override

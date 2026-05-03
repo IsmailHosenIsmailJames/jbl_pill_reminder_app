@@ -14,9 +14,9 @@ class GetAllRemindersUseCase {
   final ReminderRepository repository;
   GetAllRemindersUseCase(this.repository);
 
-  Future<List<ReminderEntity>> call({String? status, bool? isNextReminders}) {
+  Future<List<ReminderEntity>> call({String? status, bool? isNextReminders, String? date}) {
     return repository.getAllReminders(
-        status: status, isNextReminders: isNextReminders);
+        status: status, isNextReminders: isNextReminders, date: date);
   }
 }
 

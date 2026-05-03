@@ -4,7 +4,7 @@ import "../models/reminder_model.dart";
 
 abstract class ReminderRemoteDataSource {
   Future<void> createReminder(Map<String, dynamic> data);
-  Future<List<ReminderModel>> getAllReminders({String? status, bool? isNextReminders});
+  Future<List<ReminderModel>> getAllReminders({String? status, bool? isNextReminders, String? date});
   Future<ReminderModel> getReminderById(int id);
   Future<void> updateReminder(int id, Map<String, dynamic> data);
   Future<void> deleteReminder(int id);
@@ -26,13 +26,14 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
 
   @override
   Future<List<ReminderModel>> getAllReminders(
-      {String? status, bool? isNextReminders}) async {
+      {String? status, bool? isNextReminders, String? date}) async {
     try {
       final response = await dio.get(
         remindersAPI,
         queryParameters: {
           if (status != null) "status": status,
           if (isNextReminders != null) "isNextReminders": isNextReminders,
+          if (date != null) "date": date,
         },
       );
       final rawData = response.data;

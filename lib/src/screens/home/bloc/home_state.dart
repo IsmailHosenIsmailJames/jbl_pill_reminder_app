@@ -6,7 +6,7 @@ class HomeState extends Equatable {
   final DateTime selectedDay;
   final bool isLoading;
   final ReminderEntity? nextReminder;
-  final List<PillScheduleEntity> listOfTodaysReminder;
+  final List<ReminderEntity> listOfTodaysReminder;
   final List<PillScheduleEntity> listOfAllReminder;
 
   const HomeState({
@@ -21,7 +21,7 @@ class HomeState extends Equatable {
     DateTime? selectedDay,
     bool? isLoading,
     ReminderEntity? nextReminder,
-    List<PillScheduleEntity>? listOfTodaysReminder,
+    List<ReminderEntity>? listOfTodaysReminder,
     List<PillScheduleEntity>? listOfAllReminder,
   }) {
     return HomeState(
