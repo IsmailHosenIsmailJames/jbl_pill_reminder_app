@@ -428,17 +428,6 @@ class _AddReminderState extends State<AddReminder> {
                     fontSize: 18)),
             const Gap(15),
             customTextFieldDecoration(
-              textFormField: DropdownButtonFormField<ReminderType>(
-                initialValue: reminderType,
-                items: ReminderType.values
-                    .map((r) => DropdownMenuItem(
-                        value: r, child: Text(r.name.toUpperCase())))
-                    .toList(),
-                onChanged: (v) => setState(() => reminderType = v!),
-              ),
-            ),
-            const Gap(15),
-            customTextFieldDecoration(
               textFormField: DropdownButtonFormField<String>(
                 value: whenToTake.isEmpty ? null : whenToTake,
                 hint: const Text("When to take?"),
