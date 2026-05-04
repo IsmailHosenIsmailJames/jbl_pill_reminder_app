@@ -9,6 +9,7 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entitie
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/presentation/bloc/pill_schedule_cubit.dart";
 import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_entity.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_enums.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
@@ -106,10 +107,9 @@ Card cardOfReminder(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: reminder.status == "TAKEN" ||
-                          reminder.status == "COMPLETED"
+                  color: reminder.status == ReminderStatus.TAKEN.name
                       ? Colors.green.withValues(alpha: 0.2)
-                      : reminder.status == "STOPPED"
+                      : reminder.status == ReminderStatus.STOPPED.name
                           ? Colors.red.withValues(alpha: 0.2)
                           : Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -117,10 +117,9 @@ Card cardOfReminder(
                 child: Text(
                   "Status: ${reminder.status}",
                   style: TextStyle(
-                    color: reminder.status == "TAKEN" ||
-                            reminder.status == "COMPLETED"
+                    color: reminder.status == ReminderStatus.TAKEN.name
                         ? Colors.green
-                        : reminder.status == "STOPPED"
+                        : reminder.status == ReminderStatus.STOPPED.name
                             ? Colors.red
                             : Colors.orange,
                     fontWeight: FontWeight.bold,

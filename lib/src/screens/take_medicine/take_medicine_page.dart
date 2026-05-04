@@ -4,6 +4,7 @@ import "package:gap/gap.dart";
 import "package:go_router/go_router.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_entity.dart";
 import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entities/pill_schedule_enums.dart";
+import "package:jbl_pills_reminder_app/src/features/reminder/domain/entities/reminder_enums.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/widgets/medication_card.dart";
 import "package:toastification/toastification.dart";
@@ -132,7 +133,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             if (widget.reminder != null) {
                               context.read<ReminderCubit>().updateReminder(
                                 widget.reminder!.id,
-                                {"status": "STOPPED"},
+                                {"status": ReminderStatus.STOPPED.name},
                               );
                             } else {
                               _handleBack();
@@ -153,7 +154,7 @@ class _TakeMedicinePageState extends State<TakeMedicinePage> {
                             if (widget.reminder != null) {
                               context.read<ReminderCubit>().updateReminder(
                                 widget.reminder!.id,
-                                {"status": "TAKEN"},
+                                {"status": ReminderStatus.TAKEN.name},
                               );
                             } else {
                               // Logic for marking as done can be added here (intake history)

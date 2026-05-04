@@ -11,6 +11,7 @@ import "package:jbl_pills_reminder_app/src/features/pill_schedule/domain/entitie
 import "package:jbl_pills_reminder_app/src/screens/auth/login/login_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/auth/signup/signup_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/history/history_page.dart";
+import "package:jbl_pills_reminder_app/src/screens/all_reminder/all_reminder_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/home_screen.dart";
 import "package:jbl_pills_reminder_app/src/screens/my_pills/my_pills_page.dart";
 import "package:jbl_pills_reminder_app/src/screens/profile_page/profile_page.dart";
@@ -111,6 +112,14 @@ class AppRouter {
         builder: (context, state) {
           final phone = state.extra as String? ?? "";
           return HistoryPage(phone: phone);
+        },
+      ),
+      GoRoute(
+        path: Routes.allReminderRoute,
+        name: Routes.allReminderRoute,
+        builder: (context, state) {
+          final phone = state.extra as String? ?? "";
+          return AllReminderPage(phone: phone);
         },
       ),
       GoRoute(

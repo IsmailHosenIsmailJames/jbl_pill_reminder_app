@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       final authState = context.read<AuthCubit>().state;
                       context.pushNamed(
-                        Routes.historyRoute,
+                        Routes.allReminderRoute,
                         extra: authState is Authenticated
                             ? authState.user.mobile
                             : "",
@@ -243,11 +243,19 @@ class _HomeScreenState extends State<HomeScreen> {
           state.listOfTodaysReminder.length,
           (index) {
             final reminder = state.listOfTodaysReminder[index];
-            return cardOfReminder(
-              reminder,
-              context,
-              isSelectedToday: true,
-              color: Colors.blue.withValues(alpha: 0.2),
+            return GestureDetector(
+              onTap: () {
+                context.pushNamed(
+                  Routes.takeMedicineRoute,
+                  extra: reminder,
+                );
+              },
+              child: cardOfReminder(
+                reminder,
+                context,
+                isSelectedToday: true,
+                color: Colors.blue.withValues(alpha: 0.2),
+              ),
             );
           },
         ),
