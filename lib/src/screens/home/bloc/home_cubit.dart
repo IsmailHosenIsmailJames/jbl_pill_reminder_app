@@ -27,7 +27,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(state.copyWith(isLoading: true));
     try {
       final schedules = await _getAllUseCase();
-      
+
       emit(state.copyWith(
         listOfAllReminder: schedules,
       ));
@@ -42,7 +42,7 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> _updateDailyReminders(DateTime date) async {
     log("updateDailyReminders for $date");
     try {
-      final dateString = DateFormat("MM-dd-yyyy").format(date);
+      final dateString = DateFormat("yyyy-MM-dd").format(date);
       final reminders = await _getAllRemindersUseCase(
         date: dateString,
         status: "PENDING",

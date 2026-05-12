@@ -76,7 +76,7 @@ class PillScheduleModel extends PillScheduleEntity {
       yearlyDates: (json["yearlyDates"] as List?)
           ?.map((e) =>
               DateTime.tryParse(e.toString()) ??
-              DateFormat("MM-dd-yyyy").parse(e.toString()))
+              DateFormat("yyyy-MM-dd").parse(e.toString()))
           .toList(),
       whenToTake: json["whenToTake"],
       takingNotes: json["takingNotes"],
@@ -92,7 +92,7 @@ class PillScheduleModel extends PillScheduleEntity {
           : ReminderType.notification,
       notes: json["notes"],
       endDate: DateTime.tryParse(json["endDate"].toString()) ??
-          DateFormat("MM-dd-yyyy").parse(json["endDate"].toString()),
+          DateFormat("yyyy-MM-dd").parse(json["endDate"].toString()),
       status: json["status"] ?? "ACTIVE",
       createdAt: json["createdAt"] != null
           ? DateTime.tryParse(json["createdAt"].toString())
