@@ -7,8 +7,12 @@ import "package:jbl_pills_reminder_app/src/features/reminder/data/models/reminde
 import "package:jbl_pills_reminder_app/src/navigation/app_router.dart";
 import "package:jbl_pills_reminder_app/src/navigation/routes.dart";
 import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.dart";
+import "package:firebase_core/firebase_core.dart";
 
 class FCMService {
+  static const String _channelId = "fcm_default_channel";
+  static const String _channelName = "FCM Notifications";
+
   static final FirebaseMessaging _firebaseMessaging =
       FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
@@ -33,6 +37,17 @@ class FCMService {
         AndroidInitializationSettings("@mipmap/launcher_icon");
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
+
+    // Create Notification Channel for Android
+    await _localNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(const AndroidNotificationChannel(
+          _channelId,
+          _channelName,
+          importance: Importance.max,
+        ));
+
     await _localNotificationsPlugin.initialize(
         settings: initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse response) {
@@ -64,7 +79,7 @@ class FCMService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       log("Got a message whilst in the foreground!", name: "FCMService");
       log(
-        "FCM Message: ${JsonEncoder.withIndent("  ").convert(message.data)}",
+        "FCM Message: ${const JsonEncoder.withIndent("  ").convert(message.data)}",
         name: "FCMService",
       );
       if (message.notification != null) {
@@ -120,10 +135,11 @@ class FCMService {
   static void _showLocalNotification(RemoteMessage message) {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
-      "fcm_default_channel",
-      "FCM Notifications",
+      _channelId,
+      _channelName,
       importance: Importance.max,
       priority: Priority.high,
+      visibility: NotificationVisibility.public,
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -142,6 +158,13 @@ class FCMService {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("Handling a background message: ${message.messageId}",
       name: "FCMService");
-  // If you're going to use other Firebase services in the background,
-  // you must call Firebase.initializeApp() first.
+  // Ensure Firebase is initialized
+  await Firebase.initializeApp();
+
+  // Show local notification even in background to ensure lock screen visibility
+  // If message already has a notification object, the OS might show it twice
+  // on some devices, but for data-only messages this is essential.
+  if (message.data.isNotEmpty) {
+    FCMService._showLocalNotification(message);
+  }
 }
