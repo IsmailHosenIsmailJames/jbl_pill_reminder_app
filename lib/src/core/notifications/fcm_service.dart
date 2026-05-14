@@ -161,10 +161,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Ensure Firebase is initialized
   await Firebase.initializeApp();
 
-  // Show local notification even in background to ensure lock screen visibility
-  // If message already has a notification object, the OS might show it twice
-  // on some devices, but for data-only messages this is essential.
-  if (message.data.isNotEmpty) {
+  // Show local notification only if the message is a data-only message.
+  // If it has a notification payload, the OS handles it automatically.
+  if (message.notification == null && message.data.isNotEmpty) {
     FCMService._showLocalNotification(message);
   }
 }
