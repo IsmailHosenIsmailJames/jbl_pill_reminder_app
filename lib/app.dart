@@ -53,6 +53,7 @@ class _AppState extends State<App> {
         ),
       ],
       child: MaterialApp.router(
+        color: MyAppColors.primaryColor,
         debugShowCheckedModeBanner: false,
         themeMode: ThemeMode.light,
         theme: ThemeData.light().copyWith(

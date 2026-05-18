@@ -3,16 +3,10 @@ flutter_launcher_icons:
   image_path: "assets/app_logo.jpeg"
 
   android: "launcher_icon"
-  # image_path_android: "assets/app_logo.jpeg"
   min_sdk_android: 21 # android min sdk min:16, default 21
-  # adaptive_icon_background: "assets/icon/background.png"
-  # adaptive_icon_foreground: "assets/icon/foreground.png"
-  # adaptive_icon_monochrome: "assets/icon/monochrome.png"
+  adaptive_icon_background: "#ffffff" # Clean white background for adaptive icons
+  adaptive_icon_foreground: "assets/app_logo.jpeg" # Transparent app logo foreground
 
-  ios: true
-  # image_path_ios: "assets/app_logo.jpeg"
+  ios: false
   remove_alpha_channel_ios: true
-  # image_path_ios_dark_transparent: "assets/icon/icon_dark.png"
-  # image_path_ios_tinted_grayscale: "assets/icon/icon_tinted.png"
-  # desaturate_tinted_to_grayscale_ios: true
 
