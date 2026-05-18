@@ -242,7 +242,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: List.generate(
           state.listOfTodaysReminder.length,
           (index) {
-            final reminder = state.listOfTodaysReminder[index];
+            final reminder =
+                state.listOfTodaysReminder.reversed.elementAt(index);
             return GestureDetector(
               onTap: () {
                 context.pushNamed(

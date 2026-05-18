@@ -43,15 +43,19 @@ class HomeCubit extends Cubit<HomeState> {
     log("updateDailyReminders for $date");
     try {
       final dateString = DateFormat("yyyy-MM-dd").format(date);
-      final reminders = await _getAllRemindersUseCase(
-        date: dateString,
-        status: "PENDING",
-      );
 
-      // Derive next reminder from today's list if it's the current day
-      ReminderEntity? nextRem = state.nextReminder;
-      if (isSameDay(date, DateTime.now())) {
-        nextRem = reminders.isNotEmpty ? reminders.first : null;
+      // Fetch daily reminders and next reminder in parallel
+      final results = await Future.wait([
+        _getAllRemindersUseCase(date: dateString),
+        if (isSameDay(date, DateTime.now()))
+          _getAllRemindersUseCase(isNextReminders: true),
+      ]);
+
+      final reminders = results[0];
+      ReminderEntity? nextRem;
+      if (isSameDay(date, DateTime.now()) && results.length > 1) {
+        final nextList = results[1];
+        nextRem = nextList.isNotEmpty ? nextList.first : null;
       }
 
       emit(state.copyWith(

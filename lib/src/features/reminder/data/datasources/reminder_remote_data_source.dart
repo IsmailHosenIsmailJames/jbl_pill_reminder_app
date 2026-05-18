@@ -1,10 +1,13 @@
+import "dart:developer";
+
 import "package:dio/dio.dart";
 import "../../../../api/apis.dart";
 import "../models/reminder_model.dart";
 
 abstract class ReminderRemoteDataSource {
   Future<void> createReminder(Map<String, dynamic> data);
-  Future<List<ReminderModel>> getAllReminders({String? status, bool? isNextReminders, String? date});
+  Future<List<ReminderModel>> getAllReminders(
+      {String? status, bool? isNextReminders, String? date});
   Future<ReminderModel> getReminderById(int id);
   Future<void> updateReminder(int id, Map<String, dynamic> data);
   Future<void> deleteReminder(int id);
@@ -28,13 +31,17 @@ class ReminderRemoteDataSourceImpl implements ReminderRemoteDataSource {
   Future<List<ReminderModel>> getAllReminders(
       {String? status, bool? isNextReminders, String? date}) async {
     try {
+      final queryParams = <String, dynamic>{};
+      if (isNextReminders == true) {
+        queryParams["isNextReminders"] = true;
+      } else {
+        if (status != null) queryParams["status"] = status;
+        if (date != null) queryParams["date"] = date;
+      }
+      log("getAllReminders queryParams: $queryParams");
       final response = await dio.get(
         remindersAPI,
-        queryParameters: {
-          if (status != null) "status": status,
-          if (isNextReminders != null) "isNextReminders": isNextReminders,
-          if (date != null) "date": date,
-        },
+        queryParameters: queryParams,
       );
       final rawData = response.data;
 

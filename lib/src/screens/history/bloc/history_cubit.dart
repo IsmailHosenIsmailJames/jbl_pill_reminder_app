@@ -10,12 +10,13 @@ class HistoryCubit extends Cubit<HistoryState> {
   Future<void> fetchHistory() async {
     emit(HistoryLoading());
     try {
-      final allHistory = await getAllRemindersUseCase();
-      final history = allHistory.where((reminder) {
-        return reminder.status == "SENT" ||
-            reminder.status == "TAKEN" ||
-            reminder.status == "STOPPED";
-      }).toList();
+      // Fetch completed/history statuses in parallel
+      final results = await Future.wait([
+        getAllRemindersUseCase(status: "SENT"),
+        getAllRemindersUseCase(status: "TAKEN"),
+        getAllRemindersUseCase(status: "STOPPED"),
+      ]);
+      final history = [...results[0], ...results[1], ...results[2]];
       // Sort history by date descending
       history.sort((a, b) => b.date.compareTo(a.date));
       emit(HistoryLoaded(history));
