@@ -10,7 +10,7 @@ import "package:jbl_pills_reminder_app/src/core/functions/dependency_injection.d
 import "package:firebase_core/firebase_core.dart";
 
 class FCMService {
-  static const String _channelId = "fcm_default_channel";
+  static const String _channelId = "fcm_custom_sound_channel";
   static const String _channelName = "FCM Notifications";
 
   static final FirebaseMessaging _firebaseMessaging =
@@ -46,6 +46,8 @@ class FCMService {
           _channelId,
           _channelName,
           importance: Importance.max,
+          sound: RawResourceAndroidNotificationSound("shaking_pill_bottle"),
+          playSound: true,
         ));
 
     await _localNotificationsPlugin.initialize(
@@ -140,6 +142,8 @@ class FCMService {
       importance: Importance.max,
       priority: Priority.high,
       visibility: NotificationVisibility.public,
+      sound: RawResourceAndroidNotificationSound("shaking_pill_bottle"),
+      playSound: true,
     );
     const NotificationDetails platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
