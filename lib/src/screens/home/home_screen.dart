@@ -16,6 +16,7 @@ import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_
 import "package:jbl_pills_reminder_app/src/features/auth/presentation/bloc/auth_state.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_cubit.dart";
 import "package:jbl_pills_reminder_app/src/screens/home/bloc/home_state.dart";
+import "package:jbl_pills_reminder_app/src/screens/add_reminder/bloc/add_reminder_cubit.dart";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -126,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   onPressed: () async {
+                    context.read<AddReminderCubit>().resetReminder();
                     await context.pushNamed(Routes.addReminderRoute);
                     if (context.mounted) {
                       await context.read<HomeCubit>().reloadLocalReminders();
@@ -182,12 +184,29 @@ class _HomeScreenState extends State<HomeScreen> {
               const Gap(5),
               _buildTodaysReminders(context, state),
               const Gap(15),
-              Text(
-                "All Schedules",
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: MyAppColors.primaryColor,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Active Schedules",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: MyAppColors.primaryColor,
+                        ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      final authState = context.read<AuthCubit>().state;
+                      context.pushNamed(
+                        Routes.allSchedulesRoute,
+                        extra: authState is Authenticated
+                            ? authState.user.mobile
+                            : "",
+                      );
+                    },
+                    child: const Text("See All"),
+                  ),
+                ],
               ),
               const Gap(5),
               _buildAllReminders(context, state),
@@ -295,18 +314,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAllReminders(BuildContext context, HomeState state) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final schedules = state.listOfAllReminder.where((s) => !s.endDate.isBefore(today)).toList();
+
     return Column(
       children: List<Widget>.generate(
-            state.listOfAllReminder.length,
+            schedules.length,
             (index) {
               return cardOfReminderForSummary(
-                  state.listOfAllReminder[index], context,
+                  schedules[index], context,
                   isEditable: true,
                   color: Colors.orange.withValues(alpha: 0.1));
             },
           ) +
           <Widget>[
-            if (state.listOfAllReminder.isEmpty)
+            if (schedules.isEmpty)
               Card(
                 elevation: 0,
                 margin: const EdgeInsets.only(top: 5),
@@ -330,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const Gap(15),
                       const Text(
-                        "No reminders found",
+                        "No active schedules found",
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

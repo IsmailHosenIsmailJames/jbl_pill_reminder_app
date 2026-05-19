@@ -9,6 +9,7 @@ class Routes {
   static const String myPillsRoute = "/my-pills";
   static const String historyRoute = "/history";
   static const String allReminderRoute = "/all-reminder";
+  static const String allSchedulesRoute = "/all-schedules";
   static const String forgotPasswordRoute = "/forgot-password";
   static const String verifyOtpRoute = "/verify-otp";
   static const String resetPasswordRoute = "/reset-password";

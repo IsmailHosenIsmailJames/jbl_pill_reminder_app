@@ -94,6 +94,19 @@ class MyDrawer extends StatelessWidget {
           ),
           ListTile(
             minTileHeight: 40,
+            leading: const Icon(FluentIcons.calendar_clock_24_regular),
+            title: const Text("All Schedules"),
+            onTap: () {
+              context.pop();
+              final authState = context.read<AuthCubit>().state;
+              context.pushNamed(
+                Routes.allSchedulesRoute,
+                extra: authState is Authenticated ? authState.user.mobile : "",
+              );
+            },
+          ),
+          ListTile(
+            minTileHeight: 40,
             leading: const Icon(FluentIcons.sign_out_24_regular),
             title: const Text("Sign Out"),
             onTap: () {

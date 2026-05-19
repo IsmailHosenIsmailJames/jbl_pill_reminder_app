@@ -123,6 +123,7 @@ class _AddReminderState extends State<AddReminder> {
             type: ToastificationType.success,
             autoCloseDuration: const Duration(seconds: 2),
           );
+          context.read<AddReminderCubit>().resetReminder();
           context.read<HomeCubit>().reloadLocalReminders();
           context.pop();
         } else if (state is PillScheduleError) {
