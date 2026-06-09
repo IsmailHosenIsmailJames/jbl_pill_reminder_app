@@ -123,7 +123,10 @@ class FCMService {
 
   static Future<void> getTokenAndRegister() async {
     try {
-      String? token = await _firebaseMessaging.getToken();
+      String? token = await _firebaseMessaging.getToken(
+        vapidKey:
+            "BOBhuyPJDiO4SGFchX2KXHyLdVuJbf_M5oY-SMJ5S1UTI7WtNl9J-ub2dkjdMKigsy3nXEn-wGN0WuVbDz4Kdks",
+      );
       if (token != null) {
         log("FCM Token: $token", name: "FCMService");
         // Register token with backend
